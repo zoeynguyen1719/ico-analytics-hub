@@ -13,34 +13,66 @@ const menuItems = [
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-crypto-dark text-white">
-        <Sidebar className="border-r border-crypto-gray">
-          <SidebarContent>
-            <div className="p-6 border-b border-crypto-gray">
+      <div className="min-h-screen flex flex-col w-full bg-crypto-dark text-white">
+        {/* Top Navigation Bar */}
+        <header className="w-full bg-crypto-dark border-b border-crypto-gray">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between h-20">
+              {/* Logo Section */}
               <div className="flex items-center gap-3">
-                <Coins className="w-8 h-8 text-crypto-green" />
+                <Coins className="w-10 h-10 text-crypto-green" />
                 <div>
-                  <h1 className="text-xl font-bold text-crypto-green">CryptoICO</h1>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-crypto-blue to-crypto-green bg-clip-text text-transparent">
+                    CryptoICO
+                  </h1>
                   <p className="text-xs text-gray-400">Analytics Dashboard</p>
                 </div>
               </div>
+
+              {/* Navigation Menu */}
+              <nav className="hidden md:flex items-center space-x-8">
+                {menuItems.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.path}
+                    className="flex items-center gap-2 text-gray-300 hover:text-crypto-green transition-colors group py-2"
+                  >
+                    <item.icon size={18} className="group-hover:text-crypto-green transition-colors" />
+                    <span className="font-medium">{item.label}</span>
+                  </a>
+                ))}
+              </nav>
+
+              {/* Mobile Menu Trigger */}
+              <div className="md:hidden">
+                <SidebarTrigger />
+              </div>
             </div>
-            <nav className="mt-6">
-              {menuItems.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.path}
-                  className="flex items-center gap-3 px-6 py-4 text-gray-300 hover:bg-crypto-gray hover:text-crypto-green transition-colors group"
-                >
-                  <item.icon size={20} className="group-hover:text-crypto-green transition-colors" />
-                  <span>{item.label}</span>
-                </a>
-              ))}
-            </nav>
-          </SidebarContent>
-        </Sidebar>
+          </div>
+        </header>
+
+        {/* Mobile Sidebar */}
+        <div className="md:hidden">
+          <Sidebar className="border-r border-crypto-gray">
+            <SidebarContent>
+              <nav className="mt-6">
+                {menuItems.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.path}
+                    className="flex items-center gap-3 px-6 py-4 text-gray-300 hover:bg-crypto-gray hover:text-crypto-green transition-colors group"
+                  >
+                    <item.icon size={20} className="group-hover:text-crypto-green transition-colors" />
+                    <span>{item.label}</span>
+                  </a>
+                ))}
+              </nav>
+            </SidebarContent>
+          </Sidebar>
+        </div>
+
+        {/* Main Content */}
         <main className="flex-1 p-8">
-          <SidebarTrigger />
           {children}
         </main>
       </div>
