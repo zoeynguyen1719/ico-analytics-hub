@@ -2,114 +2,53 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { ProjectSection } from "@/components/projects/ProjectSection";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useState } from "react";
-
-// Mock data structure for ICO projects
-const projects = {
-  active: [
-    {
-      name: "Zephyr",
-      symbol: "ZEFY",
-      category: "DeFi",
-      type: "Public Sale",
-      endDate: "Q1, 2025",
-      value: "$561K",
-      logo: "/placeholder.svg",
-      isHighlighted: true,
-      isAd: true
-    },
-    {
-      name: "Beam",
-      symbol: "BEAM",
-      category: "Gaming",
-      type: "Node Sale Round",
-      endDate: "Q1, 2025",
-      value: "$76.65M",
-      logo: "/placeholder.svg",
-      isHighlighted: true,
-      participants: 8
-    },
-    {
-      name: "Gradient Network",
-      symbol: "",
-      category: "Infrastructure",
-      type: "Airdrop",
-      startDate: "Sep 12, 2024",
-      logo: "/placeholder.svg",
-      isHighlighted: true
-    }
-  ],
-  upcoming: [
-    {
-      name: "Qorbi World",
-      symbol: "QORBI",
-      category: "GameFi",
-      type: "IDO",
-      platform: "Kommunitas",
-      timeLeft: "10h",
-      logo: "/placeholder.svg",
-      isNew: true
-    },
-    {
-      name: "AZCoiner",
-      symbol: "AZC",
-      category: "Blockchain Service",
-      type: "IDO",
-      platform: "Kommunitas",
-      timeLeft: "34h",
-      logo: "/placeholder.svg",
-      isNew: true
-    },
-    {
-      name: "Sentient AI",
-      symbol: "SETAI",
-      category: "Artificial Intelligence (AI)",
-      type: "IDO",
-      platform: "Polkastarter",
-      date: "Dec 27, 2024",
-      logo: "/placeholder.svg",
-      isNew: true
-    }
-  ],
-  ended: [
-    {
-      name: "CratD2C",
-      symbol: "CRATD2C",
-      category: "Blockchain",
-      type: "IEO",
-      date: "Dec 21, 2024",
-      value: "$1.21M",
-      logo: "/placeholder.svg"
-    },
-    {
-      name: "Nexade",
-      symbol: "NEXD",
-      category: "RWA (Real World Assets)",
-      type: "SHO",
-      platform: "DAO Maker",
-      date: "Dec 20, 2024",
-      logo: "/placeholder.svg"
-    },
-    {
-      name: "Swing",
-      symbol: "SWING",
-      category: "DeFi",
-      type: "Public Sale",
-      date: "Dec 20, 2024",
-      value: "$9.75M",
-      participants: 7,
-      logo: "/placeholder.svg"
-    }
-  ]
-};
+import { useICOProjects } from "@/services/icoService";
+import { Card } from "@/components/ui/card";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState<"ACTIVE" | "UPCOMING" | "ENDED">("ACTIVE");
+  const { data: icoProjects, isLoading, error } = useICOProjects();
+
+  // Categorize projects based on certain criteria
+  const categorizedProjects = {
+    active: icoProjects?.filter(p => p.isHighlighted) || [],
+    upcoming: icoProjects?.filter(p => p.isNew && !p.isHighlighted) || [],
+    ended: icoProjects?.filter(p => !p.isNew && !p.isHighlighted) || []
+  };
 
   const sections = {
-    ACTIVE: { title: "ACTIVE", count: 228, projects: projects.active },
-    UPCOMING: { title: "UPCOMING", count: 664, projects: projects.upcoming },
-    ENDED: { title: "ENDED", count: 1847, projects: projects.ended }
+    ACTIVE: { title: "ACTIVE", count: categorizedProjects.active.length, projects: categorizedProjects.active },
+    UPCOMING: { title: "UPCOMING", count: categorizedProjects.upcoming.length, projects: categorizedProjects.upcoming },
+    ENDED: { title: "ENDED", count: categorizedProjects.ended.length, projects: categorizedProjects.ended }
   };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <Card className="p-6">
+          <div className="animate-pulse flex space-x-4">
+            <div className="flex-1 space-y-4 py-1">
+              <div className="h-4 bg-gray-600 rounded w-3/4"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-600 rounded"></div>
+                <div className="h-4 bg-gray-600 rounded w-5/6"></div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <Card className="p-6 text-red-500">
+          Error loading ICO projects. Please try again later.
+        </Card>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
