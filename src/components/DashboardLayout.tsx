@@ -1,5 +1,5 @@
 import { SidebarProvider, Sidebar, SidebarContent, SidebarTrigger } from "@/components/ui/sidebar";
-import { Home, PieChart, Calculator, BarChart2, Newspaper, Crown, Coins } from "lucide-react";
+import { Home, PieChart, Calculator, BarChart2, Newspaper, Crown } from "lucide-react";
 
 const menuItems = [
   { icon: Home, label: "Overview", path: "/" },
@@ -20,12 +20,18 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             <div className="flex items-center justify-between h-20">
               {/* Logo Section */}
               <div className="flex items-center gap-3">
-                <Coins className="w-10 h-10 text-crypto-green" />
+                <img 
+                  src="/lovable-uploads/mericulum-logo.png" 
+                  alt="CryptoICO Logo" 
+                  className="h-12 w-auto"
+                />
                 <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-crypto-blue to-crypto-green bg-clip-text text-transparent">
-                    CryptoICO
+                  <h1 className="text-2xl font-bold text-[#40C4FF] tracking-wider">
+                    CRYPTOICO
                   </h1>
-                  <p className="text-xs text-gray-400">Analytics Dashboard</p>
+                  <p className="text-xs uppercase tracking-wider text-gray-400">
+                    Consciousness
+                  </p>
                 </div>
               </div>
 
@@ -35,10 +41,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   <a
                     key={item.label}
                     href={item.path}
-                    className="flex items-center gap-2 text-gray-300 hover:text-crypto-green transition-colors group py-2"
+                    className="flex items-center gap-2 text-gray-300 hover:text-[#40C4FF] transition-colors group py-2"
                   >
-                    <item.icon size={18} className="group-hover:text-crypto-green transition-colors" />
-                    <span className="font-medium">{item.label}</span>
+                    <item.icon size={18} className="group-hover:text-[#40C4FF] transition-colors" />
+                    <span className="font-medium uppercase tracking-wider text-sm">{item.label}</span>
                   </a>
                 ))}
               </nav>
@@ -60,10 +66,10 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   <a
                     key={item.label}
                     href={item.path}
-                    className="flex items-center gap-3 px-6 py-4 text-gray-300 hover:bg-crypto-gray hover:text-crypto-green transition-colors group"
+                    className="flex items-center gap-3 px-6 py-4 text-gray-300 hover:bg-crypto-gray hover:text-[#40C4FF] transition-colors group"
                   >
-                    <item.icon size={20} className="group-hover:text-crypto-green transition-colors" />
-                    <span>{item.label}</span>
+                    <item.icon size={20} className="group-hover:text-[#40C4FF] transition-colors" />
+                    <span className="uppercase tracking-wider">{item.label}</span>
                   </a>
                 ))}
               </nav>
