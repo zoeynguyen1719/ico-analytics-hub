@@ -12,8 +12,8 @@ export const ProjectSection = ({ title, count, projects }: ProjectSectionProps) 
     <Card className="p-6 bg-crypto-gray border-crypto-blue">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold">{title}</h2>
-          <span className="text-sm text-gray-400">{count}</span>
+          <h2 className="text-lg font-bold text-white">{title}</h2>
+          <span className="text-sm text-gray-300">{count}</span>
         </div>
       </div>
       <div className="space-y-4">
