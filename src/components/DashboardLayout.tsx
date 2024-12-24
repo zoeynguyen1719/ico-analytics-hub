@@ -21,13 +21,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               {/* Logo Section */}
               <div className="flex items-center gap-3">
                 <img 
-                  src="/lovable-uploads/mericulum-logo.png" 
-                  alt="CryptoICO Logo" 
+                  src="/lovable-uploads/6f9834b1-7b5b-4075-919b-0d2b2c7ad02d.png" 
+                  alt="Mericulum Logo" 
                   className="h-12 w-auto"
                 />
                 <div>
                   <h1 className="text-2xl font-bold text-[#40C4FF] tracking-wider">
-                    CRYPTOICO
+                    MERICULUM
                   </h1>
                   <p className="text-xs uppercase tracking-wider text-gray-400">
                     Consciousness
