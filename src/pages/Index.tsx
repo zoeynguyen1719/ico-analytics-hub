@@ -1,5 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { ProjectSection } from "@/components/projects/ProjectSection";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useState } from "react";
 
 // Mock data structure for ICO projects
 const projects = {
@@ -101,24 +103,41 @@ const projects = {
 };
 
 const Index = () => {
+  const [activeSection, setActiveSection] = useState<"ACTIVE" | "UPCOMING" | "ENDED">("ACTIVE");
+
+  const sections = {
+    ACTIVE: { title: "ACTIVE", count: 228, projects: projects.active },
+    UPCOMING: { title: "UPCOMING", count: 664, projects: projects.upcoming },
+    ENDED: { title: "ENDED", count: 1847, projects: projects.ended }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <ToggleGroup
+          type="single"
+          value={activeSection}
+          onValueChange={(value) => {
+            if (value) setActiveSection(value as "ACTIVE" | "UPCOMING" | "ENDED");
+          }}
+          className="justify-start"
+        >
+          <ToggleGroupItem value="ACTIVE" aria-label="Show active projects">
+            Active
+          </ToggleGroupItem>
+          <ToggleGroupItem value="UPCOMING" aria-label="Show upcoming projects">
+            Upcoming
+          </ToggleGroupItem>
+          <ToggleGroupItem value="ENDED" aria-label="Show ended projects">
+            Ended
+          </ToggleGroupItem>
+        </ToggleGroup>
+
+        <div className="grid grid-cols-1">
           <ProjectSection 
-            title="ACTIVE" 
-            count={228} 
-            projects={projects.active} 
-          />
-          <ProjectSection 
-            title="UPCOMING" 
-            count={664} 
-            projects={projects.upcoming} 
-          />
-          <ProjectSection 
-            title="ENDED" 
-            count={1847} 
-            projects={projects.ended} 
+            title={sections[activeSection].title}
+            count={sections[activeSection].count}
+            projects={sections[activeSection].projects}
           />
         </div>
       </div>
