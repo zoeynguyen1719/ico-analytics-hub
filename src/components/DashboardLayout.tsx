@@ -22,7 +22,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               {/* Logo Section */}
               <div className="flex items-center">
                 <img 
-                  src="/lovable-uploads/e9b77ead-4371-450c-9bd5-3c816f6fe9dd.png" 
+                  src="/lovable-uploads/fc6224c9-4be9-4d1a-b5ad-3da64a81c6e0.png" 
                   alt="Mericulum Logo" 
                   className="h-12 w-auto"
                 />

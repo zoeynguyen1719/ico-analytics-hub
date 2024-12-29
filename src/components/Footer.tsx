@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <img 
-              src="/lovable-uploads/e9b77ead-4371-450c-9bd5-3c816f6fe9dd.png" 
+              src="/lovable-uploads/fc6224c9-4be9-4d1a-b5ad-3da64a81c6e0.png" 
               alt="Mericulum Logo" 
               className="h-8 w-auto"
             />
