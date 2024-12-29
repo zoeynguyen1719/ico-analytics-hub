@@ -63,7 +63,7 @@ const News = () => {
       {news.map((item) => (
         <Card 
           key={item.id} 
-          className={`p-6 bg-crypto-gray border-2 ${
+          className={`p-6 bg-crypto-dark border-2 ${
             sentiment === 'positive' 
               ? 'border-green-500/20 hover:border-green-500/40' 
               : 'border-red-500/20 hover:border-red-500/40'
@@ -84,7 +84,7 @@ const News = () => {
                 <h3 className="text-xl font-semibold text-white mb-2">
                   {item.title}
                 </h3>
-                <p className="text-gray-400 line-clamp-3">{item.body}</p>
+                <p className="text-gray-300 line-clamp-3">{item.body}</p>
               </div>
               <div className="flex items-center justify-between text-sm text-gray-400">
                 <span>Source: {item.source}</span>
@@ -116,16 +116,16 @@ const News = () => {
       <div className="space-y-8">
         <h1 className="text-2xl font-bold text-white">Latest Crypto News</h1>
         <Tabs defaultValue="positive" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsList className="grid w-full grid-cols-2 mb-8 bg-crypto-dark">
             <TabsTrigger 
               value="positive"
-              className="data-[state=active]:bg-green-500/20 data-[state=active]:text-green-400"
+              className="data-[state=active]:bg-green-500/20 data-[state=active]:text-green-400 text-gray-300"
             >
               Positive News ({positive.length})
             </TabsTrigger>
             <TabsTrigger 
               value="negative"
-              className="data-[state=active]:bg-red-500/20 data-[state=active]:text-red-400"
+              className="data-[state=active]:bg-red-500/20 data-[state=active]:text-red-400 text-gray-300"
             >
               Negative News ({negative.length})
             </TabsTrigger>
