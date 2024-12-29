@@ -1,4 +1,5 @@
 import { Github, Twitter, Linkedin } from "lucide-react";
+import TermsAndConditionsDialog from "./TermsAndConditionsDialog";
 
 const Footer = () => {
   return (
@@ -22,7 +23,7 @@ const Footer = () => {
               <li><a href="/" className="hover:text-crypto-blue transition-colors">Home</a></li>
               <li><a href="/portfolio" className="hover:text-crypto-blue transition-colors">Portfolio</a></li>
               <li><a href="/calculator" className="hover:text-crypto-blue transition-colors">Calculator</a></li>
-              <li><a href="/terms" className="hover:text-crypto-blue transition-colors">Terms & Conditions</a></li>
+              <li><TermsAndConditionsDialog /></li>
             </ul>
           </div>
           
