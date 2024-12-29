@@ -55,7 +55,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   className="text-gray-300 hover:text-crypto-blue p-2 transition-colors"
                   aria-label="Toggle tools"
                 >
-                  {showTools ? "Hide Tools" : "Show Tools"}
+                  Tools
                 </button>
                 {showTools && (
                   <div className="flex items-center gap-4 ml-4">
