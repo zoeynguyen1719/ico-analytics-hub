@@ -4,9 +4,10 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useState } from "react";
 import { useICOProjects } from "@/services/icoService";
 import { Card } from "@/components/ui/card";
+import OverviewStats from "@/components/overview/OverviewStats";
 
 const Index = () => {
-  const [activeSection, setActiveSection] = useState<"ACTIVE" | "UPCOMING" | "ENDED">("ACTIVE");
+  const [activeSection, setActiveSection] = useState<"OVERVIEW" | "ACTIVE" | "UPCOMING" | "ENDED">("OVERVIEW");
   const { data: icoProjects, isLoading, error } = useICOProjects();
 
   // Categorize projects based on certain criteria
@@ -57,10 +58,13 @@ const Index = () => {
           type="single"
           value={activeSection}
           onValueChange={(value) => {
-            if (value) setActiveSection(value as "ACTIVE" | "UPCOMING" | "ENDED");
+            if (value) setActiveSection(value as "OVERVIEW" | "ACTIVE" | "UPCOMING" | "ENDED");
           }}
           className="justify-start"
         >
+          <ToggleGroupItem value="OVERVIEW" aria-label="Show overview">
+            Overview
+          </ToggleGroupItem>
           <ToggleGroupItem value="ACTIVE" aria-label="Show active projects">
             Active
           </ToggleGroupItem>
@@ -73,11 +77,15 @@ const Index = () => {
         </ToggleGroup>
 
         <div className="grid grid-cols-1">
-          <ProjectSection 
-            title={sections[activeSection].title}
-            count={sections[activeSection].count}
-            projects={sections[activeSection].projects}
-          />
+          {activeSection === "OVERVIEW" ? (
+            <OverviewStats />
+          ) : (
+            <ProjectSection 
+              title={sections[activeSection].title}
+              count={sections[activeSection].count}
+              projects={sections[activeSection].projects}
+            />
+          )}
         </div>
       </div>
     </DashboardLayout>
