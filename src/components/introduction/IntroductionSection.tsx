@@ -18,24 +18,26 @@ const IntroductionSection = () => {
       <div className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-crypto-blue to-crypto-green bg-clip-text text-transparent">
               Welcome to Mericulum
             </h1>
             <p className="text-xl text-gray-300">
               Your comprehensive platform for ICO analytics and portfolio management
             </p>
             <div className="flex gap-4">
-              <Button className="bg-primary hover:bg-primary/90">
+              <Button className="bg-crypto-blue hover:bg-crypto-blue/90 text-crypto-dark">
                 Get Started <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <Button variant="outline">Learn More</Button>
+              <Button variant="outline" className="border-crypto-blue text-crypto-blue hover:bg-crypto-blue/10">
+                Learn More
+              </Button>
             </div>
           </div>
           <div className="relative">
             <img
-              src="/lovable-uploads/mericulum-logo.png"
-              alt="Mericulum Dashboard"
-              className="rounded-lg shadow-2xl"
+              src="/lovable-uploads/e9b77ead-4371-450c-9bd5-3c816f6fe9dd.png"
+              alt="Mericulum Logo"
+              className="w-full max-w-md mx-auto"
             />
           </div>
         </div>
@@ -44,14 +46,14 @@ const IntroductionSection = () => {
       {/* Features Section */}
       <div className="bg-crypto-gray py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">
+          <h2 className="text-3xl font-bold text-center mb-12 text-crypto-blue">
             Why Choose Mericulum?
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="p-6 bg-crypto-dark border-crypto-gray">
+              <Card key={index} className="p-6 bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-colors">
                 <div className="flex items-start gap-4">
-                  <CheckCircle2 className="h-6 w-6 text-secondary flex-shrink-0" />
+                  <CheckCircle2 className="h-6 w-6 text-crypto-green flex-shrink-0" />
                   <p className="text-lg">{feature}</p>
                 </div>
               </Card>
@@ -63,12 +65,12 @@ const IntroductionSection = () => {
       {/* CTA Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center space-y-6">
-          <h2 className="text-3xl font-bold">Ready to Start Your Journey?</h2>
+          <h2 className="text-3xl font-bold text-crypto-blue">Ready to Start Your Journey?</h2>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Join thousands of investors who trust Mericulum for their ICO analytics
             and portfolio management needs.
           </p>
-          <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-black">
+          <Button size="lg" className="bg-crypto-green hover:bg-crypto-green/90 text-crypto-dark">
             Start Exploring Now
           </Button>
         </div>

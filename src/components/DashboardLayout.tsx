@@ -22,7 +22,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               {/* Logo Section */}
               <div className="flex items-center">
                 <img 
-                  src="/lovable-uploads/mericulum-logo.png" 
+                  src="/lovable-uploads/e9b77ead-4371-450c-9bd5-3c816f6fe9dd.png" 
                   alt="Mericulum Logo" 
                   className="h-12 w-auto"
                 />
@@ -34,9 +34,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   <a
                     key={item.label}
                     href={item.path}
-                    className="flex items-center gap-2 text-gray-300 hover:text-primary transition-colors group py-2"
+                    className="flex items-center gap-2 text-gray-300 hover:text-crypto-blue transition-colors group py-2"
                   >
-                    <item.icon size={18} className="group-hover:text-primary transition-colors" />
+                    <item.icon size={18} className="group-hover:text-crypto-blue transition-colors" />
                     <span className="font-medium uppercase tracking-wider text-sm">{item.label}</span>
                   </a>
                 ))}
@@ -59,9 +59,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   <a
                     key={item.label}
                     href={item.path}
-                    className="flex items-center gap-3 px-6 py-4 text-gray-300 hover:bg-crypto-gray hover:text-primary transition-colors group"
+                    className="flex items-center gap-3 px-6 py-4 text-gray-300 hover:bg-crypto-gray hover:text-crypto-blue transition-colors group"
                   >
-                    <item.icon size={20} className="group-hover:text-primary transition-colors" />
+                    <item.icon size={20} className="group-hover:text-crypto-blue transition-colors" />
                     <span className="uppercase tracking-wider">{item.label}</span>
                   </a>
                 ))}

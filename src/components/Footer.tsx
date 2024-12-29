@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <img 
-              src="/lovable-uploads/mericulum-logo.png" 
+              src="/lovable-uploads/e9b77ead-4371-450c-9bd5-3c816f6fe9dd.png" 
               alt="Mericulum Logo" 
               className="h-8 w-auto"
             />
@@ -17,33 +17,33 @@ const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-white font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-crypto-blue font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-gray-400">
-              <li><a href="/" className="hover:text-primary transition-colors">Home</a></li>
-              <li><a href="/portfolio" className="hover:text-primary transition-colors">Portfolio</a></li>
-              <li><a href="/calculator" className="hover:text-primary transition-colors">Calculator</a></li>
+              <li><a href="/" className="hover:text-crypto-blue transition-colors">Home</a></li>
+              <li><a href="/portfolio" className="hover:text-crypto-blue transition-colors">Portfolio</a></li>
+              <li><a href="/calculator" className="hover:text-crypto-blue transition-colors">Calculator</a></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-white font-semibold mb-4">Resources</h3>
+            <h3 className="text-crypto-blue font-semibold mb-4">Resources</h3>
             <ul className="space-y-2 text-gray-400">
-              <li><a href="/news" className="hover:text-primary transition-colors">News</a></li>
-              <li><a href="/compare" className="hover:text-primary transition-colors">Compare</a></li>
-              <li><a href="/subscription" className="hover:text-primary transition-colors">Subscription</a></li>
+              <li><a href="/news" className="hover:text-crypto-blue transition-colors">News</a></li>
+              <li><a href="/compare" className="hover:text-crypto-blue transition-colors">Compare</a></li>
+              <li><a href="/subscription" className="hover:text-crypto-blue transition-colors">Subscription</a></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-white font-semibold mb-4">Connect With Us</h3>
+            <h3 className="text-crypto-blue font-semibold mb-4">Connect With Us</h3>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+              <a href="#" className="text-gray-400 hover:text-crypto-blue transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+              <a href="#" className="text-gray-400 hover:text-crypto-blue transition-colors">
                 <Github className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+              <a href="#" className="text-gray-400 hover:text-crypto-blue transition-colors">
                 <Linkedin className="h-5 w-5" />
               </a>
             </div>
