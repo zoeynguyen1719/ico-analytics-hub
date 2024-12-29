@@ -1,5 +1,6 @@
 import { SidebarProvider, Sidebar, SidebarContent, SidebarTrigger } from "@/components/ui/sidebar";
 import { Home, PieChart, Calculator, BarChart2, Newspaper, Crown } from "lucide-react";
+import Footer from "./Footer";
 
 const menuItems = [
   { icon: Home, label: "Overview", path: "/" },
@@ -21,7 +22,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               {/* Logo Section */}
               <div className="flex items-center">
                 <img 
-                  src="/lovable-uploads/6f9834b1-7b5b-4075-919b-0d2b2c7ad02d.png" 
+                  src="/lovable-uploads/mericulum-logo.png" 
                   alt="Mericulum Logo" 
                   className="h-12 w-auto"
                 />
@@ -33,9 +34,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   <a
                     key={item.label}
                     href={item.path}
-                    className="flex items-center gap-2 text-gray-300 hover:text-[#40C4FF] transition-colors group py-2"
+                    className="flex items-center gap-2 text-gray-300 hover:text-primary transition-colors group py-2"
                   >
-                    <item.icon size={18} className="group-hover:text-[#40C4FF] transition-colors" />
+                    <item.icon size={18} className="group-hover:text-primary transition-colors" />
                     <span className="font-medium uppercase tracking-wider text-sm">{item.label}</span>
                   </a>
                 ))}
@@ -58,9 +59,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   <a
                     key={item.label}
                     href={item.path}
-                    className="flex items-center gap-3 px-6 py-4 text-gray-300 hover:bg-crypto-gray hover:text-[#40C4FF] transition-colors group"
+                    className="flex items-center gap-3 px-6 py-4 text-gray-300 hover:bg-crypto-gray hover:text-primary transition-colors group"
                   >
-                    <item.icon size={20} className="group-hover:text-[#40C4FF] transition-colors" />
+                    <item.icon size={20} className="group-hover:text-primary transition-colors" />
                     <span className="uppercase tracking-wider">{item.label}</span>
                   </a>
                 ))}
@@ -73,6 +74,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         <main className="flex-1 p-8">
           {children}
         </main>
+
+        {/* Footer */}
+        <Footer />
       </div>
     </SidebarProvider>
   );

@@ -25,11 +25,11 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#0066FF",
+          DEFAULT: "#9b87f5",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "#00FF88",
+          DEFAULT: "#7E69AB",
           foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
@@ -49,10 +49,10 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         crypto: {
-          blue: "#0066FF",
-          green: "#00FF88",
-          dark: "#1E1E1E",
-          gray: "#2D2D2D",
+          blue: "#6E59A5",
+          green: "#D6BCFA",
+          dark: "#1A1F2C",
+          gray: "#222222",
         },
       },
       borderRadius: {
