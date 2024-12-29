@@ -5,9 +5,10 @@ import { useState } from "react";
 import { useICOProjects } from "@/services/icoService";
 import { Card } from "@/components/ui/card";
 import OverviewStats from "@/components/overview/OverviewStats";
+import IntroductionSection from "@/components/introduction/IntroductionSection";
 
 const Index = () => {
-  const [activeSection, setActiveSection] = useState<"OVERVIEW" | "ACTIVE" | "UPCOMING" | "ENDED">("OVERVIEW");
+  const [activeSection, setActiveSection] = useState<"INTRODUCTION" | "OVERVIEW" | "ACTIVE" | "UPCOMING" | "ENDED">("INTRODUCTION");
   const { data: icoProjects, isLoading, error } = useICOProjects();
 
   // Categorize projects based on certain criteria
@@ -58,10 +59,13 @@ const Index = () => {
           type="single"
           value={activeSection}
           onValueChange={(value) => {
-            if (value) setActiveSection(value as "OVERVIEW" | "ACTIVE" | "UPCOMING" | "ENDED");
+            if (value) setActiveSection(value as "INTRODUCTION" | "OVERVIEW" | "ACTIVE" | "UPCOMING" | "ENDED");
           }}
           className="justify-start"
         >
+          <ToggleGroupItem value="INTRODUCTION" aria-label="Show introduction">
+            Introduction
+          </ToggleGroupItem>
           <ToggleGroupItem value="OVERVIEW" aria-label="Show overview">
             Overview
           </ToggleGroupItem>
@@ -77,7 +81,9 @@ const Index = () => {
         </ToggleGroup>
 
         <div className="grid grid-cols-1">
-          {activeSection === "OVERVIEW" ? (
+          {activeSection === "INTRODUCTION" ? (
+            <IntroductionSection />
+          ) : activeSection === "OVERVIEW" ? (
             <OverviewStats />
           ) : (
             <ProjectSection 
