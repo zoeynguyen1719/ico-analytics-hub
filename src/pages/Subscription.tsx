@@ -2,12 +2,15 @@ import { Check } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const SubscriptionPage = () => {
   const tiers = [
     {
       name: "Basic",
       price: "Free",
+      priceId: null, // Free tier doesn't need a price ID
       features: [
         "Access to basic ICO listings",
         "Limited portfolio tracking",
@@ -20,6 +23,7 @@ const SubscriptionPage = () => {
     {
       name: "Premium",
       price: "$19/month",
+      priceId: "YOUR_PREMIUM_PRICE_ID", // Replace with your actual Stripe price ID
       features: [
         "All Basic features",
         "Advanced portfolio analytics",
@@ -33,6 +37,7 @@ const SubscriptionPage = () => {
     {
       name: "Advanced",
       price: "$49/month",
+      priceId: "YOUR_ADVANCED_PRICE_ID", // Replace with your actual Stripe price ID
       features: [
         "All Premium features",
         "API access",
@@ -41,10 +46,45 @@ const SubscriptionPage = () => {
         "Early access to new features",
         "Advanced market analytics"
       ],
-      buttonText: "Contact Sales",
+      buttonText: "Subscribe Now",
       highlighted: false
     }
   ];
+
+  const handleSubscribe = async (priceId: string | null) => {
+    if (!priceId) {
+      // Handle free tier
+      toast.success("You're now on the Basic plan!");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+          },
+          body: JSON.stringify({ priceId })
+        }
+      );
+
+      const { url, error } = await response.json();
+      
+      if (error) {
+        toast.error('Error creating checkout session');
+        return;
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = url;
+    } catch (error) {
+      toast.error('Error processing subscription');
+      console.error('Subscription error:', error);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -91,6 +131,7 @@ const SubscriptionPage = () => {
               </ul>
 
               <Button
+                onClick={() => handleSubscribe(tier.priceId)}
                 className={`w-full ${
                   tier.highlighted
                     ? "bg-crypto-blue hover:bg-crypto-blue/90"
