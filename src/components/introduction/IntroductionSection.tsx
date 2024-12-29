@@ -21,7 +21,7 @@ const IntroductionSection = () => {
             <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-crypto-blue to-crypto-green bg-clip-text text-transparent">
               Welcome to Mericulum
             </h1>
-            <p className="text-xl text-gray-300">
+            <p className="text-xl text-white">
               Your comprehensive platform for ICO analytics and portfolio management
             </p>
             <div className="flex gap-4">
@@ -54,7 +54,7 @@ const IntroductionSection = () => {
               <Card key={index} className="p-6 bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-colors">
                 <div className="flex items-start gap-4">
                   <CheckCircle2 className="h-6 w-6 text-crypto-green flex-shrink-0" />
-                  <p className="text-lg">{feature}</p>
+                  <p className="text-lg text-white">{feature}</p>
                 </div>
               </Card>
             ))}
@@ -66,7 +66,7 @@ const IntroductionSection = () => {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center space-y-6">
           <h2 className="text-3xl font-bold text-crypto-blue">Ready to Start Your Journey?</h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-white max-w-2xl mx-auto">
             Join thousands of investors who trust Mericulum for their ICO analytics
             and portfolio management needs.
           </p>
