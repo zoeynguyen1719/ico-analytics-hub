@@ -35,8 +35,8 @@ const IntroductionSection = () => {
           </div>
           <div className="relative">
             <img
-              src="/lovable-uploads/ab1abe88-caf6-4bf7-800a-d8e8350cd6fe.png"
-              alt="Crypto Investment Illustration"
+              src="/lovable-uploads/5a1e8c44-11a1-4369-a816-17ef98d2501b.png"
+              alt="Investment Growth Illustration"
               className="w-full max-w-md mx-auto"
             />
           </div>
