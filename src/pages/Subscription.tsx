@@ -23,7 +23,7 @@ const SubscriptionPage = () => {
     {
       name: "Premium",
       price: "$19/month",
-      priceId: "YOUR_PREMIUM_PRICE_ID", // Replace with your actual Stripe price ID
+      priceId: "price_1QbOJzQjoDZWLsXdFOX1Ubk1",
       features: [
         "All Basic features",
         "Advanced portfolio analytics",
@@ -37,7 +37,7 @@ const SubscriptionPage = () => {
     {
       name: "Advanced",
       price: "$49/month",
-      priceId: "YOUR_ADVANCED_PRICE_ID", // Replace with your actual Stripe price ID
+      priceId: "price_1QbOKNQjoDZWLsXdnELR9mD5",
       features: [
         "All Premium features",
         "API access",
