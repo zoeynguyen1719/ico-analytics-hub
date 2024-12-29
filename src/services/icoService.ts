@@ -21,14 +21,13 @@ interface ICOProject {
 
 export const fetchICOProjects = async (): Promise<ICOProject[]> => {
   try {
-    // First try to fetch from Supabase
     const { data: supabaseData, error: supabaseError } = await supabase
       .from('ico_projects')
-      .select('*');
+      .select('*')
+      .order('created_at', { ascending: false });
 
     if (supabaseError) {
       console.error('Error fetching from Supabase:', supabaseError);
-      // Fallback to CoinGecko if Supabase fails
       return fetchFromCoinGecko();
     }
 
@@ -50,8 +49,32 @@ export const fetchICOProjects = async (): Promise<ICOProject[]> => {
       }));
     }
 
-    // Fallback to CoinGecko if no data in Supabase
-    return fetchFromCoinGecko();
+    // If no data in Supabase, fetch from CoinGecko
+    const coinGeckoData = await fetchFromCoinGecko();
+    
+    // Store CoinGecko data in Supabase for future use
+    if (coinGeckoData.length > 0) {
+      const { error: insertError } = await supabase
+        .from('ico_projects')
+        .insert(
+          coinGeckoData.map(project => ({
+            name: project.name,
+            symbol: project.symbol,
+            category: project.category,
+            type: project.type,
+            value: parseFloat(project.value?.replace('$', '').replace(',', '') || '0'),
+            logo: project.logo,
+            is_new: project.isNew,
+            is_highlighted: project.isHighlighted,
+          }))
+        );
+
+      if (insertError) {
+        console.error('Error storing CoinGecko data in Supabase:', insertError);
+      }
+    }
+
+    return coinGeckoData;
   } catch (error) {
     console.error("Error fetching ICO projects:", error);
     return [];
