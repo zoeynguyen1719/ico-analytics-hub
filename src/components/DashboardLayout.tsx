@@ -14,9 +14,9 @@ const menuItems = [
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col w-full bg-crypto-dark text-white">
+      <div className="min-h-screen flex flex-col w-full bg-black text-white">
         {/* Top Navigation Bar */}
-        <header className="w-full bg-crypto-dark border-b border-crypto-gray">
+        <header className="w-full bg-black border-b border-crypto-gray">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
               {/* Logo Section */}
