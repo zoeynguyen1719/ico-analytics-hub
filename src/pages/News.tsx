@@ -3,6 +3,7 @@ import { useCryptoNews } from "@/services/newsService";
 import { Card } from "@/components/ui/card";
 import { ExternalLink } from "lucide-react";
 import { format } from "date-fns";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const News = () => {
   const { data: news, isLoading, error } = useCryptoNews();
@@ -23,7 +24,6 @@ const News = () => {
       } else if (negativeCount > positiveCount) {
         acc.negative.push(item);
       } else {
-        // In case of tie or no sentiment, put in positive (neutral news usually good)
         acc.positive.push(item);
       }
       
@@ -58,16 +58,8 @@ const News = () => {
 
   const { positive, negative } = categorizeNews(news);
 
-  const NewsSection = ({ title, news, sentiment }) => (
-    <div className="space-y-4">
-      <h2 className="text-xl font-bold text-white flex items-center gap-2">
-        {title}
-        <span className={`text-sm px-2 py-1 rounded ${
-          sentiment === 'positive' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-        }`}>
-          {news.length} articles
-        </span>
-      </h2>
+  const NewsSection = ({ news, sentiment }) => (
+    <div className="space-y-4 max-w-4xl mx-auto">
       {news.map((item) => (
         <Card 
           key={item.id} 
@@ -123,18 +115,28 @@ const News = () => {
     <DashboardLayout>
       <div className="space-y-8">
         <h1 className="text-2xl font-bold text-white">Latest Crypto News</h1>
-        <div className="grid md:grid-cols-2 gap-8">
-          <NewsSection 
-            title="Positive News" 
-            news={positive} 
-            sentiment="positive"
-          />
-          <NewsSection 
-            title="Negative News" 
-            news={negative} 
-            sentiment="negative"
-          />
-        </div>
+        <Tabs defaultValue="positive" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger 
+              value="positive"
+              className="data-[state=active]:bg-green-500/20 data-[state=active]:text-green-400"
+            >
+              Positive News ({positive.length})
+            </TabsTrigger>
+            <TabsTrigger 
+              value="negative"
+              className="data-[state=active]:bg-red-500/20 data-[state=active]:text-red-400"
+            >
+              Negative News ({negative.length})
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="positive">
+            <NewsSection news={positive} sentiment="positive" />
+          </TabsContent>
+          <TabsContent value="negative">
+            <NewsSection news={negative} sentiment="negative" />
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardLayout>
   );
