@@ -1,17 +1,23 @@
 import { SidebarProvider, Sidebar, SidebarContent, SidebarTrigger } from "@/components/ui/sidebar";
 import { Home, PieChart, Calculator, BarChart2, Newspaper, Crown } from "lucide-react";
+import { useState } from "react";
 import Footer from "./Footer";
 
-const menuItems = [
+const mainMenuItems = [
   { icon: Home, label: "Overview", path: "/" },
   { icon: PieChart, label: "Portfolio", path: "/portfolio" },
-  { icon: Calculator, label: "Calculator", path: "/calculator" },
-  { icon: BarChart2, label: "Compare", path: "/compare" },
   { icon: Newspaper, label: "News", path: "/news" },
   { icon: Crown, label: "Subscription", path: "/subscription" },
 ];
 
+const toolMenuItems = [
+  { icon: Calculator, label: "Calculator", path: "/calculator" },
+  { icon: BarChart2, label: "Compare", path: "/compare" },
+];
+
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+  const [showTools, setShowTools] = useState(true);
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full bg-black text-white">
@@ -30,7 +36,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
               {/* Navigation Menu */}
               <nav className="hidden md:flex items-center space-x-8">
-                {menuItems.map((item) => (
+                {mainMenuItems.map((item) => (
                   <a
                     key={item.label}
                     href={item.path}
@@ -41,6 +47,31 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   </a>
                 ))}
               </nav>
+
+              {/* Tools Section */}
+              <div className="hidden md:flex items-center">
+                <button
+                  onClick={() => setShowTools(!showTools)}
+                  className="text-gray-300 hover:text-crypto-blue p-2 transition-colors"
+                  aria-label="Toggle tools"
+                >
+                  {showTools ? "Hide Tools" : "Show Tools"}
+                </button>
+                {showTools && (
+                  <div className="flex items-center gap-4 ml-4">
+                    {toolMenuItems.map((item) => (
+                      <a
+                        key={item.label}
+                        href={item.path}
+                        className="text-gray-300 hover:text-crypto-blue transition-colors"
+                        title={item.label}
+                      >
+                        <item.icon size={20} />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Mobile Menu Trigger */}
               <div className="md:hidden">
@@ -55,7 +86,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           <Sidebar className="border-r border-crypto-gray">
             <SidebarContent>
               <nav className="mt-6">
-                {menuItems.map((item) => (
+                {[...mainMenuItems, ...toolMenuItems].map((item) => (
                   <a
                     key={item.label}
                     href={item.path}
