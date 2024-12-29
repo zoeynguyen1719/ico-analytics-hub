@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ICOProject {
   name: string;
@@ -22,7 +22,7 @@ interface ICOProject {
 export const fetchICOProjects = async (): Promise<ICOProject[]> => {
   try {
     const { data: supabaseData, error: supabaseError } = await supabase
-      .from('ico_projects')
+      .from('ICO')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -33,48 +33,22 @@ export const fetchICOProjects = async (): Promise<ICOProject[]> => {
 
     if (supabaseData && supabaseData.length > 0) {
       return supabaseData.map((project: any) => ({
-        name: project.name,
-        symbol: project.symbol,
+        name: project["Project Name"],
+        symbol: project.symbol || "N/A",
         category: project.category || "Cryptocurrency",
         type: project.type || "Public Sale",
-        value: project.value ? `$${project.value}` : undefined,
-        logo: project.logo,
-        isNew: project.is_new,
-        isHighlighted: project.is_highlighted,
-        isAd: project.is_ad,
-        platform: project.platform,
-        timeLeft: project.time_left,
-        date: project.date,
-        participants: project.participants
+        value: project.Price ? `$${project.Price}` : undefined,
+        logo: project.logo || "/placeholder.svg",
+        isNew: project["ICO date"] ? new Date(project["ICO date"]) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) : false,
+        isHighlighted: project.ROI ? project.ROI > 100 : false,
+        platform: project.Platform,
+        date: project["ICO date"],
       }));
     }
 
     // If no data in Supabase, fetch from CoinGecko
-    const coinGeckoData = await fetchFromCoinGecko();
-    
-    // Store CoinGecko data in Supabase for future use
-    if (coinGeckoData.length > 0) {
-      const { error: insertError } = await supabase
-        .from('ico_projects')
-        .insert(
-          coinGeckoData.map(project => ({
-            name: project.name,
-            symbol: project.symbol,
-            category: project.category,
-            type: project.type,
-            value: parseFloat(project.value?.replace('$', '').replace(',', '') || '0'),
-            logo: project.logo,
-            is_new: project.isNew,
-            is_highlighted: project.isHighlighted,
-          }))
-        );
-
-      if (insertError) {
-        console.error('Error storing CoinGecko data in Supabase:', insertError);
-      }
-    }
-
-    return coinGeckoData;
+    console.log('No data in Supabase, fetching from CoinGecko');
+    return fetchFromCoinGecko();
   } catch (error) {
     console.error("Error fetching ICO projects:", error);
     return [];

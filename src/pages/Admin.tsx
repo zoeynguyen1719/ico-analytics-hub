@@ -6,20 +6,20 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
 
 interface ICOProject {
   id?: number;
-  name: string;
+  "Project Name": string;
   symbol: string;
   category: string;
   type: string;
-  value: string;
+  Price?: number;
+  Platform?: string;
+  "ICO date"?: string;
   logo: string;
-  isHighlighted: boolean;
-  isNew: boolean;
 }
 
 const Admin = () => {
@@ -28,14 +28,14 @@ const Admin = () => {
   
   const form = useForm<ICOProject>({
     defaultValues: {
-      name: "",
+      "Project Name": "",
       symbol: "",
       category: "Cryptocurrency",
       type: "Public Sale",
-      value: "",
+      Price: undefined,
+      Platform: "",
+      "ICO date": "",
       logo: "",
-      isHighlighted: false,
-      isNew: true,
     },
   });
 
@@ -43,7 +43,7 @@ const Admin = () => {
     queryKey: ['admin-ico-projects'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('ico_projects')
+        .from('ICO')
         .select('*')
         .order('created_at', { ascending: false });
       
@@ -56,7 +56,7 @@ const Admin = () => {
     try {
       if (editingProject?.id) {
         const { error } = await supabase
-          .from('ico_projects')
+          .from('ICO')
           .update(data)
           .eq('id', editingProject.id);
         
@@ -67,7 +67,7 @@ const Admin = () => {
         });
       } else {
         const { error } = await supabase
-          .from('ico_projects')
+          .from('ICO')
           .insert([data]);
         
         if (error) throw error;
@@ -129,7 +129,7 @@ const Admin = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="name"
+                name="Project Name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Project Name</FormLabel>
@@ -181,18 +181,46 @@ const Admin = () => {
               
               <FormField
                 control={form.control}
-                name="value"
+                name="Price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Value</FormLabel>
+                    <FormLabel>Price</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter value" {...field} />
+                      <Input type="number" placeholder="Enter price" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               
+              <FormField
+                control={form.control}
+                name="Platform"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Platform</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter platform" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="ICO date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ICO Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="logo"
@@ -236,17 +264,17 @@ const Admin = () => {
                 <TableHead>Name</TableHead>
                 <TableHead>Symbol</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead>Value</TableHead>
+                <TableHead>Price</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {projects?.map((project) => (
                 <TableRow key={project.id}>
-                  <TableCell>{project.name}</TableCell>
+                  <TableCell>{project["Project Name"]}</TableCell>
                   <TableCell>{project.symbol}</TableCell>
                   <TableCell>{project.category}</TableCell>
-                  <TableCell>{project.value}</TableCell>
+                  <TableCell>{project.Price}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
