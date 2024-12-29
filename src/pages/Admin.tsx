@@ -13,12 +13,17 @@ import { useQuery } from "@tanstack/react-query";
 interface ICOProject {
   id?: number;
   "Project Name": string;
+  "Price"?: number;
+  "Sale Price"?: number;
+  "ROI"?: number;
+  "ATH ROI"?: number;
+  "Platform"?: string;
+  "ICO date"?: string;
+  created_at?: string;
+  // Additional fields for UI display
   symbol: string;
   category: string;
   type: string;
-  Price?: number;
-  Platform?: string;
-  "ICO date"?: string;
   logo: string;
 }
 
@@ -32,8 +37,8 @@ const Admin = () => {
       symbol: "",
       category: "Cryptocurrency",
       type: "Public Sale",
-      Price: undefined,
-      Platform: "",
+      "Price": undefined,
+      "Platform": "",
       "ICO date": "",
       logo: "",
     },
@@ -97,7 +102,7 @@ const Admin = () => {
   const handleDelete = async (id: number) => {
     try {
       const { error } = await supabase
-        .from('ico_projects')
+        .from('ICO')
         .delete()
         .eq('id', id);
       
@@ -262,9 +267,9 @@ const Admin = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Symbol</TableHead>
-                <TableHead>Category</TableHead>
                 <TableHead>Price</TableHead>
+                <TableHead>Platform</TableHead>
+                <TableHead>ICO Date</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -272,22 +277,22 @@ const Admin = () => {
               {projects?.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell>{project["Project Name"]}</TableCell>
-                  <TableCell>{project.symbol}</TableCell>
-                  <TableCell>{project.category}</TableCell>
-                  <TableCell>{project.Price}</TableCell>
+                  <TableCell>{project["Price"]}</TableCell>
+                  <TableCell>{project["Platform"]}</TableCell>
+                  <TableCell>{project["ICO date"]}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleEdit(project)}
+                        onClick={() => handleEdit(project as ICOProject)}
                       >
                         Edit
                       </Button>
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => handleDelete(project.id)}
+                        onClick={() => project.id && handleDelete(project.id)}
                       >
                         Delete
                       </Button>
