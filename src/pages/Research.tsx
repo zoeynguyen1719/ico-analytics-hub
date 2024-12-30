@@ -111,7 +111,8 @@ const Research = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            );
+          })}
         </div>
       </div>
     </DashboardLayout>
