@@ -53,22 +53,30 @@ const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
         return;
       }
 
-      const { error: signupError } = await supabase
-        .from('basic_signups')
-        .insert([
-          { 
-            email,
-            user_id: authData.user.id
-          }
-        ]);
+      // Check if email confirmation is required
+      if (authData.session) {
+        // User is immediately signed in (email confirmation disabled)
+        const { error: signupError } = await supabase
+          .from('basic_signups')
+          .insert([
+            { 
+              email,
+              user_id: authData.user.id
+            }
+          ]);
 
-      if (signupError) {
-        console.error('Signup error:', signupError);
-        toast.error("Error saving signup information");
-        return;
+        if (signupError) {
+          console.error('Signup error:', signupError);
+          toast.error("Error saving signup information");
+          return;
+        }
+
+        toast.success("Welcome to Mericulum! Your account has been created.");
+      } else {
+        // Email confirmation is required
+        toast.success("Please check your email to confirm your account. You will be able to sign in after confirmation.");
       }
 
-      toast.success("Welcome to Mericulum! Please check your email to complete signup.");
       onOpenChange(false);
       navigate("/signin");
     } catch (error: any) {
