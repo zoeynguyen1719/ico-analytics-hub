@@ -9,6 +9,27 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      basic_signups: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       ICO: {
         Row: {
           "ATH ROI": number | null
