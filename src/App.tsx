@@ -8,6 +8,7 @@ import Admin from "./pages/Admin";
 import SubscriptionPage from "./pages/Subscription";
 import News from "./pages/News";
 import SignIn from "./pages/SignIn";
+import Games from "./pages/Games";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/subscription" element={<SubscriptionPage />} />
           <Route path="/news" element={<News />} />
           <Route path="/signin" element={<SignIn />} />
+          <Route path="/games" element={<Games />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
