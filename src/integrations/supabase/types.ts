@@ -66,6 +66,42 @@ export type Database = {
         }
         Relationships: []
       }
+      research_reports: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          document_name: string
+          document_url: string | null
+          icon: string
+          id: string
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          document_name: string
+          document_url?: string | null
+          icon: string
+          id?: string
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          document_name?: string
+          document_url?: string | null
+          icon?: string
+          id?: string
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
