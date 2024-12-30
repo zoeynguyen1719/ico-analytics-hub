@@ -5,20 +5,33 @@ const Games = () => {
   const games = [
     {
       id: 1,
+      title: "Citadel Card Game",
+      description: "A strategic card game where players compete to build the most valuable crypto portfolio. Trade, stake, and outmaneuver your opponents in this exciting blockchain-themed card game.",
+      image: "/lovable-uploads/fc6224c9-4be9-4d1a-b5ad-3da64a81c6e0.png",
+      status: "Coming Soon",
+      features: [
+        "Strategic deck building",
+        "Crypto market simulation",
+        "Multiplayer battles",
+        "Daily challenges"
+      ]
+    },
+    {
+      id: 2,
       title: "Crypto Trading Simulator",
       description: "Practice trading with virtual currency in a risk-free environment",
       image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e",
       status: "Coming Soon",
     },
     {
-      id: 2,
+      id: 3,
       title: "ICO Investment Challenge",
       description: "Test your ICO investment skills and compete with other players",
       image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
       status: "Coming Soon",
     },
     {
-      id: 3,
+      id: 4,
       title: "Crypto Quiz",
       description: "Test your knowledge about cryptocurrencies and blockchain",
       image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
@@ -58,6 +71,16 @@ const Games = () => {
                 <CardDescription className="text-gray-400">
                   {game.description}
                 </CardDescription>
+                {game.features && (
+                  <ul className="mt-4 space-y-2">
+                    {game.features.map((feature, index) => (
+                      <li key={index} className="text-sm text-gray-400 flex items-center">
+                        <span className="w-2 h-2 bg-crypto-blue rounded-full mr-2"></span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </CardContent>
             </Card>
           ))}
