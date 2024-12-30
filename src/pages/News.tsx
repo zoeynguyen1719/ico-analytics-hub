@@ -31,7 +31,7 @@ const News = () => {
       
       if (selectedDate) {
         filteredNews = filteredNews.filter(item => {
-          const newsDate = new Date(item.publishedAt * 1000);
+          const newsDate = new Date(Number(item.publishedAt) * 1000);
           return newsDate.toDateString() === selectedDate.toDateString();
         });
       }

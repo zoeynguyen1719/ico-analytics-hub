@@ -22,6 +22,11 @@ const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
 
   const handleBasicSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    
     setLoading(true);
     
     try {
@@ -37,16 +42,17 @@ const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
       });
 
       if (authError) {
+        console.error('Auth error:', authError);
         toast.error(authError.message);
         return;
       }
 
       if (!authData.user) {
+        console.error('No user data returned');
         toast.error("Failed to create user account");
         return;
       }
 
-      // Only proceed with basic_signups insert if auth signup was successful
       const { error: signupError } = await supabase
         .from('basic_signups')
         .insert([
@@ -57,6 +63,7 @@ const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
         ]);
 
       if (signupError) {
+        console.error('Signup error:', signupError);
         toast.error("Error saving signup information");
         return;
       }
@@ -65,8 +72,8 @@ const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
       onOpenChange(false);
       navigate("/signin");
     } catch (error: any) {
-      console.error('Signup error:', error);
-      toast.error("Error during signup. Please try again.");
+      console.error('Unexpected error:', error);
+      toast.error(error.message || "Error during signup. Please try again.");
     } finally {
       setLoading(false);
     }
