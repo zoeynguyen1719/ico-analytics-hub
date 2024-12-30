@@ -3,6 +3,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { toast } from "sonner";
 import SubscriptionTier from "@/components/subscription/SubscriptionTier";
 import BasicSignupDialog from "@/components/subscription/BasicSignupDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 const SubscriptionPage = () => {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);

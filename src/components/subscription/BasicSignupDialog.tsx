@@ -14,6 +14,7 @@ interface BasicSignupDialogProps {
 
 const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -25,6 +26,7 @@ const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
       // First create the user account with email sign-in
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
+        password,
         options: {
           data: {
             subscription_tier: 'basic'
@@ -77,6 +79,18 @@ const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
               onChange={(e) => setEmail(e.target.value)}
               className="bg-crypto-gray text-white border-crypto-blue focus:border-crypto-green"
               placeholder="Enter your email"
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="password" className="text-white">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="bg-crypto-gray text-white border-crypto-blue focus:border-crypto-green"
+              placeholder="Enter your password"
               required
             />
           </div>
