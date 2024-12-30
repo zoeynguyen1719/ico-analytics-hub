@@ -4,13 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useState } from "react";
 
 const SubscriptionPage = () => {
+  const [selectedTier, setSelectedTier] = useState<string | null>(null);
+
   const tiers = [
     {
       name: "Basic",
       price: "Free",
-      priceId: null, // Free tier doesn't need a price ID
+      priceId: null,
       features: [
         "Access to basic ICO listings",
         "Limited portfolio tracking",
@@ -51,7 +54,9 @@ const SubscriptionPage = () => {
     }
   ];
 
-  const handleSubscribe = async (priceId: string | null) => {
+  const handleSubscribe = async (priceId: string | null, tierName: string) => {
+    setSelectedTier(tierName);
+    
     if (!priceId) {
       // Handle free tier
       toast.success("You're now on the Basic plan!");
@@ -101,7 +106,9 @@ const SubscriptionPage = () => {
             <Card
               key={tier.name}
               className={`relative p-8 rounded-xl border ${
-                tier.highlighted
+                selectedTier === tier.name
+                  ? "border-crypto-blue bg-crypto-dark"
+                  : tier.highlighted
                   ? "border-crypto-blue bg-black/50"
                   : "border-crypto-gray bg-black/30"
               }`}
@@ -131,9 +138,11 @@ const SubscriptionPage = () => {
               </ul>
 
               <Button
-                onClick={() => handleSubscribe(tier.priceId)}
+                onClick={() => handleSubscribe(tier.priceId, tier.name)}
                 className={`w-full ${
-                  tier.highlighted
+                  selectedTier === tier.name
+                    ? "bg-crypto-blue hover:bg-crypto-blue/90"
+                    : tier.highlighted
                     ? "bg-crypto-blue hover:bg-crypto-blue/90"
                     : "bg-gray-800 hover:bg-gray-700"
                 }`}
