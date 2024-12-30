@@ -5,9 +5,15 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const SubscriptionPage = () => {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
+  const [showSignupDialog, setShowSignupDialog] = useState(false);
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const tiers = [
     {
@@ -54,12 +60,39 @@ const SubscriptionPage = () => {
     }
   ];
 
+  const handleBasicSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password: Math.random().toString(36).slice(-8), // Generate a random password
+        options: {
+          data: {
+            subscription_tier: 'basic'
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      toast.success("Welcome to Mericulum! Check your email to complete signup.");
+      setShowSignupDialog(false);
+      setSelectedTier("Basic");
+    } catch (error) {
+      toast.error("Error during signup. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubscribe = async (priceId: string | null, tierName: string) => {
     setSelectedTier(tierName);
     
     if (!priceId) {
       // Handle free tier
-      toast.success("You're now on the Basic plan!");
+      setShowSignupDialog(true);
       return;
     }
 
@@ -152,6 +185,40 @@ const SubscriptionPage = () => {
             </Card>
           ))}
         </div>
+
+        <Dialog open={showSignupDialog} onOpenChange={setShowSignupDialog}>
+          <DialogContent className="bg-crypto-dark border-crypto-gray">
+            <DialogHeader>
+              <DialogTitle className="text-2xl text-crypto-blue">Sign Up for Basic Plan</DialogTitle>
+              <DialogDescription className="text-gray-300">
+                Get started with our free tier and explore the basic features
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleBasicSignup} className="space-y-4">
+              <div>
+                <Label htmlFor="email" className="text-white">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-crypto-gray text-white border-crypto-blue focus:border-crypto-green"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+              <DialogFooter>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-crypto-blue hover:bg-crypto-blue/90 text-white"
+                >
+                  {loading ? "Signing up..." : "Sign Up"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );
