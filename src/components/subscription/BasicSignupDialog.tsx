@@ -25,7 +25,6 @@ const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
     setLoading(true);
     
     try {
-      // First create the user account with email sign-in
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -37,24 +36,35 @@ const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
         }
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        toast.error(authError.message);
+        return;
+      }
 
-      // Then store the signup information
+      if (!authData.user) {
+        toast.error("Failed to create user account");
+        return;
+      }
+
+      // Only proceed with basic_signups insert if auth signup was successful
       const { error: signupError } = await supabase
         .from('basic_signups')
         .insert([
           { 
             email,
-            user_id: authData.user?.id
+            user_id: authData.user.id
           }
         ]);
 
-      if (signupError) throw signupError;
+      if (signupError) {
+        toast.error("Error saving signup information");
+        return;
+      }
 
       toast.success("Welcome to Mericulum! Please check your email to complete signup.");
       onOpenChange(false);
       navigate("/signin");
-    } catch (error) {
+    } catch (error: any) {
       console.error('Signup error:', error);
       toast.error("Error during signup. Please try again.");
     } finally {
