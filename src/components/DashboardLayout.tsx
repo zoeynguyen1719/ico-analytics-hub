@@ -1,11 +1,12 @@
 import { SidebarProvider, Sidebar, SidebarContent, SidebarTrigger } from "@/components/ui/sidebar";
-import { Home, PieChart, Calculator, BarChart2, Newspaper, Crown, Gamepad2 } from "lucide-react";
+import { Home, PieChart, Calculator, BarChart2, Newspaper, Crown, Gamepad2, BookOpen } from "lucide-react";
 import { useState } from "react";
 import Footer from "./Footer";
 
 const mainMenuItems = [
   { icon: Home, label: "Overview", path: "/" },
   { icon: PieChart, label: "Portfolio", path: "/portfolio" },
+  { icon: BookOpen, label: "Research", path: "/research" },
   { icon: Newspaper, label: "News", path: "/news" },
   { icon: Crown, label: "Subscription", path: "/subscription" },
   { icon: Gamepad2, label: "Games", path: "/games" },
