@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface BasicSignupDialogProps {
   open: boolean;
@@ -14,20 +15,21 @@ interface BasicSignupDialogProps {
 const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleBasicSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      // First create the user account
+      // First create the user account with email sign-in
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
-        password: Math.random().toString(36).slice(-8), // Generate a random password
         options: {
           data: {
             subscription_tier: 'basic'
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/signin`
         }
       });
 
@@ -45,8 +47,9 @@ const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
 
       if (signupError) throw signupError;
 
-      toast.success("Welcome to Mericulum! Check your email to complete signup.");
+      toast.success("Welcome to Mericulum! Please check your email to complete signup.");
       onOpenChange(false);
+      navigate("/signin");
     } catch (error) {
       console.error('Signup error:', error);
       toast.error("Error during signup. Please try again.");

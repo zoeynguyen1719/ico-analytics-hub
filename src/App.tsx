@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Admin from "./pages/Admin";
 import SubscriptionPage from "./pages/Subscription";
 import News from "./pages/News";
+import SignIn from "./pages/SignIn";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/subscription" element={<SubscriptionPage />} />
           <Route path="/news" element={<News />} />
+          <Route path="/signin" element={<SignIn />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
