@@ -1,15 +1,33 @@
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Rocket, Star, Award, Sparkles, Heart, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 const IntroductionSection = () => {
   const features = [
-    "Real-time ICO Analytics Dashboard",
-    "Portfolio Management Tools",
-    "Project Comparison Features",
-    "Latest Crypto News Updates",
-    "Advanced ROI Calculations",
-    "Premium Market Insights"
+    {
+      text: "Real-time ICO Analytics Dashboard",
+      icon: Rocket,
+    },
+    {
+      text: "Portfolio Management Tools",
+      icon: Star,
+    },
+    {
+      text: "Project Comparison Features",
+      icon: Award,
+    },
+    {
+      text: "Latest Crypto News Updates",
+      icon: Sparkles,
+    },
+    {
+      text: "Advanced ROI Calculations",
+      icon: Heart,
+    },
+    {
+      text: "Premium Market Insights",
+      icon: Leaf,
+    }
   ];
 
   return (
@@ -53,8 +71,8 @@ const IntroductionSection = () => {
             {features.map((feature, index) => (
               <Card key={index} className="p-6 bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-colors">
                 <div className="flex items-start gap-4">
-                  <CheckCircle2 className="h-6 w-6 text-crypto-green flex-shrink-0" />
-                  <p className="text-lg text-white">{feature}</p>
+                  <feature.icon className="h-6 w-6 text-crypto-green flex-shrink-0" />
+                  <p className="text-lg text-white">{feature.text}</p>
                 </div>
               </Card>
             ))}
