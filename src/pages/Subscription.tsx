@@ -3,11 +3,16 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { toast } from "sonner";
 import SubscriptionTier from "@/components/subscription/SubscriptionTier";
 import BasicSignupDialog from "@/components/subscription/BasicSignupDialog";
+import PremiumSignupDialog from "@/components/subscription/PremiumSignupDialog";
+import AdvancedSignupDialog from "@/components/subscription/AdvancedSignupDialog";
 import { supabase } from "@/integrations/supabase/client";
 
 const SubscriptionPage = () => {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
-  const [showSignupDialog, setShowSignupDialog] = useState(false);
+  const [showBasicSignupDialog, setShowBasicSignupDialog] = useState(false);
+  const [showPremiumSignupDialog, setShowPremiumSignupDialog] = useState(false);
+  const [showAdvancedSignupDialog, setShowAdvancedSignupDialog] = useState(false);
+  const [selectedPriceId, setSelectedPriceId] = useState<string | null>(null);
 
   const tiers = [
     {
@@ -56,13 +61,24 @@ const SubscriptionPage = () => {
 
   const handleSubscribe = async (priceId: string | null, tierName: string) => {
     setSelectedTier(tierName);
+    setSelectedPriceId(priceId);
     
-    if (!priceId) {
-      // Handle free tier
-      setShowSignupDialog(true);
-      return;
+    switch(tierName) {
+      case "Basic":
+        setShowBasicSignupDialog(true);
+        break;
+      case "Premium":
+        setShowPremiumSignupDialog(true);
+        break;
+      case "Advanced":
+        setShowAdvancedSignupDialog(true);
+        break;
     }
+  };
 
+  const handleStripeCheckout = async (userId: string) => {
+    if (!selectedPriceId) return;
+    
     try {
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`,
@@ -72,7 +88,10 @@ const SubscriptionPage = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
           },
-          body: JSON.stringify({ priceId })
+          body: JSON.stringify({ 
+            priceId: selectedPriceId,
+            userId 
+          })
         }
       );
 
@@ -83,7 +102,6 @@ const SubscriptionPage = () => {
         return;
       }
 
-      // Redirect to Stripe Checkout
       window.location.href = url;
     } catch (error) {
       toast.error('Error processing subscription');
@@ -113,8 +131,20 @@ const SubscriptionPage = () => {
         </div>
 
         <BasicSignupDialog
-          open={showSignupDialog}
-          onOpenChange={setShowSignupDialog}
+          open={showBasicSignupDialog}
+          onOpenChange={setShowBasicSignupDialog}
+        />
+        
+        <PremiumSignupDialog
+          open={showPremiumSignupDialog}
+          onOpenChange={setShowPremiumSignupDialog}
+          onSuccess={handleStripeCheckout}
+        />
+        
+        <AdvancedSignupDialog
+          open={showAdvancedSignupDialog}
+          onOpenChange={setShowAdvancedSignupDialog}
+          onSuccess={handleStripeCheckout}
         />
       </div>
     </DashboardLayout>
