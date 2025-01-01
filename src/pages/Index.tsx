@@ -6,10 +6,31 @@ import { useICOProjects } from "@/services/icoService";
 import { Card } from "@/components/ui/card";
 import OverviewStats from "@/components/overview/OverviewStats";
 import IntroductionSection from "@/components/introduction/IntroductionSection";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState<"INTRODUCTION" | "OVERVIEW" | "ACTIVE" | "UPCOMING" | "ENDED">("INTRODUCTION");
   const { data: icoProjects, isLoading, error } = useICOProjects();
+  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Categorize projects based on certain criteria
   const categorizedProjects = {
@@ -52,6 +73,38 @@ const Index = () => {
     );
   }
 
+  const renderContent = () => {
+    if (!isAuthenticated && ["ACTIVE", "UPCOMING", "ENDED"].includes(activeSection)) {
+      return (
+        <Card className="p-6 text-center">
+          <h3 className="text-lg font-semibold mb-4">Sign up for Basic Tier Access</h3>
+          <p className="text-gray-400 mb-4">
+            Please sign up for our Basic tier to view ICO projects and analytics.
+          </p>
+          <Button onClick={() => navigate("/subscription")} className="bg-crypto-blue hover:bg-crypto-blue/90">
+            Sign Up Now
+          </Button>
+        </Card>
+      );
+    }
+
+    if (activeSection === "INTRODUCTION") {
+      return <IntroductionSection />;
+    }
+    
+    if (activeSection === "OVERVIEW") {
+      return <OverviewStats />;
+    }
+    
+    return (
+      <ProjectSection 
+        title={sections[activeSection].title}
+        count={sections[activeSection].count}
+        projects={sections[activeSection].projects}
+      />
+    );
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -81,17 +134,7 @@ const Index = () => {
         </ToggleGroup>
 
         <div className="grid grid-cols-1">
-          {activeSection === "INTRODUCTION" ? (
-            <IntroductionSection />
-          ) : activeSection === "OVERVIEW" ? (
-            <OverviewStats />
-          ) : (
-            <ProjectSection 
-              title={sections[activeSection].title}
-              count={sections[activeSection].count}
-              projects={sections[activeSection].projects}
-            />
-          )}
+          {renderContent()}
         </div>
       </div>
     </DashboardLayout>
