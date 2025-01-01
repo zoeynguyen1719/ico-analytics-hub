@@ -2,38 +2,22 @@ import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { toast } from "sonner";
 import SubscriptionTier from "@/components/subscription/SubscriptionTier";
-import BasicSignupDialog from "@/components/subscription/BasicSignupDialog";
 import PremiumSignupDialog from "@/components/subscription/PremiumSignupDialog";
 import AdvancedSignupDialog from "@/components/subscription/AdvancedSignupDialog";
 import { supabase } from "@/integrations/supabase/client";
 
 const SubscriptionPage = () => {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
-  const [showBasicSignupDialog, setShowBasicSignupDialog] = useState(false);
   const [showPremiumSignupDialog, setShowPremiumSignupDialog] = useState(false);
   const [showAdvancedSignupDialog, setShowAdvancedSignupDialog] = useState(false);
   const [selectedPriceId, setSelectedPriceId] = useState<string | null>(null);
 
   const tiers = [
     {
-      name: "Basic",
-      price: "Free",
-      priceId: null,
-      features: [
-        "Access to basic ICO listings",
-        "Limited portfolio tracking",
-        "Basic calculator tools",
-        "Public news feed"
-      ],
-      buttonText: "Get Started",
-      highlighted: false
-    },
-    {
       name: "Premium",
       price: "$19/month",
       priceId: "price_1QbOJzQjoDZWLsXdFOX1Ubk1",
       features: [
-        "All Basic features",
         "Advanced portfolio analytics",
         "Priority ICO alerts",
         "Detailed project comparisons",
@@ -64,9 +48,6 @@ const SubscriptionPage = () => {
     setSelectedPriceId(priceId);
     
     switch(tierName) {
-      case "Basic":
-        setShowBasicSignupDialog(true);
-        break;
       case "Premium":
         setShowPremiumSignupDialog(true);
         break;
@@ -119,7 +100,7 @@ const SubscriptionPage = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto px-4">
+        <div className="grid md:grid-cols-2 gap-8 max-w-7xl mx-auto px-4">
           {tiers.map((tier) => (
             <SubscriptionTier
               key={tier.name}
@@ -129,11 +110,6 @@ const SubscriptionPage = () => {
             />
           ))}
         </div>
-
-        <BasicSignupDialog
-          open={showBasicSignupDialog}
-          onOpenChange={setShowBasicSignupDialog}
-        />
         
         <PremiumSignupDialog
           open={showPremiumSignupDialog}

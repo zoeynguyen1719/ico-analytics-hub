@@ -61,27 +61,9 @@ const SignIn = () => {
         return;
       }
 
-      // Check if user has basic signup
-      const { data: basicSignup, error: signupError } = await supabase
-        .from('basic_signups')
-        .select('*')
-        .eq('user_id', authData.session.user.id)
-        .single();
-
-      if (signupError && !signupError.message.includes('No rows found')) {
-        console.error("Error checking signup:", signupError);
-        toast.error("Error checking account type");
-        return;
-      }
-
       toast.success("Successfully signed in!");
+      navigate("/");
       
-      // Redirect based on user type
-      if (basicSignup) {
-        navigate("/basic-dashboard");
-      } else {
-        navigate("/");
-      }
     } catch (error) {
       console.error("Unexpected error:", error);
       toast.error("An unexpected error occurred");
