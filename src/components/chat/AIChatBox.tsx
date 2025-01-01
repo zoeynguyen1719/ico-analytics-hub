@@ -22,20 +22,33 @@ const AIChatBox = () => {
       setConversation(prev => [...prev, userMessage]);
       setMessage("");
 
-      const { data, error } = await supabase.functions.invoke('chat', {
+      const response = await supabase.functions.invoke('chat', {
         body: { message },
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
-      if (error) throw error;
+      if (response.error) {
+        console.error('Supabase function error:', response.error);
+        throw new Error(response.error.message || 'Failed to get response from AI');
+      }
 
-      setConversation(prev => [...prev, { role: "assistant", content: data.generatedText }]);
+      if (!response.data) {
+        throw new Error('No response data received');
+      }
+
+      setConversation(prev => [...prev, { role: "assistant", content: response.data.generatedText }]);
     } catch (error) {
       console.error('Chat error:', error);
       toast({
         title: "Error",
-        description: "Failed to get response from AI. Please try again.",
+        description: error.message || "Failed to get response from AI. Please try again.",
         variant: "destructive",
       });
+      
+      // Remove the user's message if we couldn't get a response
+      setConversation(prev => prev.slice(0, -1));
     } finally {
       setLoading(false);
     }
@@ -98,7 +111,7 @@ const AIChatBox = () => {
                 disabled={loading}
               />
               <Button type="submit" disabled={loading || !message.trim()}>
-                Send
+                {loading ? "Sending..." : "Send"}
               </Button>
             </div>
           </form>
