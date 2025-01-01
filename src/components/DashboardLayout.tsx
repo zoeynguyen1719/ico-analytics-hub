@@ -2,6 +2,7 @@ import { SidebarProvider, Sidebar, SidebarContent, SidebarTrigger } from "@/comp
 import { Home, Calculator, BarChart2, Newspaper, Crown, Gamepad2, BookOpen } from "lucide-react";
 import { useState } from "react";
 import Footer from "./Footer";
+import AIChatBox from "./chat/AIChatBox";
 
 const mainMenuItems = [
   { icon: Home, label: "Overview", path: "/" },
@@ -117,6 +118,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
         {/* Footer */}
         <Footer />
+
+        {/* AI Chat Box */}
+        <AIChatBox />
       </div>
     </SidebarProvider>
   );
