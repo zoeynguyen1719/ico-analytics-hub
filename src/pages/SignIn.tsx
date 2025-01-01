@@ -39,24 +39,24 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
       });
 
       if (signInError) {
+        console.error("Sign in error:", signInError);
         if (signInError.message.includes("Email not confirmed")) {
-          toast.error("Please confirm your email before signing in. Check your inbox for the confirmation link.");
+          toast.error("Please confirm your email before signing in");
         } else if (signInError.message.includes("Invalid login credentials")) {
-          toast.error("Invalid email or password. Please try again.");
+          toast.error("Invalid email or password");
         } else {
           toast.error(signInError.message);
         }
-        console.error("Sign in error:", signInError);
         return;
       }
 
-      if (!data.session) {
+      if (!authData?.session) {
         toast.error("Error getting session");
         return;
       }
@@ -65,7 +65,7 @@ const SignIn = () => {
       const { data: basicSignup, error: signupError } = await supabase
         .from('basic_signups')
         .select('*')
-        .eq('user_id', data.session.user.id)
+        .eq('user_id', authData.session.user.id)
         .single();
 
       if (signupError && !signupError.message.includes('No rows found')) {
@@ -82,9 +82,9 @@ const SignIn = () => {
       } else {
         navigate("/");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Unexpected error:", error);
-      toast.error("An unexpected error occurred. Please try again.");
+      toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
     }
