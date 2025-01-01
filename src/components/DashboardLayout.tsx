@@ -17,7 +17,7 @@ const toolMenuItems = [
 ];
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  const [showTools, setShowTools] = useState(true);
+  const [showTools, setShowTools] = useState(false);
 
   return (
     <SidebarProvider>
@@ -49,17 +49,17 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 ))}
               </nav>
 
-              {/* Tools Section */}
-              <div className="hidden md:flex items-center">
-                <button
-                  onClick={() => setShowTools(!showTools)}
-                  className="text-gray-300 hover:text-crypto-blue p-2 transition-colors"
-                  aria-label="Toggle tools"
-                >
-                  Tools
-                </button>
-                {showTools && (
-                  <div className="flex items-center gap-4 ml-4">
+              {/* Tools Section - Now with hover functionality */}
+              <div 
+                className="hidden md:flex items-center fixed right-0 top-20 bg-black/90 px-4 py-2 rounded-l-lg transition-transform duration-300 hover:translate-x-0 translate-x-[calc(100%-40px)] group"
+                onMouseEnter={() => setShowTools(true)}
+                onMouseLeave={() => setShowTools(false)}
+              >
+                <div className="flex items-center">
+                  <span className="text-gray-300 rotate-90 transform origin-left translate-y-[-50%] group-hover:opacity-0 transition-opacity absolute left-4">
+                    Tools
+                  </span>
+                  <div className="flex items-center gap-4 pl-8">
                     {toolMenuItems.map((item) => (
                       <a
                         key={item.label}
@@ -71,7 +71,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                       </a>
                     ))}
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Mobile Menu Trigger */}
