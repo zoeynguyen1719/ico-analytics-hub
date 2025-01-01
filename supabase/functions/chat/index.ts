@@ -1,15 +1,15 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+interface ChatRequest {
+  message: string;
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
-
-interface ChatRequest {
-  message: string;
-}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -47,7 +47,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo', // Using a stable model name
+        model: 'gpt-3.5-turbo',
         messages: [
           {
             role: 'system',
@@ -61,22 +61,24 @@ serve(async (req) => {
       }),
     });
 
-    if (!openAIResponse.ok) {
-      const errorData = await openAIResponse.json().catch(() => ({ error: 'Unknown error' }));
-      console.error('OpenAI API error:', errorData);
-      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
-    }
+    const responseData = await openAIResponse.json().catch(() => ({ error: 'Failed to parse OpenAI response' }));
 
-    const data = await openAIResponse.json().catch((error) => {
-      console.error('Error parsing OpenAI response:', error);
-      throw new Error('Invalid response from OpenAI API');
-    });
+    if (!openAIResponse.ok) {
+      console.error('OpenAI API error:', responseData);
+      
+      // Check for quota exceeded error
+      if (responseData.error?.message?.includes('exceeded your current quota')) {
+        throw new Error('API quota exceeded. Please try again later or contact support.');
+      }
+      
+      throw new Error(responseData.error?.message || 'Failed to get response from OpenAI');
+    }
 
     console.log('Successfully received OpenAI response');
 
     return new Response(
       JSON.stringify({
-        generatedText: data.choices[0].message.content,
+        generatedText: responseData.choices[0].message.content,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

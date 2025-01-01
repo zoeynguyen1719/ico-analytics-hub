@@ -31,7 +31,26 @@ const AIChatBox = () => {
 
       if (response.error) {
         console.error('Supabase function error:', response.error);
-        throw new Error(response.error.message || 'Failed to get response from AI');
+        
+        // Check if the error is related to quota
+        const errorMessage = response.error.message || 'Failed to get response from AI';
+        if (errorMessage.includes('quota exceeded')) {
+          toast({
+            title: "Service Temporarily Unavailable",
+            description: "Our AI service is currently at capacity. Please try again later or contact support.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: errorMessage,
+            variant: "destructive",
+          });
+        }
+        
+        // Remove the user's message if we couldn't get a response
+        setConversation(prev => prev.slice(0, -1));
+        return;
       }
 
       if (!response.data) {
@@ -43,7 +62,7 @@ const AIChatBox = () => {
       console.error('Chat error:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to get response from AI. Please try again.",
+        description: "Failed to connect to AI service. Please try again later.",
         variant: "destructive",
       });
       
