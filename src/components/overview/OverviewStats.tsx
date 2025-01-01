@@ -1,5 +1,16 @@
 import { Card } from "@/components/ui/card";
-import { ChartBar, DollarSign, Calendar, Users, Globe, Rocket, Info } from "lucide-react";
+import { ChartBar, DollarSign, Calendar, Users, Globe, Rocket, Info, TrendingUp, Gem } from "lucide-react";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+
+const mockChartData = [
+  { date: '2024-01', value: 2400 },
+  { date: '2024-02', value: 1398 },
+  { date: '2024-03', value: 9800 },
+  { date: '2024-04', value: 3908 },
+  { date: '2024-05', value: 4800 },
+  { date: '2024-06', value: 3800 },
+];
 
 const OverviewStats = () => {
   const stats = [
@@ -7,35 +18,45 @@ const OverviewStats = () => {
       title: "Total ICOs",
       value: "156",
       change: "+12%",
-      icon: ChartBar,
-      description: "Active ICO projects"
+      icon: Gem,
+      description: "Active ICO projects",
+      chartData: mockChartData
     },
     {
       title: "Total Raised",
       value: "$2.4M",
       change: "+8.2%",
       icon: DollarSign,
-      description: "Across all projects"
+      description: "Across all projects",
+      chartData: mockChartData.map(d => ({ ...d, value: d.value * 1.2 }))
     },
     {
       title: "Average ROI",
       value: "124%",
       change: "+5.4%",
-      icon: Rocket,
-      description: "Return on investment"
+      icon: TrendingUp,
+      description: "Return on investment",
+      chartData: mockChartData.map(d => ({ ...d, value: d.value * 0.8 }))
     },
     {
       title: "Active Users",
       value: "2,845",
       change: "+2.3%",
       icon: Users,
-      description: "Platform participants"
+      description: "Platform participants",
+      chartData: mockChartData.map(d => ({ ...d, value: d.value * 0.5 }))
     }
   ];
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Overview</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-white">Analytics Overview</h2>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-400">Last updated: Just now</span>
+          <Info className="w-4 h-4 text-gray-400" />
+        </div>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
@@ -55,6 +76,25 @@ const OverviewStats = () => {
               </span>
               <span className="text-sm text-gray-400 ml-2">vs last month</span>
             </div>
+            <div className="h-24 mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={stat.chartData}>
+                  <defs>
+                    <linearGradient id={`colorValue${index}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#0FA0CE" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#0FA0CE" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <Area
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#0FA0CE"
+                    fillOpacity={1}
+                    fill={`url(#colorValue${index})`}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
             <p className="text-sm text-gray-400 mt-2">{stat.description}</p>
           </Card>
         ))}
@@ -67,13 +107,17 @@ const OverviewStats = () => {
             <Calendar className="w-5 h-5 text-crypto-green" />
           </div>
           <div className="space-y-4">
-            {[1, 2, 3].map((_, index) => (
+            {[
+              { title: "New ICO Listed", project: "Metaverse Project", time: "2h ago" },
+              { title: "Price Update", project: "DeFi Protocol", time: "4h ago" },
+              { title: "ROI Milestone", project: "GameFi Token", time: "6h ago" }
+            ].map((activity, index) => (
               <div key={index} className="flex items-center justify-between py-2 border-b border-crypto-dark">
                 <div>
-                  <p className="text-sm font-medium text-white">New ICO Listed</p>
-                  <p className="text-xs text-gray-400">Metaverse Project</p>
+                  <p className="text-sm font-medium text-white">{activity.title}</p>
+                  <p className="text-xs text-gray-400">{activity.project}</p>
                 </div>
-                <span className="text-xs text-gray-400">2h ago</span>
+                <span className="text-xs text-gray-400">{activity.time}</span>
               </div>
             ))}
           </div>
@@ -86,13 +130,16 @@ const OverviewStats = () => {
           </div>
           <div className="space-y-4">
             {[
-              { label: "Total Market Cap", value: "$1.2B" },
-              { label: "24h Volume", value: "$245M" },
-              { label: "Active Projects", value: "89" }
+              { label: "Total Market Cap", value: "$1.2B", change: "+2.5%" },
+              { label: "24h Volume", value: "$245M", change: "+1.8%" },
+              { label: "Active Projects", value: "89", change: "+3.2%" }
             ].map((stat, index) => (
               <div key={index} className="flex items-center justify-between py-2 border-b border-crypto-dark">
                 <span className="text-sm text-gray-400">{stat.label}</span>
-                <span className="text-sm font-medium text-white">{stat.value}</span>
+                <div className="text-right">
+                  <span className="text-sm font-medium text-white">{stat.value}</span>
+                  <span className="text-xs text-crypto-green ml-2">{stat.change}</span>
+                </div>
               </div>
             ))}
           </div>
