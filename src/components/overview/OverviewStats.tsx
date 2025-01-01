@@ -21,8 +21,8 @@ const OverviewStats = () => {
       icon: Gem,
       description: "Active ICO projects",
       chartData: mockChartData,
-      bgColor: "bg-[#8B5CF6]/10", // Vivid Purple
-      borderColor: "border-[#8B5CF6]"
+      bgColor: "bg-crypto-blue/10",
+      borderColor: "border-crypto-blue"
     },
     {
       title: "Total Raised",
@@ -31,8 +31,8 @@ const OverviewStats = () => {
       icon: DollarSign,
       description: "Across all projects",
       chartData: mockChartData.map(d => ({ ...d, value: d.value * 1.2 })),
-      bgColor: "bg-[#0EA5E9]/10", // Ocean Blue
-      borderColor: "border-[#0EA5E9]"
+      bgColor: "bg-crypto-green/10",
+      borderColor: "border-crypto-green"
     },
     {
       title: "Average ROI",
@@ -41,8 +41,8 @@ const OverviewStats = () => {
       icon: TrendingUp,
       description: "Return on investment",
       chartData: mockChartData.map(d => ({ ...d, value: d.value * 0.8 })),
-      bgColor: "bg-[#F97316]/10", // Bright Orange
-      borderColor: "border-[#F97316]"
+      bgColor: "bg-crypto-blue/10",
+      borderColor: "border-crypto-blue"
     },
     {
       title: "Active Users",
@@ -51,8 +51,8 @@ const OverviewStats = () => {
       icon: Users,
       description: "Platform participants",
       chartData: mockChartData.map(d => ({ ...d, value: d.value * 0.5 })),
-      bgColor: "bg-[#D946EF]/10", // Magenta Pink
-      borderColor: "border-[#D946EF]"
+      bgColor: "bg-crypto-green/10",
+      borderColor: "border-crypto-green"
     }
   ];
 
@@ -89,14 +89,14 @@ const OverviewStats = () => {
                 <AreaChart data={stat.chartData}>
                   <defs>
                     <linearGradient id={`colorValue${index}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={stat.borderColor.replace('border-[', '').replace(']', '')} stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor={stat.borderColor.replace('border-[', '').replace(']', '')} stopOpacity={0}/>
+                      <stop offset="5%" stopColor={stat.borderColor.replace('border-', '').replace('crypto-', '#4BA3CC')} stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor={stat.borderColor.replace('border-', '').replace('crypto-', '#4BA3CC')} stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <Area
                     type="monotone"
                     dataKey="value"
-                    stroke={stat.borderColor.replace('border-[', '').replace(']', '')}
+                    stroke={stat.borderColor.replace('border-', '').replace('crypto-', '#4BA3CC')}
                     fillOpacity={1}
                     fill={`url(#colorValue${index})`}
                   />
