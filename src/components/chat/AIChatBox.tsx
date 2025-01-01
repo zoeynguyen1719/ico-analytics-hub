@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MessageCircle, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const AIChatBox = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,19 +22,15 @@ const AIChatBox = () => {
       setConversation(prev => [...prev, userMessage]);
       setMessage("");
 
-      const response = await fetch("/functions/v1/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message }),
+      const { data, error } = await supabase.functions.invoke('chat', {
+        body: { message },
       });
 
-      if (!response.ok) throw new Error("Failed to get response");
+      if (error) throw error;
 
-      const data = await response.json();
       setConversation(prev => [...prev, { role: "assistant", content: data.generatedText }]);
     } catch (error) {
+      console.error('Chat error:', error);
       toast({
         title: "Error",
         description: "Failed to get response from AI. Please try again.",
