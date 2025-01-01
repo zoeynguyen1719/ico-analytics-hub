@@ -1,7 +1,7 @@
 import { Home, Calculator, BarChart2, Newspaper, Crown, Gamepad2, BookOpen } from "lucide-react";
 
 export const mainMenuItems = [
-  { icon: Home, label: "Overview", path: "/" },
+  { icon: Home, label: "Home", path: "/" },
   { icon: BookOpen, label: "Research", path: "/research" },
   { icon: Newspaper, label: "News", path: "/news" },
   { icon: Crown, label: "Subscription", path: "/subscription" },
@@ -15,8 +15,8 @@ export const toolMenuItems = [
 
 const MainMenu = () => {
   return (
-    <nav className="hidden md:flex items-center justify-center flex-1 mx-4">
-      <div className="flex items-center space-x-8">
+    <nav className="hidden md:block">
+      <div className="flex items-center justify-center space-x-8 h-16">
         {mainMenuItems.map((item) => (
           <a
             key={item.label}
