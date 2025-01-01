@@ -1,8 +1,11 @@
-import { ArrowRight, Rocket, Star, Award, Sparkles, Heart, Leaf } from "lucide-react";
+import { ArrowRight, Rocket, Star, Award, Sparkles, Heart, Leaf, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 const IntroductionSection = () => {
+  const navigate = useNavigate();
+  
   const features = [
     {
       text: "Real-time ICO Analytics Dashboard",
@@ -42,12 +45,19 @@ const IntroductionSection = () => {
             <p className="text-xl text-white">
               Your comprehensive platform for ICO analytics and portfolio management
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <Button className="bg-crypto-blue hover:bg-crypto-blue/90 text-crypto-dark">
                 Get Started <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button variant="outline" className="border-crypto-blue text-crypto-blue hover:bg-crypto-blue/10">
                 Learn More
+              </Button>
+              <Button 
+                variant="outline" 
+                className="border-crypto-green text-crypto-green hover:bg-crypto-green/10"
+                onClick={() => navigate('/signin')}
+              >
+                Sign In <LogIn className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>
