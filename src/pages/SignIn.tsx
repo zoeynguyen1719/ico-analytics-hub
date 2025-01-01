@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Home } from "lucide-react";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -146,6 +146,18 @@ const SignIn = () => {
             {loading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
+
+        <div className="mt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate("/")}
+            className="w-full border-crypto-blue text-crypto-blue hover:bg-crypto-blue/10"
+          >
+            <Home className="mr-2 h-4 w-4" />
+            Return to Homepage
+          </Button>
+        </div>
       </Card>
     </div>
   );
