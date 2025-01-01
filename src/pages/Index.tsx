@@ -21,16 +21,29 @@ const Index = () => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
+      
+      // If user is not authenticated and tries to access protected sections,
+      // redirect them to Introduction
+      if (!session && ["ACTIVE", "UPCOMING", "ENDED"].includes(activeSection)) {
+        setActiveSection("INTRODUCTION");
+      }
     };
 
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session);
+      const isAuthed = !!session;
+      setIsAuthenticated(isAuthed);
+      
+      // When user signs out and is on a protected section,
+      // redirect them to Introduction
+      if (!isAuthed && ["ACTIVE", "UPCOMING", "ENDED"].includes(activeSection)) {
+        setActiveSection("INTRODUCTION");
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [activeSection]);
 
   // Categorize projects based on certain criteria
   const categorizedProjects = {
@@ -122,15 +135,19 @@ const Index = () => {
           <ToggleGroupItem value="OVERVIEW" aria-label="Show overview">
             Overview
           </ToggleGroupItem>
-          <ToggleGroupItem value="ACTIVE" aria-label="Show active projects">
-            Active
-          </ToggleGroupItem>
-          <ToggleGroupItem value="UPCOMING" aria-label="Show upcoming projects">
-            Upcoming
-          </ToggleGroupItem>
-          <ToggleGroupItem value="ENDED" aria-label="Show ended projects">
-            Ended
-          </ToggleGroupItem>
+          {isAuthenticated && (
+            <>
+              <ToggleGroupItem value="ACTIVE" aria-label="Show active projects">
+                Active
+              </ToggleGroupItem>
+              <ToggleGroupItem value="UPCOMING" aria-label="Show upcoming projects">
+                Upcoming
+              </ToggleGroupItem>
+              <ToggleGroupItem value="ENDED" aria-label="Show ended projects">
+                Ended
+              </ToggleGroupItem>
+            </>
+          )}
         </ToggleGroup>
 
         <div className="grid grid-cols-1">
