@@ -1,5 +1,5 @@
 import { SidebarProvider, Sidebar, SidebarContent, SidebarTrigger } from "@/components/ui/sidebar";
-import { Home, Calculator, BarChart2, Newspaper, Crown, Gamepad2, BookOpen, MessageSquare } from "lucide-react";
+import { Home, Calculator, BarChart2, Newspaper, Crown, Gamepad2, BookOpen } from "lucide-react";
 import { useState } from "react";
 import Footer from "./Footer";
 
@@ -14,7 +14,6 @@ const mainMenuItems = [
 const toolMenuItems = [
   { icon: Calculator, label: "Calculator", path: "/calculator" },
   { icon: BarChart2, label: "Compare", path: "/compare" },
-  { icon: MessageSquare, label: "AI Chat", path: "/chat" },
 ];
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -52,14 +51,14 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 </div>
               </nav>
 
-              {/* Tools Section - Now with hover functionality and updated background */}
+              {/* Tools Section - Now with updated colors for better visibility */}
               <div 
-                className="hidden md:flex items-center fixed right-0 top-20 bg-crypto-blue px-4 py-2 rounded-l-lg transition-transform duration-300 hover:translate-x-0 translate-x-[calc(100%-40px)] group shadow-lg"
+                className="hidden md:flex items-center fixed right-0 top-20 bg-crypto-dark px-4 py-2 rounded-l-lg transition-transform duration-300 hover:translate-x-0 translate-x-[calc(100%-40px)] group shadow-lg"
                 onMouseEnter={() => setShowTools(true)}
                 onMouseLeave={() => setShowTools(false)}
               >
                 <div className="flex items-center">
-                  <span className="text-black font-medium rotate-90 transform origin-left translate-y-[-50%] group-hover:opacity-0 transition-opacity absolute left-4">
+                  <span className="text-crypto-blue font-semibold rotate-90 transform origin-left translate-y-[-50%] group-hover:opacity-0 transition-opacity absolute left-4">
                     Tools
                   </span>
                   <div className="flex items-center gap-4 pl-8">
@@ -67,7 +66,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                       <a
                         key={item.label}
                         href={item.path}
-                        className="text-black hover:text-crypto-dark transition-colors"
+                        className="text-crypto-blue hover:text-white transition-colors"
                         title={item.label}
                       >
                         <item.icon size={20} />
