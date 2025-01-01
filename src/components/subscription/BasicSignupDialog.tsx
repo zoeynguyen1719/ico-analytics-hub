@@ -36,7 +36,6 @@ const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
             setEmail={setEmail}
             password={password}
             setPassword={setPassword}
-            loading={loading}
           />
         </form>
       </DialogContent>
