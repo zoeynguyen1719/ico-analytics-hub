@@ -39,6 +39,19 @@ const SignIn = () => {
     setLoading(true);
 
     try {
+      // First, check if the user exists
+      const { data: userExists } = await supabase
+        .from('basic_signups')
+        .select('email')
+        .eq('email', email.trim())
+        .single();
+
+      if (!userExists) {
+        toast.error("No account found with this email. Please sign up first.");
+        setLoading(false);
+        return;
+      }
+
       const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
@@ -46,10 +59,12 @@ const SignIn = () => {
 
       if (signInError) {
         console.error("Sign in error:", signInError);
+        
+        // Handle specific error cases
         if (signInError.message.includes("Email not confirmed")) {
-          toast.error("Please confirm your email before signing in");
+          toast.error("Please check your email and confirm your account before signing in");
         } else if (signInError.message.includes("Invalid login credentials")) {
-          toast.error("Invalid email or password");
+          toast.error("Invalid email or password. Please try again.");
         } else {
           toast.error(signInError.message);
         }
@@ -57,7 +72,7 @@ const SignIn = () => {
       }
 
       if (!authData?.session) {
-        toast.error("Error getting session");
+        toast.error("Unable to sign in. Please try again.");
         return;
       }
 
@@ -66,7 +81,7 @@ const SignIn = () => {
       
     } catch (error) {
       console.error("Unexpected error:", error);
-      toast.error("An unexpected error occurred");
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
