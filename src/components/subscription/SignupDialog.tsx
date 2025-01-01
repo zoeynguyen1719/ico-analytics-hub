@@ -62,7 +62,11 @@ const SignupDialog = ({
         return;
       }
 
+      // For basic tier, wait a moment to ensure the user is created before inserting into basic_signups
       if (tier === 'basic') {
+        // Small delay to ensure user creation is complete
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         const { error: signupError } = await supabase
           .from('basic_signups')
           .insert([{ 
@@ -72,8 +76,8 @@ const SignupDialog = ({
 
         if (signupError) {
           console.error('Signup error:', signupError);
-          toast.error("Error saving signup information");
-          return;
+          // If this fails, we should still let the user know to check their email
+          console.warn('Failed to create basic signup record, but user account was created');
         }
 
         toast.success("Please check your email to confirm your account. You will be redirected to sign in after confirmation.");
