@@ -19,6 +19,35 @@ interface ICOProject {
   participants?: number;
 }
 
+const fetchFromCoinGecko = async (): Promise<ICOProject[]> => {
+  try {
+    const response = await fetch(
+      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=id_asc&per_page=100&page=1&sparkline=false`
+    );
+    
+    if (!response.ok) {
+      throw new Error(`CoinGecko API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    return data.map((coin: any) => ({
+      name: coin.name,
+      symbol: coin.symbol.toUpperCase(),
+      category: "Cryptocurrency",
+      type: "Public Sale",
+      value: coin.current_price ? `$${coin.current_price.toLocaleString()}` : undefined,
+      logo: coin.image || "/placeholder.svg",
+      isNew: coin.price_change_percentage_24h > 10,
+      isHighlighted: coin.price_change_percentage_24h > 5,
+    }));
+  } catch (error) {
+    console.error("Error fetching from CoinGecko:", error);
+    // Return empty array as fallback
+    return [];
+  }
+};
+
 export const fetchICOProjects = async (): Promise<ICOProject[]> => {
   try {
     const { data: supabaseData, error: supabaseError } = await supabase
@@ -33,7 +62,7 @@ export const fetchICOProjects = async (): Promise<ICOProject[]> => {
 
     if (supabaseData && supabaseData.length > 0) {
       return supabaseData.map((project: any) => ({
-        name: project["Project Name"],
+        name: project["Project Name"] || "Unknown Project",
         symbol: project.symbol || "N/A",
         category: project.category || "Cryptocurrency",
         type: project.type || "Public Sale",
@@ -46,7 +75,6 @@ export const fetchICOProjects = async (): Promise<ICOProject[]> => {
       }));
     }
 
-    // If no data in Supabase, fetch from CoinGecko
     console.log('No data in Supabase, fetching from CoinGecko');
     return fetchFromCoinGecko();
   } catch (error) {
@@ -55,26 +83,12 @@ export const fetchICOProjects = async (): Promise<ICOProject[]> => {
   }
 };
 
-const fetchFromCoinGecko = async (): Promise<ICOProject[]> => {
-  const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=id_asc&per_page=100&page=1&sparkline=false`);
-  const data = await response.json();
-  
-  return data.map((coin: any) => ({
-    name: coin.name,
-    symbol: coin.symbol.toUpperCase(),
-    category: "Cryptocurrency",
-    type: "Public Sale",
-    value: coin.current_price ? `$${coin.current_price.toLocaleString()}` : undefined,
-    logo: coin.image,
-    isNew: coin.price_change_percentage_24h > 10,
-    isHighlighted: coin.price_change_percentage_24h > 5,
-  }));
-};
-
 export const useICOProjects = () => {
   return useQuery({
     queryKey: ['ico-projects'],
     queryFn: fetchICOProjects,
     refetchInterval: 300000, // Refetch every 5 minutes
+    retry: 3, // Retry failed requests 3 times
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
 };
