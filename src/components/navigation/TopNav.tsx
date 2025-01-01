@@ -3,18 +3,33 @@ import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 interface TopNavProps {
   user: any;
 }
 
-const TopNav = ({ user }: TopNavProps) => {
+const TopNav = ({ user: initialUser }: TopNavProps) => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(initialUser);
+
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleSignOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      setUser(null);
       toast.success("Signed out successfully");
       navigate("/signin");
     } catch (error) {
