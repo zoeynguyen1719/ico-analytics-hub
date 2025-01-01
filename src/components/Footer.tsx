@@ -1,4 +1,4 @@
-import { Github, Twitter, Linkedin } from "lucide-react";
+import { Github, Twitter, Medium } from "lucide-react";
 import TermsAndConditionsDialog from "./TermsAndConditionsDialog";
 
 const Footer = () => {
@@ -45,8 +45,8 @@ const Footer = () => {
               <a href="#" className="text-gray-400 hover:text-crypto-blue transition-colors">
                 <Github className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-crypto-blue transition-colors">
-                <Linkedin className="h-5 w-5" />
+              <a href="https://medium.com/@mericulum" className="text-gray-400 hover:text-crypto-blue transition-colors">
+                <Medium className="h-5 w-5" />
               </a>
             </div>
           </div>
