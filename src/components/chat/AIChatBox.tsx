@@ -91,7 +91,7 @@ const AIChatBox = () => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1"
+                className="flex-1 bg-crypto-gray text-white placeholder:text-gray-400"
                 disabled={loading}
               />
               <Button type="submit" disabled={loading || !message.trim()}>
