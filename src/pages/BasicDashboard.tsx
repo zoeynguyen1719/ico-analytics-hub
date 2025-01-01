@@ -1,0 +1,116 @@
+import DashboardLayout from "@/components/DashboardLayout";
+import { ProjectSection } from "@/components/projects/ProjectSection";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useState } from "react";
+import { useICOProjects } from "@/services/icoService";
+import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+
+const BasicDashboard = () => {
+  const [activeSection, setActiveSection] = useState<"ACTIVE" | "UPCOMING" | "ENDED">("ACTIVE");
+  const { data: icoProjects, isLoading, error } = useICOProjects();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/signin');
+        return;
+      }
+
+      // Verify if user has basic signup
+      const { data: basicSignup, error: signupError } = await supabase
+        .from('basic_signups')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (signupError || !basicSignup) {
+        navigate('/');
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
+  // Categorize projects based on certain criteria
+  const categorizedProjects = {
+    active: icoProjects?.filter(p => p.isHighlighted) || [],
+    upcoming: icoProjects?.filter(p => p.isNew && !p.isHighlighted) || [],
+    ended: icoProjects?.filter(p => !p.isNew && !p.isHighlighted) || []
+  };
+
+  const sections = {
+    ACTIVE: { title: "ACTIVE", count: categorizedProjects.active.length, projects: categorizedProjects.active },
+    UPCOMING: { title: "UPCOMING", count: categorizedProjects.upcoming.length, projects: categorizedProjects.upcoming },
+    ENDED: { title: "ENDED", count: categorizedProjects.ended.length, projects: categorizedProjects.ended }
+  };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <Card className="p-6">
+          <div className="animate-pulse flex space-x-4">
+            <div className="flex-1 space-y-4 py-1">
+              <div className="h-4 bg-gray-600 rounded w-3/4"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-600 rounded"></div>
+                <div className="h-4 bg-gray-600 rounded w-5/6"></div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <Card className="p-6 text-red-500">
+          Error loading ICO projects. Please try again later.
+        </Card>
+      </DashboardLayout>
+    );
+  }
+
+  return (
+    <DashboardLayout>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold text-crypto-blue">Basic Dashboard</h1>
+        
+        <ToggleGroup
+          type="single"
+          value={activeSection}
+          onValueChange={(value) => {
+            if (value) setActiveSection(value as "ACTIVE" | "UPCOMING" | "ENDED");
+          }}
+          className="justify-start"
+        >
+          <ToggleGroupItem value="ACTIVE" aria-label="Show active projects">
+            Active
+          </ToggleGroupItem>
+          <ToggleGroupItem value="UPCOMING" aria-label="Show upcoming projects">
+            Upcoming
+          </ToggleGroupItem>
+          <ToggleGroupItem value="ENDED" aria-label="Show ended projects">
+            Ended
+          </ToggleGroupItem>
+        </ToggleGroup>
+
+        <div className="grid grid-cols-1">
+          <ProjectSection 
+            title={sections[activeSection].title}
+            count={sections[activeSection].count}
+            projects={sections[activeSection].projects}
+          />
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+};
+
+export default BasicDashboard;

@@ -10,6 +10,7 @@ import News from "./pages/News";
 import SignIn from "./pages/SignIn";
 import Games from "./pages/Games";
 import Research from "./pages/Research";
+import BasicDashboard from "./pages/BasicDashboard";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/signin" element={<SignIn />} />
           <Route path="/games" element={<Games />} />
           <Route path="/research" element={<Research />} />
+          <Route path="/basic-dashboard" element={<BasicDashboard />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

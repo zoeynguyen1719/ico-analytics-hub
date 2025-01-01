@@ -20,42 +20,52 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      // First, check if the user exists
-      const { data: userExists, error: userCheckError } = await supabase
-        .from('basic_signups')
-        .select('email')
-        .eq('email', email)
-        .maybeSingle();
-
-      if (userCheckError) {
-        console.error("Error checking user:", userCheckError);
-        toast.error("Error checking user account. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      if (!userExists) {
-        toast.error("No account found with this email. Please sign up first.");
-        setLoading(false);
-        return;
-      }
-
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        if (error.message.includes("Email not confirmed")) {
+      if (signInError) {
+        if (signInError.message.includes("Email not confirmed")) {
           toast.error("Please confirm your email before signing in. Check your inbox for the confirmation link.");
-        } else if (error.message.includes("Invalid login credentials")) {
+        } else if (signInError.message.includes("Invalid login credentials")) {
           toast.error("Invalid password. Please try again.");
         } else {
-          toast.error(error.message);
+          toast.error(signInError.message);
         }
-        console.error("Sign in error:", error);
+        console.error("Sign in error:", signInError);
+        setLoading(false);
+        return;
+      }
+
+      // Get the user session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Error getting session");
+        setLoading(false);
+        return;
+      }
+
+      // Check if user has basic signup
+      const { data: basicSignup, error: signupError } = await supabase
+        .from('basic_signups')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (signupError) {
+        console.error("Error checking signup:", signupError);
+        toast.error("Error checking account type");
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Successfully signed in!");
+      
+      // Redirect based on user type
+      if (basicSignup) {
+        navigate("/basic-dashboard");
       } else {
-        toast.success("Successfully signed in!");
         navigate("/");
       }
     } catch (error: any) {
