@@ -22,12 +22,12 @@ const AIChatBox = () => {
       setConversation(prev => [...prev, userMessage]);
       setMessage("");
 
+      console.log('Sending message to chat function:', message);
       const response = await supabase.functions.invoke('chat', {
         body: { message },
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
+
+      console.log('Received response from chat function:', response);
 
       if (response.error) {
         console.error('Supabase function error:', response.error);

@@ -21,21 +21,33 @@ serve(async (req) => {
   }
 
   try {
-    const { message } = await req.json() as ChatRequest;
+    // Parse and validate request body
+    const requestData = await req.json().catch((error) => {
+      console.error('Error parsing request JSON:', error);
+      throw new Error('Invalid JSON in request body');
+    });
+
+    const { message } = requestData as ChatRequest;
     console.log('Received message:', message);
 
     if (!message) {
       throw new Error('Message is required');
     }
 
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key is not configured');
+    }
+
+    console.log('Making request to OpenAI API...');
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-3.5-turbo', // Using a stable model name
         messages: [
           {
             role: 'system',
@@ -50,13 +62,17 @@ serve(async (req) => {
     });
 
     if (!openAIResponse.ok) {
-      const errorData = await openAIResponse.json();
+      const errorData = await openAIResponse.json().catch(() => ({ error: 'Unknown error' }));
       console.error('OpenAI API error:', errorData);
       throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
     }
 
-    const data = await openAIResponse.json();
-    console.log('OpenAI response received');
+    const data = await openAIResponse.json().catch((error) => {
+      console.error('Error parsing OpenAI response:', error);
+      throw new Error('Invalid response from OpenAI API');
+    });
+
+    console.log('Successfully received OpenAI response');
 
     return new Response(
       JSON.stringify({
@@ -70,7 +86,7 @@ serve(async (req) => {
     console.error('Error in chat function:', error);
     return new Response(
       JSON.stringify({
-        error: error.message,
+        error: error.message || 'An unexpected error occurred',
       }),
       {
         status: 500,
