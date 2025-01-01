@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageCircle, X } from "lucide-react";
+import { MessageCircle, X, Bot } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -53,7 +53,10 @@ const AIChatBox = () => {
       ) : (
         <div className="bg-crypto-dark border border-crypto-gray rounded-lg shadow-xl w-[350px] max-h-[500px] flex flex-col">
           <div className="p-4 border-b border-crypto-gray flex justify-between items-center">
-            <h3 className="text-crypto-blue font-semibold">AI Assistant</h3>
+            <div className="flex items-center gap-2">
+              <Bot className="h-5 w-5 text-crypto-blue" />
+              <h3 className="text-crypto-blue font-semibold">AI Assistant</h3>
+            </div>
             <Button
               variant="ghost"
               size="icon"
