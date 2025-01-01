@@ -20,7 +20,9 @@ const OverviewStats = () => {
       change: "+12%",
       icon: Gem,
       description: "Active ICO projects",
-      chartData: mockChartData
+      chartData: mockChartData,
+      bgColor: "bg-[#8B5CF6]/10", // Vivid Purple
+      borderColor: "border-[#8B5CF6]"
     },
     {
       title: "Total Raised",
@@ -28,7 +30,9 @@ const OverviewStats = () => {
       change: "+8.2%",
       icon: DollarSign,
       description: "Across all projects",
-      chartData: mockChartData.map(d => ({ ...d, value: d.value * 1.2 }))
+      chartData: mockChartData.map(d => ({ ...d, value: d.value * 1.2 })),
+      bgColor: "bg-[#0EA5E9]/10", // Ocean Blue
+      borderColor: "border-[#0EA5E9]"
     },
     {
       title: "Average ROI",
@@ -36,7 +40,9 @@ const OverviewStats = () => {
       change: "+5.4%",
       icon: TrendingUp,
       description: "Return on investment",
-      chartData: mockChartData.map(d => ({ ...d, value: d.value * 0.8 }))
+      chartData: mockChartData.map(d => ({ ...d, value: d.value * 0.8 })),
+      bgColor: "bg-[#F97316]/10", // Bright Orange
+      borderColor: "border-[#F97316]"
     },
     {
       title: "Active Users",
@@ -44,7 +50,9 @@ const OverviewStats = () => {
       change: "+2.3%",
       icon: Users,
       description: "Platform participants",
-      chartData: mockChartData.map(d => ({ ...d, value: d.value * 0.5 }))
+      chartData: mockChartData.map(d => ({ ...d, value: d.value * 0.5 })),
+      bgColor: "bg-[#D946EF]/10", // Magenta Pink
+      borderColor: "border-[#D946EF]"
     }
   ];
 
@@ -60,14 +68,14 @@ const OverviewStats = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
-          <Card key={index} className="p-6 bg-crypto-gray border-crypto-blue hover:border-crypto-green transition-colors">
+          <Card key={index} className={`p-6 ${stat.bgColor} border-2 ${stat.borderColor} hover:border-crypto-blue transition-colors`}>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-gray-400">{stat.title}</p>
+                <p className="text-sm text-gray-300">{stat.title}</p>
                 <h3 className="text-2xl font-bold text-white mt-1">{stat.value}</h3>
               </div>
-              <div className="p-2 bg-crypto-dark rounded-lg">
-                <stat.icon className="w-6 h-6 text-crypto-green" />
+              <div className={`p-2 rounded-lg ${stat.bgColor}`}>
+                <stat.icon className={`w-6 h-6 ${stat.borderColor.replace('border-', 'text-')}`} />
               </div>
             </div>
             <div className="mt-4">
@@ -81,14 +89,14 @@ const OverviewStats = () => {
                 <AreaChart data={stat.chartData}>
                   <defs>
                     <linearGradient id={`colorValue${index}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0FA0CE" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#0FA0CE" stopOpacity={0}/>
+                      <stop offset="5%" stopColor={stat.borderColor.replace('border-[', '').replace(']', '')} stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor={stat.borderColor.replace('border-[', '').replace(']', '')} stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <Area
                     type="monotone"
                     dataKey="value"
-                    stroke="#0FA0CE"
+                    stroke={stat.borderColor.replace('border-[', '').replace(']', '')}
                     fillOpacity={1}
                     fill={`url(#colorValue${index})`}
                   />
