@@ -45,7 +45,7 @@ const Footer = () => {
               <a href="#" className="text-gray-400 hover:text-crypto-blue transition-colors">
                 <Github className="h-5 w-5" />
               </a>
-              <a href="https://medium.com/@mericulum" className="text-gray-400 hover:text-crypto-blue transition-colors">
+              <a href="https://medium.com/@mericulum" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-crypto-blue transition-colors">
                 <BookOpen className="h-5 w-5" />
               </a>
             </div>
