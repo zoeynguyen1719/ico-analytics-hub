@@ -15,6 +15,12 @@ serve(async (req) => {
 
   try {
     const { message } = await req.json();
+    
+    console.log('Received message:', message);
+
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -23,7 +29,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4',
         messages: [
           {
             role: 'system',
@@ -35,6 +41,16 @@ serve(async (req) => {
     });
 
     const data = await response.json();
+    console.log('OpenAI API response:', data);
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${data.error?.message || 'Unknown error'}`);
+    }
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid response format from OpenAI API');
+    }
+
     const generatedText = data.choices[0].message.content;
 
     return new Response(JSON.stringify({ generatedText }), {
