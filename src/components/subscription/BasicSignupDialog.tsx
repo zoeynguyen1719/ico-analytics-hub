@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useSignup } from "@/hooks/useSignup";
-import SignupFormFields from "./SignupFormFields";
+import { SignupFormFields } from "./SignupFormFields";
 
 interface BasicSignupDialogProps {
   open: boolean;
