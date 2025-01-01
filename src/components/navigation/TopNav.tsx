@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
+import { mainMenuItems } from "./MainMenu";
 
 interface TopNavProps {
   user: any;
@@ -41,7 +42,7 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
   return (
     <header className="w-full bg-black border-b border-crypto-gray">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center h-20">
           {/* Logo Section */}
           <div className="flex-shrink-0">
             <img 
@@ -50,6 +51,22 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
               className="h-12 w-auto"
             />
           </div>
+
+          {/* Main Menu */}
+          <nav className="hidden md:flex ml-8 flex-1">
+            <div className="flex items-center space-x-8">
+              {mainMenuItems.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.path}
+                  className="flex items-center gap-2 text-gray-300 hover:text-crypto-blue transition-colors group"
+                >
+                  <item.icon size={18} className="group-hover:text-crypto-blue transition-colors" />
+                  <span className="font-medium uppercase tracking-wider text-sm">{item.label}</span>
+                </a>
+              ))}
+            </div>
+          </nav>
 
           {/* Profile Section */}
           <div className="flex items-center gap-4">

@@ -4,7 +4,7 @@ import Footer from "./Footer";
 import AIChatBox from "./chat/AIChatBox";
 import { supabase } from "@/integrations/supabase/client";
 import TopNav from "./navigation/TopNav";
-import MainMenu, { mainMenuItems, toolMenuItems } from "./navigation/MainMenu";
+import { mainMenuItems, toolMenuItems } from "./navigation/MainMenu";
 import ToolsMenu from "./navigation/ToolsMenu";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -14,9 +14,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full bg-black text-white">
         <TopNav user={user} />
-
-        {/* Main Menu */}
-        <MainMenu />
 
         {/* Tools Menu */}
         <ToolsMenu />

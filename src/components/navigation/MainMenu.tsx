@@ -13,23 +13,7 @@ export const toolMenuItems = [
   { icon: BarChart2, label: "Compare", path: "/compare" },
 ];
 
-const MainMenu = () => {
-  return (
-    <nav className="hidden md:block">
-      <div className="flex items-center justify-center space-x-8 h-16">
-        {mainMenuItems.map((item) => (
-          <a
-            key={item.label}
-            href={item.path}
-            className="flex items-center gap-2 text-gray-300 hover:text-crypto-blue transition-colors group py-2"
-          >
-            <item.icon size={18} className="group-hover:text-crypto-blue transition-colors" />
-            <span className="font-medium uppercase tracking-wider text-sm">{item.label}</span>
-          </a>
-        ))}
-      </div>
-    </nav>
-  );
-};
+// This component is no longer needed as the menu is now part of TopNav
+const MainMenu = () => null;
 
 export default MainMenu;
