@@ -39,7 +39,7 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      const { data: { session }, error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
       });
@@ -56,7 +56,7 @@ const SignIn = () => {
         return;
       }
 
-      if (!session) {
+      if (!data.session) {
         toast.error("Error getting session");
         return;
       }
@@ -65,7 +65,7 @@ const SignIn = () => {
       const { data: basicSignup, error: signupError } = await supabase
         .from('basic_signups')
         .select('*')
-        .eq('user_id', session.user.id)
+        .eq('user_id', data.session.user.id)
         .single();
 
       if (signupError && !signupError.message.includes('No rows found')) {
