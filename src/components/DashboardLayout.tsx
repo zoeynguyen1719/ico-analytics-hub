@@ -58,7 +58,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 onMouseLeave={() => setShowTools(false)}
               >
                 <div className="flex items-center">
-                  <span className="text-crypto-blue font-semibold rotate-90 transform origin-left translate-y-[-50%] group-hover:opacity-0 transition-opacity absolute left-6 tracking-wider uppercase text-sm">
+                  <span className="text-crypto-blue font-bold rotate-90 transform origin-left translate-y-[-50%] group-hover:opacity-0 transition-opacity absolute left-6 tracking-widest uppercase text-sm bg-crypto-dark/50 px-3 py-1 rounded-full shadow-lg backdrop-blur-sm">
                     Tools
                   </span>
                   <div className="flex items-center gap-6 pl-10">
