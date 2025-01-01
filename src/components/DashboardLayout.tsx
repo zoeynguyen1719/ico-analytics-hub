@@ -1,8 +1,12 @@
 import { SidebarProvider, Sidebar, SidebarContent, SidebarTrigger } from "@/components/ui/sidebar";
-import { Home, Calculator, BarChart2, Newspaper, Crown, Gamepad2, BookOpen } from "lucide-react";
+import { Home, Calculator, BarChart2, Newspaper, Crown, Gamepad2, BookOpen, UserCircle } from "lucide-react";
 import { useState } from "react";
 import Footer from "./Footer";
 import AIChatBox from "./chat/AIChatBox";
+import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const mainMenuItems = [
   { icon: Home, label: "Overview", path: "/" },
@@ -19,6 +23,20 @@ const toolMenuItems = [
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [showTools, setShowTools] = useState(false);
+  const navigate = useNavigate();
+  const [user, setUser] = useState(() => supabase.auth.getUser());
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast.success("Signed out successfully");
+      navigate("/signin");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast.error("Error signing out");
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -52,40 +70,64 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 </div>
               </nav>
 
-              {/* Tools Section - Redesigned for better visual appeal */}
-              <div 
-                className="hidden md:flex items-center fixed right-0 top-20 bg-gradient-to-l from-crypto-dark to-[#2A4B57] px-6 py-3 rounded-l-xl transition-all duration-300 hover:translate-x-0 translate-x-[calc(100%-48px)] group shadow-xl border-l border-t border-b border-crypto-blue/20"
-                onMouseEnter={() => setShowTools(true)}
-                onMouseLeave={() => setShowTools(false)}
-              >
-                <div className="flex items-center">
-                  <span className="text-crypto-blue font-bold rotate-90 transform origin-left translate-y-[-50%] group-hover:opacity-0 transition-opacity absolute left-6 tracking-widest uppercase text-sm bg-crypto-dark/50 px-3 py-1 rounded-full shadow-lg backdrop-blur-sm">
-                    Tools
-                  </span>
-                  <div className="flex items-center gap-6 pl-10">
-                    {toolMenuItems.map((item) => (
-                      <a
-                        key={item.label}
-                        href={item.path}
-                        className="relative group/tool"
-                        title={item.label}
-                      >
-                        <item.icon 
-                          size={22} 
-                          className="text-crypto-blue hover:text-white transition-all duration-300 transform hover:scale-110" 
-                        />
-                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-crypto-blue text-crypto-dark px-2 py-1 rounded text-xs font-medium opacity-0 group-hover/tool:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                          {item.label}
-                        </span>
-                      </a>
-                    ))}
+              {/* Profile Section */}
+              <div className="flex items-center gap-4">
+                {/* Tools Section */}
+                <div 
+                  className="hidden md:flex items-center fixed right-0 top-20 bg-gradient-to-l from-crypto-dark to-[#2A4B57] px-6 py-3 rounded-l-xl transition-all duration-300 hover:translate-x-0 translate-x-[calc(100%-48px)] group shadow-xl border-l border-t border-b border-crypto-blue/20"
+                  onMouseEnter={() => setShowTools(true)}
+                  onMouseLeave={() => setShowTools(false)}
+                >
+                  <div className="flex items-center">
+                    <span className="text-crypto-blue font-bold rotate-90 transform origin-left translate-y-[-50%] group-hover:opacity-0 transition-opacity absolute left-6 tracking-widest uppercase text-sm bg-crypto-dark/50 px-3 py-1 rounded-full shadow-lg backdrop-blur-sm">
+                      Tools
+                    </span>
+                    <div className="flex items-center gap-6 pl-10">
+                      {toolMenuItems.map((item) => (
+                        <a
+                          key={item.label}
+                          href={item.path}
+                          className="relative group/tool"
+                          title={item.label}
+                        >
+                          <item.icon 
+                            size={22} 
+                            className="text-crypto-blue hover:text-white transition-all duration-300 transform hover:scale-110" 
+                          />
+                          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-crypto-blue text-crypto-dark px-2 py-1 rounded text-xs font-medium opacity-0 group-hover/tool:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                            {item.label}
+                          </span>
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Mobile Menu Trigger */}
-              <div className="md:hidden">
-                <SidebarTrigger />
+                {/* User Profile */}
+                {user && (
+                  <div className="relative group">
+                    <Avatar className="h-10 w-10 cursor-pointer bg-crypto-blue hover:bg-crypto-blue/80 transition-colors">
+                      <AvatarFallback className="bg-crypto-blue text-white">
+                        <UserCircle className="h-6 w-6" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-crypto-dark border border-crypto-gray opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                      <div className="py-1">
+                        <button
+                          onClick={handleSignOut}
+                          className="block w-full px-4 py-2 text-sm text-gray-300 hover:bg-crypto-gray hover:text-white transition-colors text-left"
+                        >
+                          Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Mobile Menu Trigger */}
+                <div className="md:hidden">
+                  <SidebarTrigger />
+                </div>
               </div>
             </div>
           </div>
