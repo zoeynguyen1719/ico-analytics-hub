@@ -35,11 +35,12 @@ const DashboardContent = ({ activeSection, isAuthenticated, sections }: Dashboar
   }
 
   if (activeSection === "INTRODUCTION") {
-    return <IntroductionSection />;
-  }
-  
-  if (activeSection === "OVERVIEW") {
-    return <OverviewStats />;
+    return (
+      <div className="space-y-12">
+        <IntroductionSection />
+        <OverviewStats />
+      </div>
+    );
   }
   
   return (

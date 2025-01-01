@@ -17,10 +17,7 @@ const DashboardTabs = ({ activeSection, isAuthenticated, onValueChange }: Dashbo
       className="justify-start"
     >
       <ToggleGroupItem value="INTRODUCTION" aria-label="Show introduction">
-        Introduction
-      </ToggleGroupItem>
-      <ToggleGroupItem value="OVERVIEW" aria-label="Show overview">
-        Overview
+        Home
       </ToggleGroupItem>
       {isAuthenticated && (
         <>
