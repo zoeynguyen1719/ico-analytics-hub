@@ -1,68 +1,111 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { corsHeaders } from "../_shared/cors.ts"
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+interface OpenAIResponse {
+  choices?: Array<{
+    message?: {
+      content: string;
+    };
+  }>;
+  error?: {
+    message: string;
+  };
+}
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+interface ChatRequest {
+  message: string;
+}
+
+const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+
+async function handleChatRequest(message: string): Promise<string> {
+  const response = await fetchOpenAIResponse(message);
+  const data = await handleOpenAIResponse(response);
+  return extractGeneratedText(data);
+}
+
+async function fetchOpenAIResponse(message: string): Promise<Response> {
+  const response = await fetch(OPENAI_API_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${Deno.env.get("OPENAI_API_KEY")}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant knowledgeable about cryptocurrency and ICO projects.",
+        },
+        {
+          role: "user",
+          content: message,
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error('OpenAI API error:', errorData);
+    throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+  }
+
+  return response;
+}
+
+async function handleOpenAIResponse(response: Response): Promise<OpenAIResponse> {
+  const data = await response.json();
+  console.log('OpenAI API response:', data);
+  return data;
+}
+
+function extractGeneratedText(data: OpenAIResponse): string {
+  if (!data.choices?.[0]?.message?.content) {
+    throw new Error('Invalid response format from OpenAI API');
+  }
+  return data.choices[0].message.content;
+}
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const { message } = await req.json();
-    
-    console.log('Received message:', message);
+    const { message } = await req.json() as ChatRequest;
 
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key not configured');
+    if (!message) {
+      throw new Error("Message is required");
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a helpful assistant specializing in cryptocurrency and ICO projects. Provide concise, accurate information about crypto markets, ICOs, and investment strategies. Keep responses brief and focused.'
-          },
-          { role: 'user', content: message }
-        ],
+    const generatedText = await handleChatRequest(message);
+
+    return new Response(
+      JSON.stringify({
+        generatedText,
       }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenAI API error:', errorData);
-      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
-    }
-
-    const data = await response.json();
-    console.log('OpenAI API response:', data);
-
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      throw new Error('Invalid response format from OpenAI API');
-    }
-
-    const generatedText = data.choices[0].message.content;
-
-    return new Response(JSON.stringify({ generatedText }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+      {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      }
+    );
   } catch (error) {
-    console.error('Error in chat function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.error("Error in chat function:", error);
+    return new Response(
+      JSON.stringify({
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 });
