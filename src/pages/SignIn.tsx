@@ -15,34 +15,49 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const validateInputs = () => {
+    if (!email.trim()) {
+      toast.error("Please enter your email");
+      return false;
+    }
+    if (!password.trim()) {
+      toast.error("Please enter your password");
+      return false;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return false;
+    }
+    return true;
+  };
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateInputs()) return;
+    
     setLoading(true);
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const { data: { session }, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password.trim(),
       });
 
       if (signInError) {
         if (signInError.message.includes("Email not confirmed")) {
           toast.error("Please confirm your email before signing in. Check your inbox for the confirmation link.");
         } else if (signInError.message.includes("Invalid login credentials")) {
-          toast.error("Invalid password. Please try again.");
+          toast.error("Invalid email or password. Please try again.");
         } else {
           toast.error(signInError.message);
         }
         console.error("Sign in error:", signInError);
-        setLoading(false);
         return;
       }
 
-      // Get the user session
-      const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast.error("Error getting session");
-        setLoading(false);
         return;
       }
 
@@ -53,10 +68,9 @@ const SignIn = () => {
         .eq('user_id', session.user.id)
         .single();
 
-      if (signupError) {
+      if (signupError && !signupError.message.includes('No rows found')) {
         console.error("Error checking signup:", signupError);
         toast.error("Error checking account type");
-        setLoading(false);
         return;
       }
 
