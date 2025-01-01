@@ -46,7 +46,7 @@ const SignupDialog = ({
           data: {
             subscription_tier: tier
           },
-          emailRedirectTo: tier === 'basic' ? `${window.location.origin}/signin` : undefined
+          emailRedirectTo: `${window.location.origin}/signin`
         }
       });
 
@@ -63,24 +63,20 @@ const SignupDialog = ({
       }
 
       if (tier === 'basic') {
-        if (authData.session) {
-          const { error: signupError } = await supabase
-            .from('basic_signups')
-            .insert([{ 
-              email,
-              user_id: authData.user.id
-            }]);
+        const { error: signupError } = await supabase
+          .from('basic_signups')
+          .insert([{ 
+            email,
+            user_id: authData.user.id
+          }]);
 
-          if (signupError) {
-            console.error('Signup error:', signupError);
-            toast.error("Error saving signup information");
-            return;
-          }
-
-          toast.success("Welcome to Mericulum! Your account has been created.");
-        } else {
-          toast.success("Please check your email to confirm your account. You will be able to sign in after confirmation.");
+        if (signupError) {
+          console.error('Signup error:', signupError);
+          toast.error("Error saving signup information");
+          return;
         }
+
+        toast.success("Please check your email to confirm your account. You will be redirected to sign in after confirmation.");
       } else {
         toast.success("Account created successfully!");
         onSuccess?.(authData.user.id);
