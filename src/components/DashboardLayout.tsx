@@ -27,7 +27,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
               {/* Logo Section */}
-              <div className="flex items-center">
+              <div className="flex-shrink-0">
                 <img 
                   src="/lovable-uploads/fc6224c9-4be9-4d1a-b5ad-3da64a81c6e0.png" 
                   alt="Mericulum Logo" 
@@ -35,18 +35,20 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 />
               </div>
 
-              {/* Navigation Menu */}
-              <nav className="hidden md:flex items-center space-x-8">
-                {mainMenuItems.map((item) => (
-                  <a
-                    key={item.label}
-                    href={item.path}
-                    className="flex items-center gap-2 text-gray-300 hover:text-crypto-blue transition-colors group py-2"
-                  >
-                    <item.icon size={18} className="group-hover:text-crypto-blue transition-colors" />
-                    <span className="font-medium uppercase tracking-wider text-sm">{item.label}</span>
-                  </a>
-                ))}
+              {/* Navigation Menu - Now centered */}
+              <nav className="hidden md:flex items-center justify-center flex-1 mx-4">
+                <div className="flex items-center space-x-8">
+                  {mainMenuItems.map((item) => (
+                    <a
+                      key={item.label}
+                      href={item.path}
+                      className="flex items-center gap-2 text-gray-300 hover:text-crypto-blue transition-colors group py-2"
+                    >
+                      <item.icon size={18} className="group-hover:text-crypto-blue transition-colors" />
+                      <span className="font-medium uppercase tracking-wider text-sm">{item.label}</span>
+                    </a>
+                  ))}
+                </div>
               </nav>
 
               {/* Tools Section - Now with hover functionality */}
