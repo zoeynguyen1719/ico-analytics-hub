@@ -2,6 +2,7 @@ import { ArrowRight, Rocket, Star, Award, Sparkles, Heart, Leaf, LogIn } from "l
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import OverviewStats from "../overview/OverviewStats";
 
 const IntroductionSection = () => {
   const navigate = useNavigate();
@@ -35,6 +36,11 @@ const IntroductionSection = () => {
 
   return (
     <div className="min-h-screen bg-crypto-dark text-white">
+      {/* Analytics Overview Section */}
+      <div className="container mx-auto px-4 py-8">
+        <OverviewStats />
+      </div>
+
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 gap-12 items-center">
