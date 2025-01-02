@@ -57,7 +57,7 @@ const OverviewStats = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-black p-8 rounded-lg">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-white">Analytics Overview</h2>
         <div className="flex items-center gap-2">
@@ -68,7 +68,10 @@ const OverviewStats = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
-          <Card key={index} className={`p-6 ${stat.bgColor} border-2 ${stat.borderColor} hover:border-crypto-blue transition-colors`}>
+          <Card 
+            key={index} 
+            className={`p-6 ${stat.bgColor} border-2 ${stat.borderColor} transition-all duration-300 hover:bg-opacity-20 hover:scale-105 cursor-pointer`}
+          >
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-gray-300">{stat.title}</p>
