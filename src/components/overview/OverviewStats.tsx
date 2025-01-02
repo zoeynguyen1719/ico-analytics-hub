@@ -58,14 +58,6 @@ const OverviewStats = () => {
 
   return (
     <div className="space-y-6 bg-black p-8 rounded-lg">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Analytics Overview</h2>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-400">Last updated: Just now</span>
-          <Info className="w-4 h-4 text-gray-400" />
-        </div>
-      </div>
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
           <Card 
