@@ -36,9 +36,11 @@ const IntroductionSection = () => {
 
   return (
     <div className="min-h-screen bg-crypto-dark text-white">
-      {/* Analytics Overview Section */}
-      <div className="container mx-auto px-4 py-8">
-        <OverviewStats />
+      {/* Analytics Overview Section - Now positioned at the top with no padding */}
+      <div className="w-full bg-black">
+        <div className="container mx-auto">
+          <OverviewStats />
+        </div>
       </div>
 
       {/* Hero Section */}
