@@ -63,6 +63,21 @@ const OverviewStats = () => {
           key={index} 
           className={`p-6 ${stat.bgColor} border-2 ${stat.borderColor} transition-all duration-300 hover:bg-opacity-20 hover:scale-105 cursor-pointer`}
         >
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm text-gray-300">{stat.title}</p>
+              <h3 className="text-2xl font-bold text-white mt-1">{stat.value}</h3>
+            </div>
+            <div className={`p-2 rounded-lg ${stat.bgColor}`}>
+              <stat.icon className={`w-6 h-6 ${stat.borderColor.replace('border-', 'text-')}`} />
+            </div>
+          </div>
+          <div className="mt-4">
+            <span className={`text-sm ${stat.change.startsWith('+') ? 'text-crypto-green' : 'text-red-500'}`}>
+              {stat.change}
+            </span>
+            <span className="text-sm text-gray-400 ml-2">vs last month</span>
+          </div>
           <div className="h-24 mt-4">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={stat.chartData}>
