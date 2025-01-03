@@ -1,69 +1,22 @@
-import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { toast } from "sonner";
-import SubscriptionTier from "@/components/subscription/SubscriptionTier";
 import BasicSignupDialog from "@/components/subscription/BasicSignupDialog";
 import PremiumSignupDialog from "@/components/subscription/PremiumSignupDialog";
 import AdvancedSignupDialog from "@/components/subscription/AdvancedSignupDialog";
-import { supabase } from "@/integrations/supabase/client";
+import { SubscriptionTierList } from "@/components/subscription/SubscriptionTierList";
+import { useSubscription } from "@/hooks/useSubscription";
+import { useState } from "react";
 
 const SubscriptionPage = () => {
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [showBasicSignupDialog, setShowBasicSignupDialog] = useState(false);
   const [showPremiumSignupDialog, setShowPremiumSignupDialog] = useState(false);
   const [showAdvancedSignupDialog, setShowAdvancedSignupDialog] = useState(false);
-  const [selectedPriceId, setSelectedPriceId] = useState<string | null>(null);
+  
+  const { selectedTier, handleSubscribe, handleStripeCheckout } = useSubscription();
 
-  const tiers = [
-    {
-      name: "Basic",
-      price: "Free",
-      priceId: null,
-      features: [
-        "Access to basic ICO listings",
-        "Limited portfolio tracking",
-        "Basic calculator tools",
-        "Public news feed"
-      ],
-      buttonText: "Get Started",
-      highlighted: false
-    },
-    {
-      name: "Premium",
-      price: "$19/month",
-      priceId: "price_1QbOJzQjoDZWLsXdFOX1Ubk1",
-      features: [
-        "All Basic features",
-        "Advanced portfolio analytics",
-        "Priority ICO alerts",
-        "Detailed project comparisons",
-        "Premium news access"
-      ],
-      buttonText: "Subscribe Now",
-      highlighted: true
-    },
-    {
-      name: "Advanced",
-      price: "$49/month",
-      priceId: "price_1QbOKNQjoDZWLsXdnELR9mD5",
-      features: [
-        "All Premium features",
-        "API access",
-        "Custom alerts",
-        "Priority support",
-        "Early access to new features",
-        "Advanced market analytics"
-      ],
-      buttonText: "Subscribe Now",
-      highlighted: false
-    }
-  ];
-
-  const handleSubscribe = async (priceId: string | null, tierName: string) => {
-    setSelectedTier(tierName);
-    setSelectedPriceId(priceId);
+  const handleTierSelection = async (priceId: string | null, tierName: string) => {
+    const { tierName: selectedTierName } = await handleSubscribe(priceId, tierName);
     
-    switch(tierName) {
+    switch(selectedTierName) {
       case "Basic":
         setShowBasicSignupDialog(true);
         break;
@@ -73,40 +26,6 @@ const SubscriptionPage = () => {
       case "Advanced":
         setShowAdvancedSignupDialog(true);
         break;
-    }
-  };
-
-  const handleStripeCheckout = async (userId: string) => {
-    if (!selectedPriceId) return;
-    
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        toast.error('Authentication required');
-        return;
-      }
-
-      const response = await supabase.functions.invoke('create-checkout', {
-        body: { 
-          priceId: selectedPriceId,
-          userId 
-        }
-      });
-
-      if (response.error) {
-        console.error('Checkout error:', response.error);
-        toast.error('Error creating checkout session');
-        return;
-      }
-
-      if (response.data?.url) {
-        window.location.href = response.data.url;
-      } else {
-        toast.error('Invalid checkout response');
-      }
-    } catch (error) {
-      console.error('Subscription error:', error);
-      toast.error('Error processing subscription');
     }
   };
 
@@ -120,16 +39,10 @@ const SubscriptionPage = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto px-4">
-          {tiers.map((tier) => (
-            <SubscriptionTier
-              key={tier.name}
-              {...tier}
-              isSelected={selectedTier === tier.name}
-              onSelect={() => handleSubscribe(tier.priceId, tier.name)}
-            />
-          ))}
-        </div>
+        <SubscriptionTierList 
+          onSubscribe={handleTierSelection}
+          selectedTier={selectedTier}
+        />
         
         <BasicSignupDialog
           open={showBasicSignupDialog}
