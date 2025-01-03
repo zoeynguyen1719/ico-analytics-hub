@@ -60,23 +60,31 @@ export const useSignup = ({ onSuccess, onOpenChange, tier }: UseSignupProps) => 
   };
 
   const handleBasicSignup = async (email: string, userId: string) => {
-    // Small delay to ensure user creation is complete
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const { error: signupError } = await supabase
-      .from('basic_signups')
-      .insert([{ 
-        email,
-        user_id: userId
-      }]);
+    try {
+      // Wait a short moment to ensure the auth user is fully created
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const { error: signupError } = await supabase
+        .from('basic_signups')
+        .insert([{ 
+          email,
+          user_id: userId
+        }])
+        .select()
+        .single();
 
-    if (signupError) {
-      console.error('Signup error:', signupError);
-      // If this fails, we should still let the user know to check their email
-      console.warn('Failed to create basic signup record, but user account was created');
+      if (signupError) {
+        console.error('Signup error:', signupError);
+        // If this fails, we should still let the user know their account was created
+        console.warn('Failed to create basic signup record, but user account was created');
+      }
+
+      toast.success("Please check your email to confirm your account. You will be redirected to sign in after confirmation.");
+    } catch (error) {
+      console.error('Error in basic signup:', error);
+      // Still show success since the auth account was created
+      toast.success("Account created! Please check your email to confirm your account.");
     }
-
-    toast.success("Please check your email to confirm your account. You will be redirected to sign in after confirmation.");
   };
 
   return {
