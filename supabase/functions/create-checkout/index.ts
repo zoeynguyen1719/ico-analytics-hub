@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from 'https://esm.sh/stripe@14.21.0'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,14 +13,12 @@ serve(async (req) => {
   }
 
   try {
-    const { priceId, userId } = await req.json()
+    const { priceId } = await req.json()
     
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
-    console.log('Creating checkout session for price:', priceId)
-    
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
@@ -32,8 +31,6 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/subscription`,
     })
 
-    console.log('Checkout session created:', session.id)
-
     return new Response(
       JSON.stringify({ url: session.url }),
       { 
@@ -42,7 +39,6 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error creating checkout session:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
