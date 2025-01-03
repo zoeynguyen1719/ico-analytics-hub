@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useSignup } from "@/hooks/useSignup";
 import { SignupFormFields } from "./SignupFormFields";
+import { Button } from "@/components/ui/button";
 
 interface BasicSignupDialogProps {
   open: boolean;
@@ -37,6 +38,13 @@ const BasicSignupDialog = ({ open, onOpenChange }: BasicSignupDialogProps) => {
             password={password}
             setPassword={setPassword}
           />
+          <Button 
+            type="submit"
+            disabled={loading}
+            className="w-full bg-crypto-blue hover:bg-crypto-green text-white"
+          >
+            {loading ? "Creating Account..." : "Sign Up"}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>
