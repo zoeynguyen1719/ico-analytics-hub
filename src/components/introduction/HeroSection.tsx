@@ -6,7 +6,7 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="container mx-auto px-4 py-4">
       <div className="grid md:grid-cols-4 gap-12">
         {/* Left Section - 1/4 width */}
         <div className="md:col-span-1 space-y-6">
