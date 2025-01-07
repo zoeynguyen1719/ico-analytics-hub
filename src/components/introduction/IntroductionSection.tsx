@@ -66,19 +66,19 @@ const IntroductionSection = () => {
               <div className="flex justify-center">
                 <Crown className="h-12 w-12 text-crypto-blue" />
               </div>
-              <h2 className="text-2xl font-bold text-crypto-blue">
+              <h2 className="text-2xl font-bold text-white">
                 Upgrade to Premium
               </h2>
               <ul className="text-left space-y-4">
-                <li className="flex items-center">
+                <li className="flex items-center text-white">
                   <Star className="h-5 w-5 text-crypto-green mr-2" />
                   <span>Advanced Portfolio Analytics</span>
                 </li>
-                <li className="flex items-center">
+                <li className="flex items-center text-white">
                   <Award className="h-5 w-5 text-crypto-green mr-2" />
                   <span>Priority ICO Alerts</span>
                 </li>
-                <li className="flex items-center">
+                <li className="flex items-center text-white">
                   <Sparkles className="h-5 w-5 text-crypto-green mr-2" />
                   <span>Exclusive Market Insights</span>
                 </li>
