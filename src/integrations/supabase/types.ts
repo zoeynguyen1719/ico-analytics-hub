@@ -102,6 +102,57 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      website_visits: {
+        Row: {
+          created_at: string
+          id: string
+          is_authenticated: boolean | null
+          page_visited: string
+          user_id: string | null
+          visit_duration: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_authenticated?: boolean | null
+          page_visited: string
+          user_id?: string | null
+          visit_duration?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_authenticated?: boolean | null
+          page_visited?: string
+          user_id?: string | null
+          visit_duration?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -110,7 +161,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      subscription_tier: "basic" | "premium" | "advanced"
     }
     CompositeTypes: {
       [_ in never]: never

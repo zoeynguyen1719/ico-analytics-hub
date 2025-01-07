@@ -1,4 +1,4 @@
-import { ArrowRight, Rocket, Star, Award, Sparkles, Heart, Leaf, LogIn } from "lucide-react";
+import { ArrowRight, Rocket, Star, Award, Sparkles, Heart, Leaf, LogIn, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -35,22 +35,20 @@ const IntroductionSection = () => {
 
   return (
     <div className="min-h-screen bg-crypto-dark text-white">
-      {/* Hero Section */}
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+      {/* Hero Section with Split Layout */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid md:grid-cols-2 gap-8 items-center">
+          {/* Left Half - Hero Content */}
           <div className="space-y-6">
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-crypto-blue to-crypto-green bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-crypto-blue to-crypto-green bg-clip-text text-transparent">
               Welcome to Mericulum
             </h1>
-            <p className="text-xl text-white">
+            <p className="text-lg text-white">
               Your comprehensive platform for ICO analytics and portfolio management
             </p>
             <div className="flex flex-wrap gap-4">
               <Button className="bg-crypto-blue hover:bg-crypto-blue/90 text-crypto-dark">
                 Get Started <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button variant="outline" className="border-crypto-blue text-crypto-blue hover:bg-crypto-blue/10">
-                Learn More
               </Button>
               <Button 
                 variant="outline" 
@@ -61,13 +59,38 @@ const IntroductionSection = () => {
               </Button>
             </div>
           </div>
-          <div className="relative">
-            <img
-              src="/lovable-uploads/5a1e8c44-11a1-4369-a816-17ef98d2501b.png"
-              alt="Investment Growth Illustration"
-              className="w-full max-w-md mx-auto"
-            />
-          </div>
+
+          {/* Right Half - Premium Promotion */}
+          <Card className="p-8 bg-crypto-gray/50 border-crypto-blue hover:border-crypto-green transition-colors">
+            <div className="text-center space-y-6">
+              <div className="flex justify-center">
+                <Crown className="h-12 w-12 text-crypto-blue" />
+              </div>
+              <h2 className="text-2xl font-bold text-crypto-blue">
+                Upgrade to Premium
+              </h2>
+              <ul className="text-left space-y-4">
+                <li className="flex items-center">
+                  <Star className="h-5 w-5 text-crypto-green mr-2" />
+                  <span>Advanced Portfolio Analytics</span>
+                </li>
+                <li className="flex items-center">
+                  <Award className="h-5 w-5 text-crypto-green mr-2" />
+                  <span>Priority ICO Alerts</span>
+                </li>
+                <li className="flex items-center">
+                  <Sparkles className="h-5 w-5 text-crypto-green mr-2" />
+                  <span>Exclusive Market Insights</span>
+                </li>
+              </ul>
+              <Button 
+                className="w-full bg-crypto-green hover:bg-crypto-green/90 text-crypto-dark"
+                onClick={() => navigate('/subscription')}
+              >
+                Upgrade Now <Crown className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </Card>
         </div>
       </div>
 
