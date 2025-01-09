@@ -18,6 +18,9 @@ export default {
       },
     },
     extend: {
+      cursor: {
+        'rocket': 'url("/rocket-cursor.png"), pointer',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

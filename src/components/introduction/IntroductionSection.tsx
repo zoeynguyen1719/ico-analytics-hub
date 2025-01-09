@@ -48,14 +48,14 @@ const IntroductionSection = () => {
             </p>
             <div className="flex flex-wrap gap-4">
               <Button 
-                className="bg-crypto-blue hover:bg-crypto-blue/90 text-crypto-dark"
+                className="bg-crypto-blue hover:bg-crypto-blue/90 text-crypto-dark cursor-rocket"
                 onClick={() => navigate('/subscription')}
               >
                 Get Started <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button 
                 variant="outline" 
-                className="border-crypto-green text-crypto-green hover:bg-crypto-green/10"
+                className="border-crypto-green text-crypto-green hover:bg-crypto-green/10 cursor-rocket"
                 onClick={() => navigate('/signin')}
               >
                 Sign In <LogIn className="ml-2 h-4 w-4" />
@@ -100,7 +100,7 @@ const IntroductionSection = () => {
                 </li>
               </ul>
               <Button 
-                className="w-full bg-gradient-to-r from-crypto-blue to-crypto-green hover:opacity-90 text-crypto-dark font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-crypto-blue to-crypto-green hover:opacity-90 text-crypto-dark font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 cursor-rocket"
                 onClick={() => navigate('/subscription')}
               >
                 Upgrade Now <Crown className="ml-2 h-4 w-4" />
@@ -118,7 +118,7 @@ const IntroductionSection = () => {
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="p-6 bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-colors">
+              <Card key={index} className="p-6 bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-colors cursor-rocket">
                 <div className="flex items-start gap-4">
                   <feature.icon className="h-6 w-6 text-crypto-green flex-shrink-0" />
                   <p className="text-lg text-white">{feature.text}</p>
@@ -139,7 +139,7 @@ const IntroductionSection = () => {
           </p>
           <Button 
             size="lg" 
-            className="bg-crypto-green hover:bg-crypto-green/90 text-crypto-dark"
+            className="bg-crypto-green hover:bg-crypto-green/90 text-crypto-dark cursor-rocket"
             onClick={() => navigate('/subscription')}
           >
             Start Exploring Now
