@@ -61,30 +61,43 @@ const IntroductionSection = () => {
           </div>
 
           {/* Right Half - Premium Promotion */}
-          <Card className="p-8 bg-crypto-gray/50 border-crypto-blue hover:border-crypto-green transition-colors">
-            <div className="text-center space-y-6">
+          <Card className="relative p-8 bg-gradient-to-br from-[#1A3B47] via-[#2A4B57] to-[#1A3B47] border-2 border-crypto-blue/30 hover:border-crypto-green/50 transition-all duration-300 shadow-xl hover:shadow-crypto-blue/20">
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+              <span className="bg-gradient-to-r from-crypto-blue to-crypto-green px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
+                Premium Tier
+              </span>
+            </div>
+            <div className="text-center space-y-8">
               <div className="flex justify-center">
-                <Crown className="h-12 w-12 text-crypto-blue" />
+                <div className="p-4 bg-crypto-blue/10 rounded-full">
+                  <Crown className="h-12 w-12 text-crypto-blue animate-pulse" />
+                </div>
               </div>
               <h2 className="text-2xl font-bold text-white">
                 Upgrade to Premium
               </h2>
-              <ul className="text-left space-y-4">
-                <li className="flex items-center text-white">
-                  <Star className="h-5 w-5 text-crypto-green mr-2" />
+              <ul className="text-left space-y-6">
+                <li className="flex items-center text-white/90 hover:text-white transition-colors">
+                  <div className="p-2 bg-crypto-green/10 rounded-full mr-3">
+                    <Star className="h-5 w-5 text-crypto-green" />
+                  </div>
                   <span>Advanced Portfolio Analytics</span>
                 </li>
-                <li className="flex items-center text-white">
-                  <Award className="h-5 w-5 text-crypto-green mr-2" />
+                <li className="flex items-center text-white/90 hover:text-white transition-colors">
+                  <div className="p-2 bg-crypto-green/10 rounded-full mr-3">
+                    <Award className="h-5 w-5 text-crypto-green" />
+                  </div>
                   <span>Priority ICO Alerts</span>
                 </li>
-                <li className="flex items-center text-white">
-                  <Sparkles className="h-5 w-5 text-crypto-green mr-2" />
+                <li className="flex items-center text-white/90 hover:text-white transition-colors">
+                  <div className="p-2 bg-crypto-green/10 rounded-full mr-3">
+                    <Sparkles className="h-5 w-5 text-crypto-green" />
+                  </div>
                   <span>Exclusive Market Insights</span>
                 </li>
               </ul>
               <Button 
-                className="w-full bg-crypto-green hover:bg-crypto-green/90 text-crypto-dark"
+                className="w-full bg-gradient-to-r from-crypto-blue to-crypto-green hover:opacity-90 text-crypto-dark font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
                 onClick={() => navigate('/subscription')}
               >
                 Upgrade Now <Crown className="ml-2 h-4 w-4" />
