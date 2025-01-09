@@ -40,11 +40,17 @@ const SignIn = () => {
 
     try {
       // First, check if the user exists
-      const { data: userExists } = await supabase
+      const { data: userExists, error: userCheckError } = await supabase
         .from('basic_signups')
         .select('email')
         .eq('email', email.trim())
-        .single();
+        .maybeSingle();
+
+      if (userCheckError) {
+        console.error("Error checking user:", userCheckError);
+        toast.error("Error checking user account. Please try again.");
+        return;
+      }
 
       if (!userExists) {
         toast.error("No account found with this email. Please sign up first.");
