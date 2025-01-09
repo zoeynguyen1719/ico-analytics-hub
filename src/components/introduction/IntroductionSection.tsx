@@ -47,7 +47,10 @@ const IntroductionSection = () => {
               Your comprehensive platform for ICO analytics and portfolio management
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button className="bg-crypto-blue hover:bg-crypto-blue/90 text-crypto-dark">
+              <Button 
+                className="bg-crypto-blue hover:bg-crypto-blue/90 text-crypto-dark"
+                onClick={() => navigate('/subscription')}
+              >
                 Get Started <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button 
@@ -134,7 +137,11 @@ const IntroductionSection = () => {
             Join thousands of investors who trust Mericulum for their ICO analytics
             and portfolio management needs.
           </p>
-          <Button size="lg" className="bg-crypto-green hover:bg-crypto-green/90 text-crypto-dark">
+          <Button 
+            size="lg" 
+            className="bg-crypto-green hover:bg-crypto-green/90 text-crypto-dark"
+            onClick={() => navigate('/subscription')}
+          >
             Start Exploring Now
           </Button>
         </div>
