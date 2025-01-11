@@ -11,11 +11,12 @@ const HeroSection = () => {
       <div 
         className="absolute inset-0 z-0"
         style={{
-          backgroundImage: 'url("/lovable-uploads/d24c917e-2ca3-467c-bf45-9c93ec2ad197.png")',
+          backgroundImage: 'url("/lovable-uploads/1f1b7894-c97b-48df-9bbc-12bb865c97d4.png")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           opacity: 0.4,
           mixBlendMode: 'screen',
+          filter: 'blur(2px)',
         }}
       />
 
