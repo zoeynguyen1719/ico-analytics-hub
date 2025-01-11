@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { mainMenuItems } from "./MainMenu";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 import ProfileMenu from "./ProfileMenu";
+import { Button } from "@/components/ui/button";
+import { ArrowUpCircle } from "lucide-react";
 
 interface TopNavProps {
   user: any;
@@ -46,6 +48,12 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
     }
   };
 
+  const handleUpgrade = () => {
+    navigate("/subscription");
+  };
+
+  const showUpgradeButton = user && subscriptionTier && subscriptionTier !== 'advanced';
+
   return (
     <header className="w-full bg-black border-b border-crypto-gray">
       <div className="container mx-auto px-4">
@@ -77,6 +85,15 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
 
           {/* Profile Section */}
           <div className="flex items-center gap-4">
+            {showUpgradeButton && (
+              <Button
+                onClick={handleUpgrade}
+                className="bg-crypto-blue hover:bg-crypto-blue/90 text-white flex items-center gap-2"
+              >
+                <ArrowUpCircle className="h-4 w-4" />
+                Upgrade Tier
+              </Button>
+            )}
             <ProfileMenu 
               user={user} 
               subscriptionTier={subscriptionTier}
