@@ -80,29 +80,24 @@ const SubscriptionPage = () => {
     if (!selectedPriceId) return;
     
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-          },
-          body: JSON.stringify({ 
-            priceId: selectedPriceId,
-            userId 
-          })
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { 
+          priceId: selectedPriceId,
+          userId 
         }
-      );
-
-      const { url, error } = await response.json();
+      });
       
       if (error) {
         toast.error('Error creating checkout session');
+        console.error('Checkout error:', error);
         return;
       }
 
-      window.location.href = url;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error('Invalid checkout response');
+      }
     } catch (error) {
       toast.error('Error processing subscription');
       console.error('Subscription error:', error);
