@@ -109,10 +109,10 @@ const OverviewStats = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-        <Card className="p-6 bg-crypto-gray border-crypto-blue">
+        <Card className="p-6 bg-gradient-to-br from-crypto-dark to-crypto-gray border-2 border-crypto-blue/30 hover:border-crypto-blue/50 transition-all duration-300 shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-white">Recent Activity</h3>
-            <Calendar className="w-5 h-5 text-crypto-green" />
+            <Calendar className="w-5 h-5 text-crypto-blue" />
           </div>
           <div className="space-y-4">
             {[
@@ -120,21 +120,21 @@ const OverviewStats = () => {
               { title: "Price Update", project: "DeFi Protocol", time: "4h ago" },
               { title: "ROI Milestone", project: "GameFi Token", time: "6h ago" }
             ].map((activity, index) => (
-              <div key={index} className="flex items-center justify-between py-2 border-b border-crypto-dark">
+              <div key={index} className="flex items-center justify-between py-2 border-b border-crypto-dark/50 hover:border-crypto-blue/30 transition-colors">
                 <div>
                   <p className="text-sm font-medium text-white">{activity.title}</p>
                   <p className="text-xs text-gray-400">{activity.project}</p>
                 </div>
-                <span className="text-xs text-gray-400">{activity.time}</span>
+                <span className="text-xs text-crypto-blue">{activity.time}</span>
               </div>
             ))}
           </div>
         </Card>
 
-        <Card className="p-6 bg-crypto-gray border-crypto-blue">
+        <Card className="p-6 bg-gradient-to-br from-crypto-dark to-crypto-gray border-2 border-crypto-blue/30 hover:border-crypto-blue/50 transition-all duration-300 shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-white">Global Statistics</h3>
-            <Globe className="w-5 h-5 text-crypto-green" />
+            <Globe className="w-5 h-5 text-crypto-blue" />
           </div>
           <div className="space-y-4">
             {[
@@ -142,11 +142,11 @@ const OverviewStats = () => {
               { label: "24h Volume", value: "$245M", change: "+1.8%" },
               { label: "Active Projects", value: "89", change: "+3.2%" }
             ].map((stat, index) => (
-              <div key={index} className="flex items-center justify-between py-2 border-b border-crypto-dark">
+              <div key={index} className="flex items-center justify-between py-2 border-b border-crypto-dark/50 hover:border-crypto-blue/30 transition-colors">
                 <span className="text-sm text-gray-400">{stat.label}</span>
                 <div className="text-right">
                   <span className="text-sm font-medium text-white">{stat.value}</span>
-                  <span className="text-xs text-crypto-green ml-2">{stat.change}</span>
+                  <span className="text-xs text-crypto-blue ml-2">{stat.change}</span>
                 </div>
               </div>
             ))}
