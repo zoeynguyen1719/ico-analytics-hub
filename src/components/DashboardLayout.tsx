@@ -13,21 +13,22 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full bg-black text-white">
-        <TopNav user={user} />
-
-        {/* Tools Menu */}
-        <ToolsMenu />
+        {/* Navigation */}
+        <div className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-lg border-b border-white/10">
+          <TopNav user={user} />
+          <ToolsMenu />
+        </div>
 
         {/* Mobile Sidebar */}
         <div className="md:hidden">
-          <Sidebar className="border-r border-crypto-gray">
+          <Sidebar className="border-r border-white/10">
             <SidebarContent>
               <nav className="mt-6">
                 {[...mainMenuItems, ...toolMenuItems].map((item) => (
                   <a
                     key={item.label}
                     href={item.path}
-                    className="flex items-center gap-3 px-6 py-4 text-gray-300 hover:bg-crypto-gray hover:text-crypto-blue transition-colors group"
+                    className="flex items-center gap-3 px-6 py-4 text-gray-300 hover:bg-white/5 hover:text-crypto-blue transition-colors group"
                   >
                     <item.icon size={20} className="group-hover:text-crypto-blue transition-colors" />
                     <span className="uppercase tracking-wider">{item.label}</span>
@@ -39,7 +40,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 pt-32 p-8">
           {children}
         </main>
 

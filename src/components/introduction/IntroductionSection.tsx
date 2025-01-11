@@ -4,7 +4,7 @@ import CTASection from "./CTASection";
 
 const IntroductionSection = () => {
   return (
-    <div className="min-h-screen bg-crypto-dark text-white">
+    <div className="min-h-screen bg-black text-white">
       <HeroSection />
       <FeaturesSection />
       <CTASection />
