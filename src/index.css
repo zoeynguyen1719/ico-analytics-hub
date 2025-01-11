@@ -73,7 +73,9 @@
 
   body {
     @apply bg-background text-foreground;
-    background-color: black;
+    background: linear-gradient(180deg, #001B3D 0%, #003366 100%);
+    min-height: 100vh;
+    color: white;
   }
 
   /* Custom Scrollbar */
