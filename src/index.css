@@ -79,7 +79,7 @@
 
   body {
     @apply bg-background text-foreground;
-    background: linear-gradient(180deg, #001B3D 0%, #003366 100%) fixed;
+    background: #143442;
     color: white;
     min-height: 100vh;
     width: 100%;
