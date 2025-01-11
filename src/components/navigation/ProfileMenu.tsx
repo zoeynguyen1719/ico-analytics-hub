@@ -22,11 +22,11 @@ const ProfileMenu = ({ user, subscriptionTier, onSignOut }: ProfileMenuProps) =>
       </Avatar>
       <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-crypto-dark border border-crypto-gray opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
         <div className="py-1">
-          {subscriptionTier && (
-            <div className="px-4 py-2 text-sm text-gray-300 border-b border-crypto-gray">
-              <span className="text-crypto-blue font-semibold uppercase">{subscriptionTier}</span> Tier
-            </div>
-          )}
+          <div className="px-4 py-2 text-sm text-gray-300 border-b border-crypto-gray">
+            <span className="text-crypto-blue font-semibold uppercase">
+              {subscriptionTier || 'Basic'} Tier
+            </span>
+          </div>
           <button
             onClick={onSignOut}
             className="block w-full px-4 py-2 text-sm text-gray-300 hover:bg-crypto-gray hover:text-white transition-colors text-left"
