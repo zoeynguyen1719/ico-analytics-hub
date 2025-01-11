@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -22,26 +23,31 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      // First, check if the user exists in subscriptions or basic_signups
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('tier')
-        .eq('email', email.trim())
-        .maybeSingle();
+      // First, check if the user exists in auth.users
+      const { data: { user: existingUser }, error: userError } = await supabase.auth.getUser();
+      
+      if (!existingUser) {
+        // If no authenticated user, check subscriptions and basic_signups
+        const { data: subscription } = await supabase
+          .from('subscriptions')
+          .select('tier')
+          .eq('email', email.trim())
+          .maybeSingle();
 
-      const { data: basicSignup } = await supabase
-        .from('basic_signups')
-        .select('email')
-        .eq('email', email.trim())
-        .maybeSingle();
+        const { data: basicSignup } = await supabase
+          .from('basic_signups')
+          .select('email')
+          .eq('email', email.trim())
+          .maybeSingle();
 
-      if (!subscription && !basicSignup) {
-        toast.error("No account found with this email. Please sign up first.");
-        setLoading(false);
-        return;
+        if (!subscription && !basicSignup) {
+          toast.error("No account found with this email. Please sign up first.");
+          setLoading(false);
+          return;
+        }
       }
 
-      // If we get here, the user exists, so try to sign them in
+      // Attempt to sign in
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
@@ -49,7 +55,7 @@ const SignIn = () => {
 
       if (signInError) {
         if (signInError.message.includes('Invalid login credentials')) {
-          toast.error("Invalid password. Please try again.");
+          toast.error("Invalid email or password. Please try again.");
         } else {
           toast.error(signInError.message);
         }
@@ -92,6 +98,7 @@ const SignIn = () => {
               className="bg-crypto-gray text-white border-crypto-blue focus:border-crypto-green"
               placeholder="Enter your email"
               required
+              disabled={loading}
             />
           </div>
 
@@ -107,6 +114,7 @@ const SignIn = () => {
               className="bg-crypto-gray text-white border-crypto-blue focus:border-crypto-green"
               placeholder="Enter your password"
               required
+              disabled={loading}
             />
           </div>
 
@@ -115,7 +123,14 @@ const SignIn = () => {
             disabled={loading}
             className="w-full bg-crypto-blue hover:bg-crypto-blue/90"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Signing in...
+              </div>
+            ) : (
+              "Sign In"
+            )}
           </Button>
 
           <Button
@@ -123,6 +138,7 @@ const SignIn = () => {
             onClick={handleReturnHome}
             variant="outline"
             className="w-full mt-4 border-crypto-blue text-crypto-blue hover:bg-crypto-blue/10"
+            disabled={loading}
           >
             Return to Homepage
           </Button>
