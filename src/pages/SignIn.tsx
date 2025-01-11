@@ -22,23 +22,11 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      // Try to sign in first
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-
-      if (!signInError) {
-        toast.success("Successfully signed in!");
-        navigate("/");
-        return;
-      }
-
-      // If sign in fails, check if user exists in subscriptions or basic_signups
+      // First, check if the user exists in subscriptions or basic_signups
       const { data: subscription } = await supabase
         .from('subscriptions')
         .select('tier')
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+        .eq('email', email.trim())
         .maybeSingle();
 
       const { data: basicSignup } = await supabase
@@ -49,12 +37,27 @@ const SignIn = () => {
 
       if (!subscription && !basicSignup) {
         toast.error("No account found with this email. Please sign up first.");
+        setLoading(false);
         return;
       }
 
-      // If we get here, the user exists but the password was wrong
-      toast.error("Invalid password. Please try again.");
+      // If we get here, the user exists, so try to sign them in
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
 
+      if (signInError) {
+        if (signInError.message.includes('Invalid login credentials')) {
+          toast.error("Invalid password. Please try again.");
+        } else {
+          toast.error(signInError.message);
+        }
+        console.error("Sign in error:", signInError);
+      } else {
+        toast.success("Successfully signed in!");
+        navigate("/");
+      }
     } catch (error) {
       console.error("Sign in error:", error);
       toast.error("An unexpected error occurred. Please try again.");
