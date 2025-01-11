@@ -108,8 +108,8 @@ const OverviewStats = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-        <Card className="p-6 bg-gradient-to-br from-crypto-dark to-crypto-gray border-2 border-crypto-blue/30 hover:border-crypto-blue/50 transition-all duration-300 shadow-lg">
+      <div className="flex gap-4 mt-6">
+        <Card className="w-1/2 p-6 bg-gradient-to-br from-crypto-dark to-crypto-gray border-2 border-crypto-blue/30 hover:border-crypto-blue/50 transition-all duration-300 shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-white">Recent Activity</h3>
             <Calendar className="w-5 h-5 text-crypto-blue" />
@@ -131,7 +131,7 @@ const OverviewStats = () => {
           </div>
         </Card>
 
-        <Card className="p-6 bg-gradient-to-br from-crypto-dark to-crypto-gray border-2 border-crypto-blue/30 hover:border-crypto-blue/50 transition-all duration-300 shadow-lg">
+        <Card className="w-1/2 p-6 bg-gradient-to-br from-crypto-dark to-crypto-gray border-2 border-crypto-blue/30 hover:border-crypto-blue/50 transition-all duration-300 shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-white">Global Statistics</h3>
             <Globe className="w-5 h-5 text-crypto-blue" />
