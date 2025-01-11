@@ -22,56 +22,39 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      // First, check if the user exists in any subscription tier
-      const { data: subscription, error: subscriptionError } = await supabase
-        .from('subscriptions')
-        .select('tier')
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
-        .maybeSingle();
-
-      if (subscriptionError) {
-        console.error("Error checking subscription:", subscriptionError);
-        toast.error("Error checking subscription. Please try again.");
-        return;
-      }
-
-      // If no subscription found, check basic_signups
-      if (!subscription) {
-        const { data: basicSignup, error: basicSignupError } = await supabase
-          .from('basic_signups')
-          .select('email')
-          .eq('email', email.trim())
-          .maybeSingle();
-
-        if (basicSignupError) {
-          console.error("Error checking basic signup:", basicSignupError);
-          toast.error("Error checking user account. Please try again.");
-          return;
-        }
-
-        if (!basicSignup) {
-          toast.error("No account found with this email. Please sign up first.");
-          return;
-        }
-      }
-
-      // Proceed with sign in
+      // Try to sign in first
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
 
-      if (signInError) {
-        if (signInError.message === "Invalid login credentials") {
-          toast.error("Invalid email or password. Please try again.");
-        } else {
-          toast.error(signInError.message);
-        }
+      if (!signInError) {
+        toast.success("Successfully signed in!");
+        navigate("/");
         return;
       }
 
-      toast.success("Successfully signed in!");
-      navigate("/");
+      // If sign in fails, check if user exists in subscriptions or basic_signups
+      const { data: subscription } = await supabase
+        .from('subscriptions')
+        .select('tier')
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+        .maybeSingle();
+
+      const { data: basicSignup } = await supabase
+        .from('basic_signups')
+        .select('email')
+        .eq('email', email.trim())
+        .maybeSingle();
+
+      if (!subscription && !basicSignup) {
+        toast.error("No account found with this email. Please sign up first.");
+        return;
+      }
+
+      // If we get here, the user exists but the password was wrong
+      toast.error("Invalid password. Please try again.");
+
     } catch (error) {
       console.error("Sign in error:", error);
       toast.error("An unexpected error occurred. Please try again.");
