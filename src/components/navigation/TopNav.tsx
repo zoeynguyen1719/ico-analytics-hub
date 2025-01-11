@@ -13,11 +13,37 @@ interface TopNavProps {
 const TopNav = ({ user: initialUser }: TopNavProps) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(initialUser);
+  const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
 
   useEffect(() => {
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user || null);
+      if (session?.user) {
+        // Check for subscription
+        const { data: subData } = await supabase
+          .from('subscriptions')
+          .select('tier')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+
+        if (subData) {
+          setSubscriptionTier(subData.tier);
+        } else {
+          // Check basic_signups if no subscription found
+          const { data: basicData } = await supabase
+            .from('basic_signups')
+            .select('email')
+            .eq('email', session.user.email)
+            .maybeSingle();
+
+          if (basicData) {
+            setSubscriptionTier('basic');
+          }
+        }
+      } else {
+        setSubscriptionTier(null);
+      }
     });
 
     // Cleanup subscription on unmount
@@ -31,6 +57,7 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       setUser(null);
+      setSubscriptionTier(null);
       toast.success("Signed out successfully");
       navigate("/signin");
     } catch (error) {
@@ -79,6 +106,11 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
                 </Avatar>
                 <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-crypto-dark border border-crypto-gray opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <div className="py-1">
+                    {subscriptionTier && (
+                      <div className="px-4 py-2 text-sm text-gray-300 border-b border-crypto-gray">
+                        <span className="text-crypto-blue font-semibold uppercase">{subscriptionTier}</span> Tier
+                      </div>
+                    )}
                     <button
                       onClick={handleSignOut}
                       className="block w-full px-4 py-2 text-sm text-gray-300 hover:bg-crypto-gray hover:text-white transition-colors text-left"
