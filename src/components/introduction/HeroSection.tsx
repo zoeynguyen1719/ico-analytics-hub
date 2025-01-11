@@ -7,8 +7,20 @@ const HeroSection = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-black">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: 'url("/lovable-uploads/d24c917e-2ca3-467c-bf45-9c93ec2ad197.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.4,
+          mixBlendMode: 'screen',
+        }}
+      />
+
       {/* Gradient Orb Effect */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-1">
         <div className="w-[500px] h-[500px] rounded-full bg-crypto-blue/20 blur-[120px]" />
       </div>
 
@@ -29,7 +41,7 @@ const HeroSection = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
           <Button 
             size="lg"
-            className="bg-crypto-blue hover:bg-crypto-blue/90 text-crypto-dark min-w-[200px] h-14 text-lg cursor-rocket"
+            className="bg-crypto-blue hover:bg-crypto-blue/90 text-crypto-dark min-w-[200px] h-14 text-lg cursor-rocket backdrop-blur-sm"
             onClick={() => navigate('/subscription')}
           >
             Access App <ArrowRight className="ml-2 h-5 w-5" />
@@ -38,7 +50,7 @@ const HeroSection = () => {
           <Button 
             size="lg"
             variant="outline" 
-            className="border-crypto-green text-crypto-green hover:bg-crypto-green/10 min-w-[200px] h-14 text-lg cursor-rocket"
+            className="border-crypto-green text-crypto-green hover:bg-crypto-green/10 min-w-[200px] h-14 text-lg cursor-rocket backdrop-blur-sm"
             onClick={() => navigate('/signin')}
           >
             Sign In <LogIn className="ml-2 h-5 w-5" />
@@ -47,7 +59,7 @@ const HeroSection = () => {
       </div>
 
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[url('/grid-pattern.png')] bg-repeat opacity-20" />
+      <div className="absolute inset-0 bg-[url('/grid-pattern.png')] bg-repeat opacity-20 z-[2]" />
     </div>
   );
 };
