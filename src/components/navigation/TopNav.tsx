@@ -15,32 +15,43 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
   const [user, setUser] = useState(initialUser);
   const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
 
+  const checkSubscriptionTier = async (user: any) => {
+    if (!user) return;
+    
+    // Check for subscription
+    const { data: subData } = await supabase
+      .from('subscriptions')
+      .select('tier')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (subData) {
+      setSubscriptionTier(subData.tier);
+    } else {
+      // Check basic_signups if no subscription found
+      const { data: basicData } = await supabase
+        .from('basic_signups')
+        .select('email')
+        .eq('email', user.email)
+        .maybeSingle();
+
+      if (basicData) {
+        setSubscriptionTier('basic');
+      }
+    }
+  };
+
   useEffect(() => {
+    // Check subscription tier on mount if user exists
+    if (initialUser?.user) {
+      checkSubscriptionTier(initialUser.user);
+    }
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user || null);
       if (session?.user) {
-        // Check for subscription
-        const { data: subData } = await supabase
-          .from('subscriptions')
-          .select('tier')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-
-        if (subData) {
-          setSubscriptionTier(subData.tier);
-        } else {
-          // Check basic_signups if no subscription found
-          const { data: basicData } = await supabase
-            .from('basic_signups')
-            .select('email')
-            .eq('email', session.user.email)
-            .maybeSingle();
-
-          if (basicData) {
-            setSubscriptionTier('basic');
-          }
-        }
+        await checkSubscriptionTier(session.user);
       } else {
         setSubscriptionTier(null);
       }
@@ -50,7 +61,7 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [initialUser]);
 
   const handleSignOut = async () => {
     try {
