@@ -15,6 +15,13 @@ serve(async (req) => {
   try {
     const { priceId, userId } = await req.json()
     
+    if (!userId) {
+      console.error('No userId provided');
+      throw new Error('User ID is required');
+    }
+
+    console.log('Processing checkout for user:', userId);
+    
     // Initialize Stripe with the secret key from environment variables
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
@@ -27,13 +34,23 @@ serve(async (req) => {
     )
 
     // Get user email for the customer creation
+    console.log('Fetching user details...');
     const { data: { user }, error: userError } = await supabaseClient.auth.admin.getUserById(userId)
     
-    if (userError || !user?.email) {
-      throw new Error('User not found')
+    if (userError) {
+      console.error('Error fetching user:', userError);
+      throw new Error('Error fetching user details');
     }
 
+    if (!user?.email) {
+      console.error('User email not found');
+      throw new Error('User email not found');
+    }
+
+    console.log('User found:', user.email);
+
     // Check if customer already exists
+    console.log('Checking for existing Stripe customer...');
     const customers = await stripe.customers.list({
       email: user.email,
       limit: 1
@@ -42,9 +59,12 @@ serve(async (req) => {
     let customerId = undefined
     if (customers.data.length > 0) {
       customerId = customers.data[0].id
+      console.log('Existing customer found:', customerId);
+    } else {
+      console.log('No existing customer found, will create new');
     }
 
-    console.log('Creating checkout session...')
+    console.log('Creating checkout session...');
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
@@ -59,7 +79,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/checkout?payment=cancelled`,
     })
 
-    console.log('Checkout session created:', session.id)
+    console.log('Checkout session created:', session.id);
     return new Response(
       JSON.stringify({ url: session.url }),
       { 
@@ -68,7 +88,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error creating checkout session:', error)
+    console.error('Error creating checkout session:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 

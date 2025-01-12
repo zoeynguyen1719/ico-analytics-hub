@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { toast } from "sonner";
 import SubscriptionTier from "@/components/subscription/SubscriptionTier";
@@ -77,9 +77,18 @@ const SubscriptionPage = () => {
   };
 
   const handleStripeCheckout = async (userId: string) => {
-    if (!selectedPriceId) return;
-    
+    if (!selectedPriceId) {
+      toast.error('No subscription plan selected');
+      return;
+    }
+
+    if (!userId) {
+      toast.error('User not authenticated');
+      return;
+    }
+
     try {
+      console.log('Creating checkout session for user:', userId);
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
           priceId: selectedPriceId,
@@ -88,19 +97,20 @@ const SubscriptionPage = () => {
       });
       
       if (error) {
-        toast.error('Error creating checkout session');
         console.error('Checkout error:', error);
+        toast.error('Error creating checkout session');
         return;
       }
 
       if (data?.url) {
         window.location.href = data.url;
       } else {
+        console.error('Invalid checkout response:', data);
         toast.error('Invalid checkout response');
       }
     } catch (error) {
-      toast.error('Error processing subscription');
       console.error('Subscription error:', error);
+      toast.error('Error processing subscription');
     }
   };
 
