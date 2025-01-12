@@ -14,7 +14,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full bg-black text-white">
         {/* Navigation */}
-        <div className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-lg border-b border-white/10">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-lg">
           <TopNav user={user} />
           <ToolsMenu />
         </div>
