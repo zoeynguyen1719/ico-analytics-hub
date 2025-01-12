@@ -18,21 +18,35 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
   const { subscriptionTier, setSubscriptionTier, checkSubscriptionTier } = useSubscriptionTier(initialUser);
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user || null);
-      if (session?.user) {
-        await checkSubscriptionTier(session.user);
-      } else {
-        setSubscriptionTier(null);
+    const handleAuthChange = async (_event: string, session: any) => {
+      try {
+        if (session?.user) {
+          setUser(session.user);
+          await checkSubscriptionTier(session.user);
+        } else {
+          setUser(null);
+          setSubscriptionTier(null);
+          // If token is invalid, redirect to signin
+          if (_event === 'TOKEN_REFRESHED' || _event === 'SIGNED_OUT') {
+            navigate('/signin');
+            toast.error("Session expired. Please sign in again.");
+          }
+        }
+      } catch (error: any) {
+        console.error("Auth error:", error);
+        if (error.message?.includes('refresh_token_not_found')) {
+          navigate('/signin');
+          toast.error("Session expired. Please sign in again.");
+        }
       }
-    });
+    };
 
-    // Cleanup subscription on unmount
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthChange);
+
     return () => {
       subscription.unsubscribe();
     };
-  }, [initialUser, checkSubscriptionTier, setSubscriptionTier]);
+  }, [navigate, checkSubscriptionTier, setSubscriptionTier]);
 
   const handleSignOut = async () => {
     try {

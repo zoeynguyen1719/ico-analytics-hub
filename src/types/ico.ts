@@ -23,9 +23,9 @@ export interface ICOProject {
   roadmap?: Record<string, any>;
   token_metrics?: Record<string, any>;
   slug?: string;
-  // UI specific fields
-  symbol: string;
-  category: string;
-  type: string;
-  logo: string;
+  // UI specific fields with defaults
+  symbol?: string;
+  category?: string;
+  type?: string;
+  logo?: string;
 }

@@ -20,7 +20,15 @@ const Admin = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      
+      // Transform the data to match ICOProject interface
+      return data.map((project: any) => ({
+        ...project,
+        symbol: project.symbol || "",
+        category: project.category || "Cryptocurrency",
+        type: project.type || "Public Sale",
+        logo: project.logo || "",
+      })) as ICOProject[];
     },
   });
 
