@@ -41,24 +41,24 @@ serve(async (req) => {
 
     // Get user email for the customer creation
     console.log('Fetching user details...');
-    const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
+    const { data: user, error: userError } = await supabaseAdmin.auth.admin.getUser(userId)
     
     if (userError) {
       console.error('Error fetching user:', userError);
       throw new Error('Error fetching user details');
     }
 
-    if (!user?.email) {
+    if (!user?.user?.email) {
       console.error('User email not found');
       throw new Error('User email not found');
     }
 
-    console.log('User found:', user.email);
+    console.log('User found:', user.user.email);
 
     // Check if customer already exists
     console.log('Checking for existing Stripe customer...');
     const customers = await stripe.customers.list({
-      email: user.email,
+      email: user.user.email,
       limit: 1
     })
 
@@ -73,7 +73,7 @@ serve(async (req) => {
     console.log('Creating checkout session...');
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : user.email,
+      customer_email: customerId ? undefined : user.user.email,
       line_items: [
         {
           price: priceId,
