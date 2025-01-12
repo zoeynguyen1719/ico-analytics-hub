@@ -27,8 +27,8 @@ serve(async (req) => {
         },
       ],
       mode: 'subscription',
-      success_url: `${req.headers.get('origin')}/dashboard?payment=success`,
-      cancel_url: `${req.headers.get('origin')}/subscription?payment=cancelled`,
+      success_url: `${req.headers.get('origin')}/checkout?payment=success`,
+      cancel_url: `${req.headers.get('origin')}/checkout?payment=cancelled`,
     })
 
     return new Response(
