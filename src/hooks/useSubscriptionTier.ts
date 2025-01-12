@@ -7,7 +7,7 @@ export const useSubscriptionTier = (user: any) => {
   const checkSubscriptionTier = async (user: any) => {
     if (!user) return;
     
-    // Check for subscription
+    // Check for subscription using user_id
     const { data: subData } = await supabase
       .from('subscriptions')
       .select('tier')
