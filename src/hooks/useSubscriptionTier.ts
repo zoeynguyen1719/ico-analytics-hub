@@ -5,7 +5,7 @@ export const useSubscriptionTier = (user: any) => {
   const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
 
   const checkSubscriptionTier = async (user: any) => {
-    if (!user) return;
+    if (!user?.id) return;
     
     // Check for subscription using user_id
     const { data: subData, error: subError } = await supabase

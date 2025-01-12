@@ -8,7 +8,13 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<DashboardLayout />} />
+        <Route path="/" element={
+          <DashboardLayout>
+            <div className="container mx-auto px-4">
+              <h1 className="text-3xl font-bold text-crypto-blue">Welcome to Mericulum</h1>
+            </div>
+          </DashboardLayout>
+        } />
         <Route path="/subscription" element={<SubscriptionPage />} />
         <Route path="/checkout" element={<Checkout />} />
       </Routes>
