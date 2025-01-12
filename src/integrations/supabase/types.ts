@@ -34,35 +34,80 @@ export type Database = {
         Row: {
           "ATH ROI": number | null
           created_at: string
+          description: string | null
+          distributed_percentage: number | null
+          hard_cap: string | null
           "ICO date": string | null
           id: number
+          kyc_required: boolean | null
           Platform: string | null
           Price: number | null
           "Project Name": string | null
+          restricted_countries: string[] | null
+          roadmap: Json | null
           ROI: number | null
           "Sale Price": number | null
+          slug: string | null
+          social_links: Json | null
+          team_members: Json | null
+          token_metrics: Json | null
+          token_price: string | null
+          token_supply: number | null
+          token_type: string | null
+          website_url: string | null
+          whitepaper_url: string | null
         }
         Insert: {
           "ATH ROI"?: number | null
           created_at?: string
+          description?: string | null
+          distributed_percentage?: number | null
+          hard_cap?: string | null
           "ICO date"?: string | null
           id?: number
+          kyc_required?: boolean | null
           Platform?: string | null
           Price?: number | null
           "Project Name"?: string | null
+          restricted_countries?: string[] | null
+          roadmap?: Json | null
           ROI?: number | null
           "Sale Price"?: number | null
+          slug?: string | null
+          social_links?: Json | null
+          team_members?: Json | null
+          token_metrics?: Json | null
+          token_price?: string | null
+          token_supply?: number | null
+          token_type?: string | null
+          website_url?: string | null
+          whitepaper_url?: string | null
         }
         Update: {
           "ATH ROI"?: number | null
           created_at?: string
+          description?: string | null
+          distributed_percentage?: number | null
+          hard_cap?: string | null
           "ICO date"?: string | null
           id?: number
+          kyc_required?: boolean | null
           Platform?: string | null
           Price?: number | null
           "Project Name"?: string | null
+          restricted_countries?: string[] | null
+          roadmap?: Json | null
           ROI?: number | null
           "Sale Price"?: number | null
+          slug?: string | null
+          social_links?: Json | null
+          team_members?: Json | null
+          token_metrics?: Json | null
+          token_price?: string | null
+          token_supply?: number | null
+          token_type?: string | null
+          website_url?: string | null
+          whitepaper_url?: string | null
         }
         Relationships: []
       }

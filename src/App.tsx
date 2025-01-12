@@ -11,6 +11,7 @@ import SignIn from "./pages/SignIn";
 import Games from "./pages/Games";
 import Research from "./pages/Research";
 import Analytics from "./pages/Analytics";
+import ProjectDetails from "./pages/ProjectDetails";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/games" element={<Games />} />
           <Route path="/research" element={<Research />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/projects/:slug" element={<ProjectDetails />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
