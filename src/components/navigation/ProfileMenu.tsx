@@ -1,4 +1,4 @@
-import { UserCircle } from "lucide-react";
+import { UserCircle, ArrowUpCircle } from "lucide-react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,7 +11,15 @@ interface ProfileMenuProps {
 }
 
 const ProfileMenu = ({ user, subscriptionTier, onSignOut }: ProfileMenuProps) => {
+  const navigate = useNavigate();
+  
   if (!user) return null;
+
+  const handleUpgrade = () => {
+    navigate("/subscription");
+  };
+
+  const showUpgradeButton = subscriptionTier && subscriptionTier !== 'advanced';
 
   return (
     <div className="relative group">
@@ -22,6 +30,15 @@ const ProfileMenu = ({ user, subscriptionTier, onSignOut }: ProfileMenuProps) =>
       </Avatar>
       <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-crypto-dark border border-crypto-gray opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
         <div className="py-1">
+          {showUpgradeButton && (
+            <button
+              onClick={handleUpgrade}
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-300 hover:bg-crypto-gray hover:text-white transition-colors text-left border-b border-crypto-gray"
+            >
+              <ArrowUpCircle className="h-4 w-4" />
+              Upgrade Tier
+            </button>
+          )}
           <div className="px-4 py-2 text-sm text-gray-300 border-b border-crypto-gray">
             <span className="text-crypto-blue font-semibold uppercase">
               {subscriptionTier || 'Basic'} Tier
