@@ -27,15 +27,21 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    // Create Supabase client to get user information
-    const supabaseClient = createClient(
+    // Create Supabase client with service role key for admin access
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
     )
 
     // Get user email for the customer creation
     console.log('Fetching user details...');
-    const { data: { user }, error: userError } = await supabaseClient.auth.admin.getUserById(userId)
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
     
     if (userError) {
       console.error('Error fetching user:', userError);
