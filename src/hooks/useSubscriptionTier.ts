@@ -31,8 +31,8 @@ export const useSubscriptionTier = (user: any) => {
   };
 
   useEffect(() => {
-    if (user?.user) {
-      checkSubscriptionTier(user.user);
+    if (user) {
+      checkSubscriptionTier(user);
     }
   }, [user]);
 
