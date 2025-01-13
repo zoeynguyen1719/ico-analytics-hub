@@ -2,7 +2,14 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line
@@ -10,9 +17,9 @@ import {
 import {
   Search, Filter, TrendingUp, Activity, BarChart2, 
   Download, Crown, ChevronRight, Globe, Zap, Signal,
-  Database, AlertCircle, RefreshCw
+  Database, AlertCircle, RefreshCw, ArrowUpDown
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useICOProjects } from "@/services/icoService";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ICOProject } from "@/types/ico";
@@ -37,7 +44,72 @@ const COLORS = ['#6FD5FF', '#4BA3CC', '#1A3B47', '#2A4B57'];
 
 const Analytics = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterPlatform, setFilterPlatform] = useState("");
+  const [filterPriceRange, setFilterPriceRange] = useState("");
+  const [filterROIRange, setFilterROIRange] = useState("");
+  const [filterICODate, setFilterICODate] = useState("");
+  const [sortField, setSortField] = useState<keyof ICOProject | "">("");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const { data: icoProjects, isLoading } = useICOProjects();
+
+  const filteredAndSortedProjects = useMemo(() => {
+    if (!icoProjects) return [];
+
+    let filtered = icoProjects.filter(project => {
+      const matchesSearch = project["Project Name"]?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          project["Platform"]?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesPlatform = !filterPlatform || project["Platform"] === filterPlatform;
+      
+      const matchesPriceRange = !filterPriceRange || (() => {
+        const price = project["Price"];
+        if (!price) return false;
+        switch (filterPriceRange) {
+          case "0-100": return price <= 100;
+          case "100-1000": return price > 100 && price <= 1000;
+          case "1000+": return price > 1000;
+          default: return true;
+        }
+      })();
+
+      const matchesROIRange = !filterROIRange || (() => {
+        const roi = project["ROI"];
+        if (!roi) return false;
+        switch (filterROIRange) {
+          case "negative": return roi < 0;
+          case "0-100": return roi >= 0 && roi <= 100;
+          case "100+": return roi > 100;
+          default: return true;
+        }
+      })();
+
+      return matchesSearch && matchesPlatform && matchesPriceRange && matchesROIRange;
+    });
+
+    if (sortField) {
+      filtered.sort((a, b) => {
+        const aValue = a[sortField];
+        const bValue = b[sortField];
+        
+        if (aValue === null || aValue === undefined) return 1;
+        if (bValue === null || bValue === undefined) return -1;
+        
+        const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+        return sortDirection === "asc" ? comparison : -comparison;
+      });
+    }
+
+    return filtered;
+  }, [icoProjects, searchQuery, filterPlatform, filterPriceRange, filterROIRange, sortField, sortDirection]);
+
+  const handleSort = (field: keyof ICOProject) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -60,9 +132,64 @@ const Analytics = () => {
                 />
                 <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
               </div>
-              <Button variant="outline" className="bg-crypto-dark border-crypto-gray hover:bg-crypto-gray">
-                <Filter className="mr-2 h-4 w-4" /> Advanced Filters
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="bg-crypto-dark border-crypto-gray hover:bg-crypto-gray">
+                    <Filter className="mr-2 h-4 w-4" /> Advanced Filters
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-crypto-dark border-crypto-gray text-white">
+                  <DialogHeader>
+                    <DialogTitle>Advanced Filters</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Platform</label>
+                      <Select value={filterPlatform} onValueChange={setFilterPlatform}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Platform" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Platforms</SelectItem>
+                          <SelectItem value="Ethereum">Ethereum</SelectItem>
+                          <SelectItem value="Binance">Binance</SelectItem>
+                          <SelectItem value="Solana">Solana</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Price Range</label>
+                      <Select value={filterPriceRange} onValueChange={setFilterPriceRange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Price Range" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All Prices</SelectItem>
+                          <SelectItem value="0-100">$0 - $100</SelectItem>
+                          <SelectItem value="100-1000">$100 - $1000</SelectItem>
+                          <SelectItem value="1000+">$1000+</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">ROI Range</label>
+                      <Select value={filterROIRange} onValueChange={setFilterROIRange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select ROI Range" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All ROI</SelectItem>
+                          <SelectItem value="negative">Negative ROI</SelectItem>
+                          <SelectItem value="0-100">0% - 100%</SelectItem>
+                          <SelectItem value="100+">100%+</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </div>
@@ -167,11 +294,21 @@ const Analytics = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Project Name</TableHead>
-                  <TableHead>Platform</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>ROI</TableHead>
-                  <TableHead>ICO Date</TableHead>
+                  <TableHead onClick={() => handleSort("Project Name")} className="cursor-pointer">
+                    Project Name <ArrowUpDown className="inline ml-1 h-4 w-4" />
+                  </TableHead>
+                  <TableHead onClick={() => handleSort("Platform")} className="cursor-pointer">
+                    Platform <ArrowUpDown className="inline ml-1 h-4 w-4" />
+                  </TableHead>
+                  <TableHead onClick={() => handleSort("Price")} className="cursor-pointer">
+                    Price <ArrowUpDown className="inline ml-1 h-4 w-4" />
+                  </TableHead>
+                  <TableHead onClick={() => handleSort("ROI")} className="cursor-pointer">
+                    ROI <ArrowUpDown className="inline ml-1 h-4 w-4" />
+                  </TableHead>
+                  <TableHead onClick={() => handleSort("ICO date")} className="cursor-pointer">
+                    ICO Date <ArrowUpDown className="inline ml-1 h-4 w-4" />
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -179,9 +316,9 @@ const Analytics = () => {
                   <TableRow>
                     <TableCell colSpan={5} className="text-center">Loading projects...</TableCell>
                   </TableRow>
-                ) : icoProjects && icoProjects.length > 0 ? (
-                  icoProjects.map((project: ICOProject, index: number) => (
-                    <TableRow key={index}>
+                ) : filteredAndSortedProjects.length > 0 ? (
+                  filteredAndSortedProjects.map((project: ICOProject, index: number) => (
+                    <TableRow key={project.id || index}>
                       <TableCell className="font-medium">{project["Project Name"] || "Unknown"}</TableCell>
                       <TableCell>{project["Platform"] || "N/A"}</TableCell>
                       <TableCell>${project["Price"]?.toLocaleString() || "N/A"}</TableCell>
