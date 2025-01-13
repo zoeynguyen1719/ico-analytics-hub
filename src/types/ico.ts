@@ -1,6 +1,6 @@
 export interface ICOProject {
   id?: number;
-  "Project Name": string | null;  // Changed to allow null
+  "Project Name": string | null;
   "Price"?: number;
   "Sale Price"?: number;
   "ROI"?: number;
@@ -23,9 +23,17 @@ export interface ICOProject {
   roadmap?: Record<string, any>;
   token_metrics?: Record<string, any>;
   slug?: string;
-  // UI specific fields with defaults
+  // UI specific fields
   symbol?: string;
   category?: string;
   type?: string;
   logo?: string;
+  value?: string;
+  isHighlighted?: boolean;
+  isAd?: boolean;
+  isNew?: boolean;
+  platform?: string;
+  timeLeft?: string;
+  date?: string;
+  participants?: number;
 }

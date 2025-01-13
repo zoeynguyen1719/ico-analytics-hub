@@ -21,8 +21,8 @@ const ICOAnalytics = () => {
 
   // Prepare data for charts
   const platformData = projects?.reduce((acc: any, curr) => {
-    if (curr.platform) {
-      acc[curr.platform] = (acc[curr.platform] || 0) + 1;
+    if (curr.Platform) {
+      acc[curr.Platform] = (acc[curr.Platform] || 0) + 1;
     }
     return acc;
   }, {});
@@ -83,7 +83,7 @@ const ICOAnalytics = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={projects}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
+                <XAxis dataKey="Project Name" />
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="value" fill="#4BA3CC" />
