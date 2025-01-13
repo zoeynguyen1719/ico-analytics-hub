@@ -4,6 +4,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import SubscriptionPage from "@/pages/Subscription";
 import Checkout from "./pages/Checkout";
 import Index from "./pages/Index";
+import Analytics from "./pages/Analytics";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Create a client
@@ -24,6 +25,7 @@ const App = () => {
           <Route path="/" element={<Index />} />
           <Route path="/subscription" element={<SubscriptionPage />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/analytics" element={<Analytics />} />
         </Routes>
         <Toaster />
       </Router>
