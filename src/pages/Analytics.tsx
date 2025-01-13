@@ -94,7 +94,7 @@ const Analytics = () => {
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Funding Trends */}
-          <Card className="p-6 bg-crypto-dark border-crypto-gray">
+          <Card className="p-6 bg-black border-crypto-gray text-white">
             <h3 className="text-lg font-semibold text-white mb-4">ICO Funding Trends</h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -121,7 +121,7 @@ const Analytics = () => {
           </Card>
 
           {/* Industry Distribution */}
-          <Card className="p-6 bg-crypto-dark border-crypto-gray">
+          <Card className="p-6 bg-black border-crypto-gray text-white">
             <h3 className="text-lg font-semibold text-white mb-4">Industry Distribution</h3>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -154,7 +154,7 @@ const Analytics = () => {
         </div>
 
         {/* ICO Projects List */}
-        <Card className="p-6 bg-crypto-dark border-crypto-gray">
+        <Card className="p-6 bg-black border-crypto-gray text-white">
           <h3 className="text-lg font-semibold text-white mb-4">ICO Projects Overview</h3>
           <div className="overflow-x-auto">
             <Table>
