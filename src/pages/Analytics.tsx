@@ -179,21 +179,27 @@ const Analytics = () => {
                   <TableRow>
                     <TableCell colSpan={5} className="text-center">Loading projects...</TableCell>
                   </TableRow>
-                ) : icoProjects?.map((project: ICOProject) => (
-                  <TableRow key={project["Project Name"]}>
-                    <TableCell className="font-medium">{project["Project Name"]}</TableCell>
-                    <TableCell>{project["Platform"] || "N/A"}</TableCell>
-                    <TableCell>${project["Price"]?.toLocaleString() || "N/A"}</TableCell>
-                    <TableCell>
-                      {project["ROI"] ? (
-                        <span className={project["ROI"] > 0 ? "text-green-500" : "text-red-500"}>
-                          {project["ROI"]}%
-                        </span>
-                      ) : "N/A"}
-                    </TableCell>
-                    <TableCell>{project["ICO date"] || "N/A"}</TableCell>
+                ) : icoProjects && icoProjects.length > 0 ? (
+                  icoProjects.map((project: ICOProject, index: number) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">{project["Project Name"] || "Unknown"}</TableCell>
+                      <TableCell>{project["Platform"] || "N/A"}</TableCell>
+                      <TableCell>${project["Price"]?.toLocaleString() || "N/A"}</TableCell>
+                      <TableCell>
+                        {project["ROI"] ? (
+                          <span className={project["ROI"] > 0 ? "text-green-500" : "text-red-500"}>
+                            {project["ROI"]}%
+                          </span>
+                        ) : "N/A"}
+                      </TableCell>
+                      <TableCell>{project["ICO date"] || "N/A"}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center">No projects found</TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </div>

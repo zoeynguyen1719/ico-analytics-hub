@@ -1,6 +1,6 @@
 export interface ICOProject {
   id?: number;
-  "Project Name": string;
+  "Project Name": string | null;  // Changed to allow null
   "Price"?: number;
   "Sale Price"?: number;
   "ROI"?: number;

@@ -1,28 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
-interface ICOProject {
-  name: string;
-  symbol: string;
-  category: string;
-  type: string;
-  endDate?: string;
-  startDate?: string;
-  value?: string;
-  logo: string;
-  isHighlighted?: boolean;
-  isAd?: boolean;
-  isNew?: boolean;
-  platform?: string;
-  timeLeft?: string;
-  date?: string;
-  participants?: number;
-  "Project Name"?: string;
-  "Platform"?: string;
-  "Price"?: number;
-  "ROI"?: number;
-  "ICO date"?: string;
-}
+import { ICOProject } from "@/types/ico";
 
 const fetchFromCryptorank = async (): Promise<ICOProject[]> => {
   try {
@@ -35,7 +13,13 @@ const fetchFromCryptorank = async (): Promise<ICOProject[]> => {
     }
     
     const { data } = await response.json();
-    return data;
+    return data.map((item: any) => ({
+      "Project Name": item["Project Name"] || "Unknown Project",
+      "Platform": item.Platform || null,
+      "Price": item.Price || null,
+      "ROI": item.ROI || null,
+      "ICO date": item["ICO date"] || null
+    }));
   } catch (error) {
     console.error("Error fetching from Cryptorank:", error);
     return [];
@@ -55,18 +39,14 @@ const fetchFromCoinGecko = async (): Promise<ICOProject[]> => {
     const data = await response.json();
     
     return data.map((coin: any) => ({
-      name: coin.name,
-      symbol: coin.symbol.toUpperCase(),
-      category: "Cryptocurrency",
-      type: "Public Sale",
-      value: coin.current_price ? `$${coin.current_price.toLocaleString()}` : undefined,
-      logo: coin.image || "/placeholder.svg",
-      isNew: coin.price_change_percentage_24h > 10,
-      isHighlighted: coin.price_change_percentage_24h > 5,
+      "Project Name": coin.name,
+      "Platform": "CoinGecko",
+      "Price": coin.current_price,
+      "ROI": coin.price_change_percentage_24h,
+      "ICO date": null
     }));
   } catch (error) {
     console.error("Error fetching from CoinGecko:", error);
-    // Return empty array as fallback
     return [];
   }
 };
@@ -89,21 +69,12 @@ export const fetchICOProjects = async (): Promise<ICOProject[]> => {
 
     if (supabaseData && supabaseData.length > 0) {
       return supabaseData.map((project: any) => ({
-        name: project["Project Name"] || "Unknown Project",
-        symbol: project.symbol || "N/A",
-        category: project.category || "Cryptocurrency",
-        type: project.type || "Public Sale",
-        value: project.Price ? `$${project.Price}` : undefined,
-        logo: project.logo || "/placeholder.svg",
-        isNew: project["ICO date"] ? new Date(project["ICO date"]) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) : false,
-        isHighlighted: project.ROI ? project.ROI > 100 : false,
-        platform: project.Platform,
-        date: project["ICO date"],
-        "Project Name": project["Project Name"],
-        "Platform": project.Platform,
-        "Price": project.Price,
-        "ROI": project.ROI,
-        "ICO date": project["ICO date"],
+        "Project Name": project["Project Name"] || "Unknown Project",
+        "Platform": project.Platform || null,
+        "Price": project.Price || null,
+        "ROI": project.ROI || null,
+        "ICO date": project["ICO date"] || null,
+        ...project
       }));
     }
 
