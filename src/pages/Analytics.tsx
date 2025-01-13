@@ -12,6 +12,8 @@ import {
   Download, Crown, ChevronRight, Globe, Zap
 } from "lucide-react";
 import { useState } from "react";
+import { useICOProjects } from "@/services/icoService";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const mockTrendData = [
   { month: 'Jan', value: 2400 },
@@ -33,6 +35,7 @@ const COLORS = ['#6FD5FF', '#4BA3CC', '#1A3B47', '#2A4B57'];
 
 const Analytics = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: icoProjects, isLoading } = useICOProjects();
 
   return (
     <DashboardLayout>
@@ -149,6 +152,45 @@ const Analytics = () => {
             </div>
           </Card>
         </div>
+
+        {/* ICO Projects List */}
+        <Card className="p-6 bg-crypto-dark border-crypto-gray">
+          <h3 className="text-lg font-semibold text-white mb-4">ICO Projects Overview</h3>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Project Name</TableHead>
+                  <TableHead>Platform</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>ROI</TableHead>
+                  <TableHead>ICO Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center">Loading projects...</TableCell>
+                  </TableRow>
+                ) : icoProjects?.map((project) => (
+                  <TableRow key={project.id}>
+                    <TableCell className="font-medium">{project["Project Name"]}</TableCell>
+                    <TableCell>{project["Platform"] || "N/A"}</TableCell>
+                    <TableCell>${project["Price"]?.toLocaleString() || "N/A"}</TableCell>
+                    <TableCell>
+                      {project["ROI"] ? (
+                        <span className={project["ROI"] > 0 ? "text-green-500" : "text-red-500"}>
+                          {project["ROI"]}%
+                        </span>
+                      ) : "N/A"}
+                    </TableCell>
+                    <TableCell>{project["ICO date"] || "N/A"}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </Card>
 
         {/* Call to Action */}
         <div className="fixed bottom-0 left-0 right-0 bg-crypto-dark border-t border-crypto-gray p-4">
