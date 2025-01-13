@@ -17,7 +17,30 @@ interface ICOProject {
   timeLeft?: string;
   date?: string;
   participants?: number;
+  "Project Name"?: string;
+  "Platform"?: string;
+  "Price"?: number;
+  "ROI"?: number;
+  "ICO date"?: string;
 }
+
+const fetchFromCryptorank = async (): Promise<ICOProject[]> => {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/scrape-ico`
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Cryptorank scraping error: ${response.status}`);
+    }
+    
+    const { data } = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching from Cryptorank:", error);
+    return [];
+  }
+};
 
 const fetchFromCoinGecko = async (): Promise<ICOProject[]> => {
   try {
@@ -57,7 +80,11 @@ export const fetchICOProjects = async (): Promise<ICOProject[]> => {
 
     if (supabaseError) {
       console.error('Error fetching from Supabase:', supabaseError);
-      return fetchFromCoinGecko();
+      const [cryptorankData, coingeckoData] = await Promise.all([
+        fetchFromCryptorank(),
+        fetchFromCoinGecko()
+      ]);
+      return [...cryptorankData, ...coingeckoData];
     }
 
     if (supabaseData && supabaseData.length > 0) {
@@ -72,11 +99,20 @@ export const fetchICOProjects = async (): Promise<ICOProject[]> => {
         isHighlighted: project.ROI ? project.ROI > 100 : false,
         platform: project.Platform,
         date: project["ICO date"],
+        "Project Name": project["Project Name"],
+        "Platform": project.Platform,
+        "Price": project.Price,
+        "ROI": project.ROI,
+        "ICO date": project["ICO date"],
       }));
     }
 
-    console.log('No data in Supabase, fetching from CoinGecko');
-    return fetchFromCoinGecko();
+    console.log('No data in Supabase, fetching from external sources');
+    const [cryptorankData, coingeckoData] = await Promise.all([
+      fetchFromCryptorank(),
+      fetchFromCoinGecko()
+    ]);
+    return [...cryptorankData, ...coingeckoData];
   } catch (error) {
     console.error("Error fetching ICO projects:", error);
     return [];
