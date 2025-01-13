@@ -9,11 +9,13 @@ import {
 } from 'recharts';
 import {
   Search, Filter, TrendingUp, Activity, BarChart2, 
-  Download, Crown, ChevronRight, Globe, Zap
+  Download, Crown, ChevronRight, Globe, Zap, Signal,
+  Database, AlertCircle, RefreshCw
 } from "lucide-react";
 import { useState } from "react";
 import { useICOProjects } from "@/services/icoService";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ICOProject } from "@/types/ico";
 
 const mockTrendData = [
   { month: 'Jan', value: 2400 },
@@ -44,7 +46,7 @@ const Analytics = () => {
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-white">ICO Analytics</h1>
+              <h1 className="text-3xl font-bold text-white">ICO Analytics & Data Integration</h1>
               <p className="text-gray-400 mt-1">Uncover trends and insights powered by AI</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -65,30 +67,35 @@ const Analytics = () => {
           </div>
         </div>
 
-        {/* Analytics Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { title: "Total ICOs", value: "156", change: "+12%", icon: BarChart2, color: "text-crypto-blue" },
-            { title: "Success Rate", value: "78%", change: "+5%", icon: TrendingUp, color: "text-green-500" },
-            { title: "Market Sentiment", value: "Positive", change: "+8%", icon: Activity, color: "text-crypto-blue" },
-            { title: "Active Industry", value: "DeFi", change: "+15%", icon: Zap, color: "text-yellow-500" },
-          ].map((stat, index) => (
-            <Card key={index} className="p-6 bg-crypto-dark border-crypto-gray hover:border-crypto-blue transition-all">
-              <div className="flex justify-between items-start">
-                <div className="space-y-2">
-                  <p className="text-gray-400 text-sm">{stat.title}</p>
-                  <p className="text-2xl font-bold text-white">{stat.value}</p>
-                </div>
-                <div className={`p-2 rounded-lg bg-opacity-20 ${stat.color}`}>
-                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                </div>
+        {/* API Status Panel */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="p-6 bg-black border-crypto-gray text-white">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Database className="h-5 w-5 text-crypto-blue" />
+                <h3 className="text-lg font-semibold">CoinGecko API Status</h3>
               </div>
-              <div className="mt-4">
-                <span className="text-green-500 text-sm">{stat.change}</span>
-                <span className="text-gray-400 text-sm ml-2">vs last month</span>
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">Connected</span>
+                <RefreshCw className="h-4 w-4 text-crypto-blue cursor-pointer" />
               </div>
-            </Card>
-          ))}
+            </div>
+            <p className="text-gray-400">Rate Limit: 75/100 calls remaining</p>
+          </Card>
+
+          <Card className="p-6 bg-black border-crypto-gray text-white">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Database className="h-5 w-5 text-crypto-blue" />
+                <h3 className="text-lg font-semibold">CryptoRank API Status</h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">Connected</span>
+                <RefreshCw className="h-4 w-4 text-crypto-blue cursor-pointer" />
+              </div>
+            </div>
+            <p className="text-gray-400">Rate Limit: 88/100 calls remaining</p>
+          </Card>
         </div>
 
         {/* Charts Section */}
@@ -172,8 +179,8 @@ const Analytics = () => {
                   <TableRow>
                     <TableCell colSpan={5} className="text-center">Loading projects...</TableCell>
                   </TableRow>
-                ) : icoProjects?.map((project) => (
-                  <TableRow key={project.id}>
+                ) : icoProjects?.map((project: ICOProject) => (
+                  <TableRow key={project["Project Name"]}>
                     <TableCell className="font-medium">{project["Project Name"]}</TableCell>
                     <TableCell>{project["Platform"] || "N/A"}</TableCell>
                     <TableCell>${project["Price"]?.toLocaleString() || "N/A"}</TableCell>
