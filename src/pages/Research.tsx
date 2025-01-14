@@ -1,6 +1,6 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, BookOpen, DollarSign, Download, Search, Filter, SortAsc } from "lucide-react";
+import { BookOpen, Download, Search, Filter } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,16 +21,6 @@ type ResearchReport = {
   pdf_url: string | null;
   thumbnail_url: string | null;
   created_at: string;
-};
-
-// Function to get icon component based on string name
-const getIconComponent = (iconName: string) => {
-  const icons = {
-    Shield,
-    BookOpen,
-    DollarSign,
-  };
-  return icons[iconName as keyof typeof icons] || BookOpen;
 };
 
 const Research = () => {
@@ -138,61 +128,57 @@ const Research = () => {
 
         {/* Reports Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredReports?.map((report) => {
-            const IconComponent = getIconComponent(report.icon);
-            
-            return (
-              <Card 
-                key={report.id} 
-                className="group bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-all duration-300 hover:scale-[1.02]"
-              >
-                <CardContent className="p-6 space-y-4">
-                  {/* Thumbnail */}
-                  <div className="relative aspect-video rounded-lg overflow-hidden bg-crypto-gray">
-                    {report.thumbnail_url ? (
-                      <img
-                        src={report.thumbnail_url}
-                        alt={report.title}
-                        className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-300"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <IconComponent className="w-12 h-12 text-crypto-blue" />
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-semibold text-white group-hover:text-crypto-blue transition-colors">
-                      {report.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm line-clamp-2">
-                      {report.description}
-                    </p>
-                  </div>
-                  
-                  {/* Footer */}
-                  <div className="flex items-center justify-between pt-4">
-                    <span className="text-xs text-crypto-blue bg-crypto-gray px-3 py-1 rounded-full">
-                      {report.category}
-                    </span>
-                    {report.pdf_url && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-crypto-blue hover:text-white hover:bg-crypto-blue"
-                        onClick={() => window.open(report.pdf_url!, '_blank')}
-                      >
-                        <Download className="w-4 h-4 mr-2" />
-                        Download
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+          {filteredReports?.map((report) => (
+            <Card 
+              key={report.id} 
+              className="group bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-all duration-300 hover:scale-[1.02]"
+            >
+              <CardContent className="p-6 space-y-4">
+                {/* Thumbnail */}
+                <div className="relative aspect-video rounded-lg overflow-hidden bg-crypto-gray">
+                  {report.thumbnail_url ? (
+                    <img
+                      src={report.thumbnail_url}
+                      alt={report.title}
+                      className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-300"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <BookOpen className="w-12 h-12 text-crypto-blue" />
+                    </div>
+                  )}
+                </div>
+                
+                {/* Content */}
+                <div className="space-y-2">
+                  <h3 className="text-xl font-semibold text-white group-hover:text-crypto-blue transition-colors">
+                    {report.title}
+                  </h3>
+                  <p className="text-gray-400 text-sm line-clamp-2">
+                    {report.description}
+                  </p>
+                </div>
+                
+                {/* Footer */}
+                <div className="flex items-center justify-between pt-4">
+                  <span className="text-xs text-crypto-blue bg-crypto-gray px-3 py-1 rounded-full">
+                    {report.category}
+                  </span>
+                  {report.pdf_url && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-crypto-blue hover:text-white hover:bg-crypto-blue"
+                      onClick={() => window.open(report.pdf_url!, '_blank')}
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Load More Button (if needed) */}
