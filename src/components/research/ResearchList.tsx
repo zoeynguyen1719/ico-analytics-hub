@@ -1,81 +1,86 @@
-import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { BookOpen, Download } from "lucide-react";
-
-interface ResearchReport {
-  id: string;
-  category: string;
-  title: string;
-  description: string;
-  document_name: string;
-  document_url: string | null;
-  icon: string;
-  pdf_url: string | null;
-  thumbnail_url: string | null;
-  created_at: string;
-}
+import { Card } from "@/components/ui/card";
+import { FileText, Download } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import type { ResearchReport } from "@/pages/Research";
 
 interface ResearchListProps {
   reports: ResearchReport[];
 }
 
-const ResearchList: React.FC<ResearchListProps> = ({ reports }) => {
+const ResearchList = ({ reports }: ResearchListProps) => {
+  const handleDownload = async (pdfUrl: string | null, documentName: string) => {
+    if (!pdfUrl) return;
+    
+    try {
+      const { data, error } = await supabase.storage
+        .from('research_reports')
+        .download(pdfUrl);
+        
+      if (error) throw error;
+      
+      // Create a download link
+      const url = window.URL.createObjectURL(data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = documentName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {reports.map((report) => (
-        <Card 
-          key={report.id} 
-          className="group bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-all duration-300"
-        >
-          <CardContent className="p-6">
-            <div className="flex gap-6">
-              <div className="relative h-24 w-24 flex-shrink-0 rounded-lg overflow-hidden bg-crypto-gray">
-                {report.thumbnail_url ? (
-                  <img
-                    src={report.thumbnail_url}
-                    alt={report.title}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-300"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <BookOpen className="w-8 h-8 text-crypto-blue" />
-                  </div>
+        <Card key={report.id} className="p-4 hover:shadow-lg transition-shadow">
+          <div className="flex items-start gap-4">
+            {report.thumbnail_url ? (
+              <img
+                src={`${supabase.storage.from('research_reports').getPublicUrl(report.thumbnail_url).data.publicUrl}`}
+                alt={report.title}
+                className="w-24 h-24 object-cover rounded"
+              />
+            ) : (
+              <div className="w-24 h-24 bg-gray-100 rounded flex items-center justify-center">
+                <FileText className="w-8 h-8 text-gray-400" />
+              </div>
+            )}
+            
+            <div className="flex-1">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-semibold">{report.title}</h3>
+                  <p className="text-sm text-gray-500">{report.category}</p>
+                  <p className="mt-2 text-sm text-gray-600">{report.description}</p>
+                </div>
+                
+                {report.pdf_url && (
+                  <button
+                    onClick={() => handleDownload(report.pdf_url, report.document_name)}
+                    className="flex items-center gap-2 px-3 py-1 text-sm text-crypto-blue hover:bg-crypto-blue/10 rounded transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </button>
                 )}
               </div>
               
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-semibold text-white group-hover:text-crypto-blue transition-colors">
-                      {report.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm line-clamp-2">
-                      {report.description}
-                    </p>
-                  </div>
-                  {report.pdf_url && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-crypto-blue hover:text-white hover:bg-crypto-blue flex-shrink-0"
-                      onClick={() => window.open(report.pdf_url!, '_blank')}
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Download
-                    </Button>
-                  )}
-                </div>
-                <div className="mt-4">
-                  <span className="text-xs text-crypto-blue bg-crypto-gray px-3 py-1 rounded-full">
-                    {report.category}
-                  </span>
-                </div>
+              <div className="mt-2 text-sm text-gray-400">
+                Added {new Date(report.created_at).toLocaleDateString()}
               </div>
             </div>
-          </CardContent>
+          </div>
         </Card>
       ))}
+      
+      {reports.length === 0 && (
+        <div className="text-center py-8 text-gray-500">
+          No research reports found.
+        </div>
+      )}
     </div>
   );
 };
