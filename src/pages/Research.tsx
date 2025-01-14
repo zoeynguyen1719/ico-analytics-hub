@@ -25,7 +25,7 @@ type ResearchReport = {
 
 const Research = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   // Fetch reports from Supabase
@@ -46,7 +46,7 @@ const Research = () => {
   const filteredReports = reports?.filter(report => {
     const matchesSearch = report.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          report.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !selectedCategory || report.category === selectedCategory;
+    const matchesCategory = selectedCategory === "all" || report.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -92,13 +92,15 @@ const Research = () => {
         {/* Filter Section */}
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-crypto-dark p-4 rounded-lg">
           <div className="flex-1 w-full md:w-auto">
-            <Input
-              placeholder="Search reports..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-crypto-gray border-crypto-blue text-white"
-              icon={<Search className="text-crypto-blue" />}
-            />
+            <div className="relative">
+              <Input
+                placeholder="Search reports..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-crypto-gray border-crypto-blue text-white pl-10"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-crypto-blue w-4 h-4" />
+            </div>
           </div>
           <div className="flex gap-4 w-full md:w-auto">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -106,7 +108,7 @@ const Research = () => {
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent className="bg-crypto-dark border-crypto-blue">
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}
