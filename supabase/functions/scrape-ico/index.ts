@@ -7,6 +7,7 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -14,6 +15,11 @@ serve(async (req) => {
   try {
     console.log('Starting ICO data scraping...');
     const response = await fetch('https://cryptorank.io/ico');
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const html = await response.text();
     const doc = new DOMParser().parseFromString(html, 'text/html');
 
@@ -40,7 +46,18 @@ serve(async (req) => {
           "token_metrics": {},
           "isHighlighted": false,
           "isNew": true,
-          "value": "$0"
+          "value": "$0",
+          "description": null,
+          "website_url": null,
+          "whitepaper_url": null,
+          "token_type": null,
+          "token_price": null,
+          "token_supply": null,
+          "hard_cap": null,
+          "distributed_percentage": null,
+          "kyc_required": false,
+          "restricted_countries": [],
+          "slug": null
         };
         projects.push(project);
       }
