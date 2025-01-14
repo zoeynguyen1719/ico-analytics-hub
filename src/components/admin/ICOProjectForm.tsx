@@ -4,6 +4,21 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { ICOProject } from "@/types/ico";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const formSchema = z.object({
+  "Project Name": z.string().optional().nullable(),
+  symbol: z.string().optional(),
+  category: z.string(),
+  type: z.string(),
+  Price: z.number().optional().nullable(),
+  Platform: z.string().optional().nullable(),
+  "ICO date": z.string().optional().nullable(),
+  logo: z.string().optional(),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 interface ICOProjectFormProps {
   initialData?: ICOProject | null;
@@ -12,22 +27,30 @@ interface ICOProjectFormProps {
 }
 
 const ICOProjectForm = ({ initialData, onSubmit, onCancel }: ICOProjectFormProps) => {
-  const form = useForm<ICOProject>({
-    defaultValues: initialData || {
-      "Project Name": "",
-      symbol: "",
-      category: "Cryptocurrency",
-      type: "Public Sale",
-      "Price": undefined,
-      "Platform": "",
-      "ICO date": "",
-      logo: "",
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      "Project Name": initialData?.["Project Name"] || "",
+      symbol: initialData?.symbol || "",
+      category: initialData?.category || "Cryptocurrency",
+      type: initialData?.type || "Public Sale",
+      Price: initialData?.Price || undefined,
+      Platform: initialData?.Platform || "",
+      "ICO date": initialData?.["ICO date"] || "",
+      logo: initialData?.logo || "",
     },
   });
 
+  const handleSubmit = (data: FormData) => {
+    onSubmit({
+      ...initialData,
+      ...data,
+    } as ICOProject);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -36,7 +59,7 @@ const ICOProjectForm = ({ initialData, onSubmit, onCancel }: ICOProjectFormProps
               <FormItem>
                 <FormLabel>Project Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter project name" {...field} />
+                  <Input placeholder="Enter project name" {...field} value={field.value || ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -88,7 +111,12 @@ const ICOProjectForm = ({ initialData, onSubmit, onCancel }: ICOProjectFormProps
               <FormItem>
                 <FormLabel>Price</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Enter price" {...field} />
+                  <Input 
+                    type="number" 
+                    placeholder="Enter price" 
+                    {...field}
+                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -102,7 +130,7 @@ const ICOProjectForm = ({ initialData, onSubmit, onCancel }: ICOProjectFormProps
               <FormItem>
                 <FormLabel>Platform</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter platform" {...field} />
+                  <Input placeholder="Enter platform" {...field} value={field.value || ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -116,7 +144,7 @@ const ICOProjectForm = ({ initialData, onSubmit, onCancel }: ICOProjectFormProps
               <FormItem>
                 <FormLabel>ICO Date</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <Input type="date" {...field} value={field.value || ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
