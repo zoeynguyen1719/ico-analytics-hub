@@ -1,42 +1,19 @@
-import { Library, Home, Info, Phone, ChartBar, Wallet, LineChart } from "lucide-react";
+import { Home, Calculator, BarChart2, Newspaper, Crown, Gamepad2, BookOpen, LineChart } from "lucide-react";
 
 export const mainMenuItems = [
-  {
-    label: "Home",
-    path: "/",
-    icon: Home,
-  },
-  {
-    label: "Research",
-    path: "/research-library",
-    icon: Library,
-  },
-  {
-    label: "About",
-    path: "/about",
-    icon: Info,
-  },
-  {
-    label: "Contact",
-    path: "/contact",
-    icon: Phone,
-  },
+  { icon: Home, label: "Home", path: "/" },
+  { icon: BookOpen, label: "Research", path: "/research" },
+  { icon: LineChart, label: "Analytics", path: "/analytics" },
+  { icon: Newspaper, label: "News", path: "/news" },
+  { icon: Crown, label: "Subscription", path: "/subscription" },
+  { icon: Gamepad2, label: "Games", path: "/games" },
 ];
 
 export const toolMenuItems = [
-  {
-    label: "Analytics",
-    path: "/analytics",
-    icon: ChartBar,
-  },
-  {
-    label: "Portfolio",
-    path: "/portfolio",
-    icon: Wallet,
-  },
-  {
-    label: "Trading",
-    path: "/trading",
-    icon: LineChart,
-  },
+  { icon: Calculator, label: "Calculator", path: "/calculator" },
+  { icon: BarChart2, label: "Compare", path: "/compare" },
 ];
+
+const MainMenu = () => null;
+
+export default MainMenu;
