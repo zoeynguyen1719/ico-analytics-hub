@@ -33,13 +33,20 @@ serve(async (req) => {
           "Price": parseFloat(cells[2]?.textContent?.replace('$', '').trim()) || null,
           "ROI": parseFloat(cells[3]?.textContent?.replace('%', '').trim()) || null,
           "ICO date": cells[4]?.textContent?.trim() || null,
+          "social_links": {},
+          "team_members": {},
+          "roadmap": {},
+          "token_metrics": {},
+          "isHighlighted": false,
+          "isNew": true,
+          "value": "$0"
         };
         projects.push(project);
       }
     }
 
     return new Response(
-      JSON.stringify({ data: projects }),
+      JSON.stringify(projects),
       { 
         headers: { 
           ...corsHeaders,

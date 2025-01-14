@@ -15,7 +15,12 @@ const fetchICOProjects = async (): Promise<ICOProject[]> => {
     }
 
     if (supabaseData && supabaseData.length > 0) {
-      return supabaseData;
+      return supabaseData.map(project => ({
+        ...project,
+        isHighlighted: false,
+        isNew: false,
+        value: project.token_price || "$0"
+      }));
     }
 
     console.info("No data in Supabase, fetching from external sources");
@@ -34,14 +39,13 @@ const fetchICOProjects = async (): Promise<ICOProject[]> => {
 
     const data = await response.json();
     
-    if (!data || !Array.isArray(data)) {
+    if (!Array.isArray(data)) {
       throw new Error('Invalid data format received from API');
     }
 
     return data;
   } catch (error) {
-    console.error("Error fetching from Cryptorank:", error);
-    // Return empty array instead of throwing to prevent UI from breaking
+    console.error("Error fetching ICO projects:", error);
     return [];
   }
 };
