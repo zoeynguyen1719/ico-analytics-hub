@@ -56,14 +56,15 @@ const Analytics = () => {
     if (!icoProjects) return [];
 
     let filtered = icoProjects.filter(project => {
-      const matchesSearch = project["Project Name"]?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          project["Platform"]?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = 
+        project["Project Name"]?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        project["Platform"]?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        project.description?.toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesPlatform = !filterPlatform || project["Platform"] === filterPlatform;
       
       const matchesPriceRange = !filterPriceRange || (() => {
-        const price = project["Price"];
-        if (!price) return false;
+        const price = parseFloat(project["Price"]?.toString() || "0");
         switch (filterPriceRange) {
           case "0-100": return price <= 100;
           case "100-1000": return price > 100 && price <= 1000;
@@ -73,8 +74,7 @@ const Analytics = () => {
       })();
 
       const matchesROIRange = !filterROIRange || (() => {
-        const roi = project["ROI"];
-        if (!roi) return false;
+        const roi = parseFloat(project["ROI"]?.toString() || "0");
         switch (filterROIRange) {
           case "negative": return roi < 0;
           case "0-100": return roi >= 0 && roi <= 100;
