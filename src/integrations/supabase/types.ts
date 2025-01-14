@@ -120,8 +120,6 @@ export type Database = {
           document_url: string | null
           icon: string
           id: string
-          pdf_url: string | null
-          thumbnail_url: string | null
           title: string
           user_id: string | null
         }
@@ -133,8 +131,6 @@ export type Database = {
           document_url?: string | null
           icon: string
           id?: string
-          pdf_url?: string | null
-          thumbnail_url?: string | null
           title: string
           user_id?: string | null
         }
@@ -146,8 +142,6 @@ export type Database = {
           document_url?: string | null
           icon?: string
           id?: string
-          pdf_url?: string | null
-          thumbnail_url?: string | null
           title?: string
           user_id?: string | null
         }

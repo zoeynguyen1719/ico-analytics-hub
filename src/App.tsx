@@ -1,27 +1,36 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
+import DashboardLayout from "@/components/DashboardLayout";
+import SubscriptionPage from "@/pages/Subscription";
+import Checkout from "./pages/Checkout";
+import Index from "./pages/Index";
+import Analytics from "./pages/Analytics";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ResearchLibrary from "./pages/ResearchLibrary";
-import Dashboard from "./pages/Dashboard";
-import Home from "./pages/Home";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
 
-const queryClient = new QueryClient();
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 3,
+    },
+  },
+});
 
-function App() {
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/research-library" element={<ResearchLibrary />} />
+          <Route path="/" element={<Index />} />
+          <Route path="/subscription" element={<SubscriptionPage />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/analytics" element={<Analytics />} />
         </Routes>
-      </BrowserRouter>
+        <Toaster />
+      </Router>
     </QueryClientProvider>
   );
-}
+};
 
 export default App;
