@@ -1,6 +1,6 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
-import { BookOpen, Download, Search, Filter } from "lucide-react";
+import { BookOpen, Download, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -62,13 +62,17 @@ const Research = () => {
               Access our comprehensive collection of research reports and analysis on various crypto projects and market trends.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <Card key={i} className="bg-crypto-dark border-crypto-blue">
                 <CardContent className="p-6">
-                  <Skeleton className="h-48 w-full bg-crypto-gray rounded-lg" />
-                  <Skeleton className="h-6 w-3/4 mt-4 bg-crypto-gray" />
-                  <Skeleton className="h-4 w-full mt-2 bg-crypto-gray" />
+                  <div className="flex gap-4">
+                    <Skeleton className="h-24 w-24 bg-crypto-gray rounded-lg flex-shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-6 w-3/4 bg-crypto-gray" />
+                      <Skeleton className="h-4 w-full bg-crypto-gray" />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -128,55 +132,59 @@ const Research = () => {
           </div>
         </div>
 
-        {/* Reports Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Reports List */}
+        <div className="space-y-4">
           {filteredReports?.map((report) => (
             <Card 
               key={report.id} 
-              className="group bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-all duration-300 hover:scale-[1.02]"
+              className="group bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-all duration-300"
             >
-              <CardContent className="p-6 space-y-4">
-                {/* Thumbnail */}
-                <div className="relative aspect-video rounded-lg overflow-hidden bg-crypto-gray">
-                  {report.thumbnail_url ? (
-                    <img
-                      src={report.thumbnail_url}
-                      alt={report.title}
-                      className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-300"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <BookOpen className="w-12 h-12 text-crypto-blue" />
+              <CardContent className="p-6">
+                <div className="flex gap-6">
+                  {/* Thumbnail */}
+                  <div className="relative h-24 w-24 flex-shrink-0 rounded-lg overflow-hidden bg-crypto-gray">
+                    {report.thumbnail_url ? (
+                      <img
+                        src={report.thumbnail_url}
+                        alt={report.title}
+                        className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-300"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <BookOpen className="w-8 h-8 text-crypto-blue" />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-semibold text-white group-hover:text-crypto-blue transition-colors">
+                          {report.title}
+                        </h3>
+                        <p className="text-gray-400 text-sm line-clamp-2">
+                          {report.description}
+                        </p>
+                      </div>
+                      {report.pdf_url && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-crypto-blue hover:text-white hover:bg-crypto-blue flex-shrink-0"
+                          onClick={() => window.open(report.pdf_url!, '_blank')}
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          Download
+                        </Button>
+                      )}
                     </div>
-                  )}
-                </div>
-                
-                {/* Content */}
-                <div className="space-y-2">
-                  <h3 className="text-xl font-semibold text-white group-hover:text-crypto-blue transition-colors">
-                    {report.title}
-                  </h3>
-                  <p className="text-gray-400 text-sm line-clamp-2">
-                    {report.description}
-                  </p>
-                </div>
-                
-                {/* Footer */}
-                <div className="flex items-center justify-between pt-4">
-                  <span className="text-xs text-crypto-blue bg-crypto-gray px-3 py-1 rounded-full">
-                    {report.category}
-                  </span>
-                  {report.pdf_url && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-crypto-blue hover:text-white hover:bg-crypto-blue"
-                      onClick={() => window.open(report.pdf_url!, '_blank')}
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Download
-                    </Button>
-                  )}
+                    <div className="mt-4">
+                      <span className="text-xs text-crypto-blue bg-crypto-gray px-3 py-1 rounded-full">
+                        {report.category}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
