@@ -12,6 +12,7 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Starting ICO data scraping...');
     const response = await fetch('https://cryptorank.io/ico');
     const html = await response.text();
     const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -20,7 +21,7 @@ serve(async (req) => {
       throw new Error('Failed to parse HTML');
     }
 
-    // Find the table rows containing ICO data
+    console.log('Successfully fetched and parsed HTML');
     const rows = doc.querySelectorAll('table tbody tr');
     const projects = [];
 
@@ -45,6 +46,7 @@ serve(async (req) => {
       }
     }
 
+    console.log(`Scraped ${projects.length} ICO projects`);
     return new Response(
       JSON.stringify(projects),
       { 

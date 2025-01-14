@@ -25,20 +25,16 @@ const fetchICOProjects = async (): Promise<ICOProject[]> => {
 
     console.info("No data in Supabase, fetching from external sources");
 
-    // If no data in Supabase, fetch from Cryptorank
-    const response = await fetch(`${window.location.origin}/functions/scrape-ico`, {
+    // If no data in Supabase, fetch from external API using Edge Function
+    const { data, error } = await supabase.functions.invoke('scrape-ico', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (error) {
+      console.error("Error calling scrape-ico function:", error);
+      throw error;
     }
 
-    const data = await response.json();
-    
     if (!Array.isArray(data)) {
       throw new Error('Invalid data format received from API');
     }

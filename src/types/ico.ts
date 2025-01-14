@@ -1,3 +1,5 @@
+import { Json } from "@/integrations/supabase/types";
+
 export interface ICOProject {
   id?: number;
   "Project Name": string | null;
@@ -18,10 +20,10 @@ export interface ICOProject {
   distributed_percentage?: number | null;
   kyc_required?: boolean | null;
   restricted_countries?: string[] | null;
-  social_links?: Record<string, any> | null;
-  team_members?: Record<string, any> | null;
-  roadmap?: Record<string, any> | null;
-  token_metrics?: Record<string, any> | null;
+  social_links?: Json | null;
+  team_members?: Json | null;
+  roadmap?: Json | null;
+  token_metrics?: Json | null;
   slug?: string | null;
   // UI specific fields
   symbol?: string;
