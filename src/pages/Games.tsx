@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Bitcoin, Wallet, Shield, UserCog, HardDrive, PlayCircle } from "lucide-react";
+import GameBoard from "@/components/game/GameBoard";
 
 const roles = [
   {
@@ -42,30 +44,35 @@ const roles = [
 ];
 
 const Games = () => {
+  const [showGame, setShowGame] = useState(false);
+
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-crypto-dark text-white">
-        {/* Hero Section */}
-        <div className="relative py-20 px-6 overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/grid-pattern.png')] bg-repeat opacity-20" />
-          <div className="relative z-10 max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-crypto-blue to-crypto-green bg-clip-text text-transparent">
-              Crypto Strategy Game
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300 mb-8">
-              Build your crypto empire, trade assets, and compete in a dynamic market
-            </p>
-            <Button 
-              size="lg"
-              className="bg-crypto-blue hover:bg-crypto-blue/90 text-white"
-            >
-              <PlayCircle className="mr-2 h-5 w-5" />
-              Play Now
-            </Button>
-          </div>
-        </div>
+        {!showGame ? (
+          <>
+            {/* Hero Section */}
+            <div className="relative py-20 px-6 overflow-hidden">
+              <div className="absolute inset-0 bg-[url('/grid-pattern.png')] bg-repeat opacity-20" />
+              <div className="relative z-10 max-w-4xl mx-auto text-center">
+                <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-crypto-blue to-crypto-green bg-clip-text text-transparent">
+                  Crypto Strategy Game
+                </h1>
+                <p className="text-lg md:text-xl text-gray-300 mb-8">
+                  Build your crypto empire, trade assets, and compete in a dynamic market
+                </p>
+                <Button 
+                  size="lg"
+                  className="bg-crypto-blue hover:bg-crypto-blue/90 text-white"
+                  onClick={() => setShowGame(true)}
+                >
+                  <PlayCircle className="mr-2 h-5 w-5" />
+                  Play Now
+                </Button>
+              </div>
+            </div>
 
-        {/* Roles Section */}
+            {/* Roles Section */}
         <div className="py-16 px-6 bg-crypto-gray">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12 text-crypto-blue">
@@ -99,7 +106,7 @@ const Games = () => {
           </div>
         </div>
 
-        {/* Game Modes Section */}
+            {/* Game Modes Section */}
         <div className="py-16 px-6">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12 text-crypto-blue">
@@ -129,6 +136,18 @@ const Games = () => {
             </div>
           </div>
         </div>
+          </>
+        ) : (
+          <div className="py-8">
+            <Button 
+              onClick={() => setShowGame(false)}
+              className="mb-8 ml-8 bg-crypto-gray hover:bg-crypto-gray/90"
+            >
+              Back to Menu
+            </Button>
+            <GameBoard />
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
