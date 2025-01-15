@@ -8,23 +8,30 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { priceId, userId } = await req.json()
+    const { priceId, userId } = await req.json();
     
     if (!userId) {
       console.error('No userId provided');
-      throw new Error('User ID is required');
+      return new Response(
+        JSON.stringify({ error: 'User ID is required' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      );
     }
 
     console.log('Processing checkout for user:', userId);
     
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
-    })
+    });
 
     // Create Supabase admin client
     const supabaseAdmin = createClient(
@@ -37,34 +44,47 @@ serve(async (req) => {
           detectSessionInUrl: false
         }
       }
-    )
+    );
 
     // Get user email using admin API
     console.log('Fetching user details...');
-    const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
+    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
     
-    if (userError) {
-      console.error('Error fetching user:', userError);
-      throw new Error(`Error fetching user: ${userError.message}`);
+    if (userError || !userData?.user) {
+      console.error('Error fetching user:', userError || 'User not found');
+      return new Response(
+        JSON.stringify({ error: `Error fetching user: ${userError?.message || 'User not found'}` }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500,
+        }
+      );
     }
 
-    if (!user?.email) {
+    const userEmail = userData.user.email;
+    if (!userEmail) {
       console.error('No user email found for ID:', userId);
-      throw new Error('User email not found');
+      return new Response(
+        JSON.stringify({ error: 'User email not found' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500,
+        }
+      );
     }
 
-    console.log('User found:', user.email);
+    console.log('User found:', userEmail);
 
     // Check if customer already exists
     console.log('Checking for existing Stripe customer...');
-    const customers = await stripe.customers.list({
-      email: user.email,
+    const { data: customers } = await stripe.customers.list({
+      email: userEmail,
       limit: 1
-    })
+    });
 
-    let customerId = undefined
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id
+    let customerId = undefined;
+    if (customers.length > 0) {
+      customerId = customers[0].id;
       console.log('Existing customer found:', customerId);
     } else {
       console.log('No existing customer found, will create new');
@@ -73,7 +93,7 @@ serve(async (req) => {
     console.log('Creating checkout session...');
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : user.email,
+      customer_email: customerId ? undefined : userEmail,
       line_items: [
         {
           price: priceId,
@@ -83,7 +103,7 @@ serve(async (req) => {
       mode: 'subscription',
       success_url: `${req.headers.get('origin')}/checkout?payment=success`,
       cancel_url: `${req.headers.get('origin')}/checkout?payment=cancelled`,
-    })
+    });
 
     console.log('Checkout session created:', session.id);
     return new Response(
@@ -92,7 +112,7 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       }
-    )
+    );
   } catch (error) {
     console.error('Error creating checkout session:', error);
     return new Response(
@@ -101,6 +121,6 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       }
-    )
+    );
   }
-})
+});
