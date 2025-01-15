@@ -6,6 +6,7 @@ import Checkout from "./pages/Checkout";
 import Index from "./pages/Index";
 import Analytics from "./pages/Analytics";
 import Research from "./pages/Research";
+import Games from "./pages/Games";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Create a client
@@ -28,6 +29,7 @@ const App = () => {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/research" element={<Research />} />
+          <Route path="/games" element={<Games />} />
         </Routes>
         <Toaster />
       </Router>
