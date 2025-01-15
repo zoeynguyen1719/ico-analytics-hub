@@ -27,7 +27,7 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    // Create Supabase admin client
+    // Create Supabase admin client with better error handling
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -40,13 +40,18 @@ serve(async (req) => {
       }
     )
 
-    // Get user email using admin API
+    // Get user email using admin API with better error handling
     console.log('Fetching user details...');
     const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
     
-    if (userError || !user?.email) {
+    if (userError) {
       console.error('Error fetching user:', userError);
-      throw new Error('Error fetching user details');
+      throw new Error(`Error fetching user: ${userError.message}`);
+    }
+
+    if (!user?.email) {
+      console.error('No user email found for ID:', userId);
+      throw new Error('User email not found');
     }
 
     console.log('User found:', user.email);
