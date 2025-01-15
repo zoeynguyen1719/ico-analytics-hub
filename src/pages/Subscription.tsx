@@ -7,6 +7,20 @@ import PremiumSignupDialog from "@/components/subscription/PremiumSignupDialog";
 import AdvancedSignupDialog from "@/components/subscription/AdvancedSignupDialog";
 import { supabase } from "@/integrations/supabase/client";
 
+declare global {
+  interface Window {
+    gtag: (
+      command: string,
+      action: string,
+      params: {
+        event_category: string;
+        event_label: string;
+        value?: number;
+      }
+    ) => void;
+  }
+}
+
 const SubscriptionPage = () => {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [showBasicSignupDialog, setShowBasicSignupDialog] = useState(false);
@@ -60,6 +74,15 @@ const SubscriptionPage = () => {
   ];
 
   const handleSubscribe = async (priceId: string | null, tierName: string) => {
+    // Track tier selection event
+    if (window.gtag) {
+      window.gtag('event', 'select_tier', {
+        event_category: 'subscription',
+        event_label: tierName,
+        value: tierName === 'Basic' ? 0 : tierName === 'Premium' ? 19 : 49
+      });
+    }
+
     setSelectedTier(tierName);
     setSelectedPriceId(priceId);
     
