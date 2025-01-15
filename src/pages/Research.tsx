@@ -8,7 +8,7 @@ import ResearchHeader from "@/components/research/ResearchHeader";
 import ResearchFilters from "@/components/research/ResearchFilters";
 import ResearchList from "@/components/research/ResearchList";
 
-type ResearchReport = {
+export type ResearchReport = {
   id: string;
   category: string;
   title: string;
