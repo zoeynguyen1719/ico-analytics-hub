@@ -22,12 +22,11 @@ serve(async (req) => {
 
     console.log('Processing checkout for user:', userId);
     
-    // Initialize Stripe with the secret key from environment variables
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
-    // Create Supabase admin client with better error handling
+    // Create Supabase admin client
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -40,7 +39,7 @@ serve(async (req) => {
       }
     )
 
-    // Get user email using admin API with better error handling
+    // Get user email using admin API
     console.log('Fetching user details...');
     const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
     
