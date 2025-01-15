@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Bitcoin, Wallet, Shield, UserCog, HardDrives, PlayCircle } from "lucide-react";
+import { Bitcoin, Wallet, Shield, UserCog, HardDrive, PlayCircle } from "lucide-react";
 
 const Games = () => {
   const roles = [
@@ -36,7 +36,7 @@ const Games = () => {
     {
       id: 5,
       title: "Miner",
-      icon: <HardDrives className="w-8 h-8 text-orange-500" />,
+      icon: <HardDrive className="w-8 h-8 text-orange-500" />,
       description: "Focus on resource mining and network security",
       abilities: ["Resource generation", "Network validation", "Mining rewards"]
     }
