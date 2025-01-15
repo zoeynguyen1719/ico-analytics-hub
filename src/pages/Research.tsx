@@ -29,18 +29,23 @@ const Research = () => {
   const { data: reports, isLoading } = useQuery({
     queryKey: ['research-reports'],
     queryFn: async () => {
+      console.log('Fetching research reports...');
       const { data, error } = await supabase
         .from('research_reports')
         .select('*')
         .order('created_at', { ascending: sortOrder === 'asc' });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching reports:', error);
+        throw error;
+      }
+      
+      console.log('Fetched reports:', data);
       return data as ResearchReport[];
     },
   });
 
   const handleSearch = () => {
-    // Implement search logic here if needed
     console.log('Searching for:', searchQuery);
   };
 
