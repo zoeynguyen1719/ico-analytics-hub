@@ -93,10 +93,33 @@ const ICOProjectForm = ({ initialData, onSubmit, onCancel }: ICOProjectFormProps
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Cryptocurrency">Cryptocurrency</SelectItem>
-                    <SelectItem value="DeFi">DeFi</SelectItem>
-                    <SelectItem value="NFT">NFT</SelectItem>
-                    <SelectItem value="GameFi">GameFi</SelectItem>
+                    <SelectItem value="cryptocurrency">Cryptocurrency</SelectItem>
+                    <SelectItem value="defi">DeFi</SelectItem>
+                    <SelectItem value="nft">NFT</SelectItem>
+                    <SelectItem value="gamefi">GameFi</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Type</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="public_sale">Public Sale</SelectItem>
+                    <SelectItem value="private_sale">Private Sale</SelectItem>
+                    <SelectItem value="seed_round">Seed Round</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
