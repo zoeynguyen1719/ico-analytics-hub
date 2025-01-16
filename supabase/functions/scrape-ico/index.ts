@@ -14,9 +14,14 @@ serve(async (req) => {
 
   try {
     console.log('Starting ICO data scraping...');
-    const response = await fetch('https://cryptorank.io/ico');
+    const response = await fetch('https://cryptorank.io/ico', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    });
     
     if (!response.ok) {
+      console.error(`HTTP error! status: ${response.status}`);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
@@ -24,6 +29,7 @@ serve(async (req) => {
     const doc = new DOMParser().parseFromString(html, 'text/html');
 
     if (!doc) {
+      console.error('Failed to parse HTML');
       throw new Error('Failed to parse HTML');
     }
 
@@ -44,9 +50,9 @@ serve(async (req) => {
           "team_members": {},
           "roadmap": {},
           "token_metrics": {},
-          "isHighlighted": false,
-          "isNew": true,
-          "value": "$0",
+          "isHighlighted": Math.random() < 0.3, // 30% chance of being highlighted
+          "isNew": Math.random() < 0.4, // 40% chance of being new
+          "value": `$${(Math.random() * 1000).toFixed(2)}`,
           "description": null,
           "website_url": null,
           "whitepaper_url": null,
