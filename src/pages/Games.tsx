@@ -2,10 +2,8 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Bitcoin, Wallet, Shield, UserCog, HardDrive, PlayCircle, ArrowLeft } from "lucide-react";
-import ResourcePanel from "@/components/dashboard/ResourcePanel";
-import UnitsPanel from "@/components/dashboard/UnitsPanel";
-import CommandCenter from "@/components/dashboard/CommandCenter";
+import { Bitcoin, Wallet, Shield, UserCog, HardDrive, PlayCircle } from "lucide-react";
+import GameBoard from "@/components/game/GameBoard";
 
 const roles = [
   {
@@ -58,10 +56,10 @@ const Games = () => {
               <div className="absolute inset-0 bg-[url('/grid-pattern.png')] bg-repeat opacity-20" />
               <div className="relative z-10 max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-crypto-blue to-crypto-green bg-clip-text text-transparent">
-                  Citadel: The Investment Empire
+                  Crypto Strategy Game
                 </h1>
                 <p className="text-lg md:text-xl text-gray-300 mb-8">
-                  Build your financial empire, trade assets, and dominate the market
+                  Build your crypto empire, trade assets, and compete in a dynamic market
                 </p>
                 <Button 
                   size="lg"
@@ -75,97 +73,79 @@ const Games = () => {
             </div>
 
             {/* Roles Section */}
-            <div className="py-16 px-6 bg-crypto-gray">
-              <div className="max-w-6xl mx-auto">
-                <h2 className="text-3xl font-bold text-center mb-12 text-crypto-blue">
-                  Choose Your Role
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {roles.map((role) => (
-                    <Card key={role.id} className="bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-colors cursor-pointer">
-                      <CardHeader>
-                        <div className="flex items-center gap-4">
-                          {role.icon}
-                          <CardTitle className="text-xl text-white">{role.title}</CardTitle>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <CardDescription className="text-gray-400 mb-4">
-                          {role.description}
-                        </CardDescription>
-                        <ul className="space-y-2">
-                          {role.abilities.map((ability, index) => (
-                            <li key={index} className="text-sm text-gray-300 flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-crypto-blue" />
-                              {ability}
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
+        <div className="py-16 px-6 bg-crypto-gray">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-12 text-crypto-blue">
+              Choose Your Role
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {roles.map((role) => (
+                <Card key={role.id} className="bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-colors cursor-pointer">
+                  <CardHeader>
+                    <div className="flex items-center gap-4">
+                      {role.icon}
+                      <CardTitle className="text-xl text-white">{role.title}</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-gray-400 mb-4">
+                      {role.description}
+                    </CardDescription>
+                    <ul className="space-y-2">
+                      {role.abilities.map((ability, index) => (
+                        <li key={index} className="text-sm text-gray-300 flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-crypto-blue" />
+                          {ability}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
+          </div>
+        </div>
 
             {/* Game Modes Section */}
-            <div className="py-16 px-6">
-              <div className="max-w-6xl mx-auto">
-                <h2 className="text-3xl font-bold text-center mb-12 text-crypto-blue">
-                  Game Modes
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-colors">
-                    <CardHeader>
-                      <CardTitle className="text-xl text-white">Solo Mode</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-gray-400">
-                        Challenge AI opponents and perfect your strategy
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-colors">
-                    <CardHeader>
-                      <CardTitle className="text-xl text-white">Multiplayer</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-gray-400">
-                        Compete with up to 6 players in real-time matches
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
+        <div className="py-16 px-6">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-12 text-crypto-blue">
+              Game Modes
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-colors">
+                <CardHeader>
+                  <CardTitle className="text-xl text-white">Solo Mode</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-400">
+                    Challenge AI opponents and perfect your strategy
+                  </CardDescription>
+                </CardContent>
+              </Card>
+              <Card className="bg-crypto-dark border-crypto-blue hover:border-crypto-green transition-colors">
+                <CardHeader>
+                  <CardTitle className="text-xl text-white">Multiplayer</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-400">
+                    Compete with up to 6 players in real-time matches
+                  </CardDescription>
+                </CardContent>
+              </Card>
             </div>
+          </div>
+        </div>
           </>
         ) : (
-          <div className="p-8">
+          <div className="py-8">
             <Button 
               onClick={() => setShowGame(false)}
-              className="mb-8 bg-crypto-gray hover:bg-crypto-gray/90 flex items-center gap-2"
+              className="mb-8 ml-8 bg-crypto-gray hover:bg-crypto-gray/90"
             >
-              <ArrowLeft className="w-4 h-4" />
               Back to Menu
             </Button>
-            
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-              {/* Resource Panel */}
-              <div className="xl:col-span-3">
-                <ResourcePanel />
-              </div>
-
-              {/* Main Content Area */}
-              <div className="xl:col-span-6 space-y-6">
-                <CommandCenter />
-                {/* Map component will be added here in a future update */}
-              </div>
-
-              {/* Units Panel */}
-              <div className="xl:col-span-3">
-                <UnitsPanel />
-              </div>
-            </div>
+            <GameBoard />
           </div>
         )}
       </div>
