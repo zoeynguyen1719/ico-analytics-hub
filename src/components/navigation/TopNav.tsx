@@ -77,7 +77,8 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
             <img 
               src="/lovable-uploads/fc6224c9-4be9-4d1a-b5ad-3da64a81c6e0.png" 
               alt="Mericulum Logo" 
-              className="h-12 w-auto"
+              className="h-12 w-auto cursor-pointer"
+              onClick={() => navigate('/')}
             />
           </div>
 
