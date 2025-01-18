@@ -15,7 +15,7 @@ const SubscriptionPage = () => {
   const [showPremiumSignupDialog, setShowPremiumSignupDialog] = useState(false);
   const [showAdvancedSignupDialog, setShowAdvancedSignupDialog] = useState(false);
   const [selectedPriceId, setSelectedPriceId] = useState<string | null>(null);
-  const { data: { user } } = await supabase.auth.getUser();
+  const [user, setUser] = useState<any>(null);
   const { subscriptionTier } = useSubscriptionTier(user);
   const navigate = useNavigate();
 
@@ -24,6 +24,8 @@ const SubscriptionPage = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         navigate('/signin');
+      } else {
+        setUser(user);
       }
     };
     checkAuth();
@@ -119,10 +121,24 @@ const SubscriptionPage = () => {
         return;
       }
 
+      // Check for existing subscription
+      const { data: existingSubscription, error: subError } = await supabase
+        .from('subscriptions')
+        .select('stripe_subscription_id, status')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (subError) {
+        console.error('Error checking existing subscription:', subError);
+        toast.error('Error checking subscription status');
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
           priceId: selectedPriceId,
-          userId 
+          userId,
+          existingSubscriptionId: existingSubscription?.stripe_subscription_id
         },
         headers: {
           Authorization: `Bearer ${session.access_token}`

@@ -15,7 +15,7 @@ serve(async (req) => {
 
   try {
     console.log('Starting checkout process...');
-    const { priceId, userId } = await req.json();
+    const { priceId, userId, existingSubscriptionId } = await req.json();
     
     // Validate required parameters
     if (!userId || !priceId) {
@@ -28,11 +28,6 @@ serve(async (req) => {
         }
       );
     }
-
-    console.log('Initializing Stripe...');
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2023-10-16',
-    });
 
     console.log('Creating Supabase admin client...');
     const supabaseAdmin = createClient(
@@ -88,31 +83,10 @@ serve(async (req) => {
       );
     }
 
-    console.log('User validated successfully:', userEmail);
-
-    // Validate price ID with Stripe
-    try {
-      console.log('Validating price ID:', priceId);
-      const price = await stripe.prices.retrieve(priceId);
-      if (!price.active) {
-        return new Response(
-          JSON.stringify({ error: 'Invalid or inactive price ID' }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 400,
-          }
-        );
-      }
-    } catch (error) {
-      console.error('Error validating price:', error);
-      return new Response(
-        JSON.stringify({ error: 'Invalid price ID provided' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400,
-        }
-      );
-    }
+    console.log('Initializing Stripe...');
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2023-10-16',
+    });
 
     // Check for existing Stripe customer
     console.log('Checking for existing Stripe customer...');
@@ -125,53 +99,74 @@ serve(async (req) => {
     if (customers.length > 0) {
       customerId = customers[0].id;
       console.log('Existing customer found:', customerId);
-    } else {
-      console.log('No existing customer found, will create new');
+
+      // Check existing subscription if ID provided
+      if (existingSubscriptionId) {
+        try {
+          const subscription = await stripe.subscriptions.retrieve(existingSubscriptionId);
+          
+          if (subscription.status === 'canceled' || subscription.status === 'incomplete_expired') {
+            // Reactivate subscription if it's canceled but still within the current period
+            if (subscription.current_period_end * 1000 > Date.now()) {
+              await stripe.subscriptions.update(existingSubscriptionId, {
+                cancel_at_period_end: false,
+                items: [{ price: priceId }],
+              });
+              
+              // Update subscription in database
+              await supabaseAdmin
+                .from('subscriptions')
+                .update({
+                  status: 'active',
+                  updated_at: new Date().toISOString(),
+                  cancel_at: null
+                })
+                .eq('stripe_subscription_id', existingSubscriptionId);
+
+              return new Response(
+                JSON.stringify({ message: 'Subscription reactivated successfully' }),
+                { 
+                  headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                  status: 200,
+                }
+              );
+            }
+          }
+        } catch (error) {
+          console.log('Error retrieving subscription, will create new one:', error);
+        }
+      }
     }
 
-    // Create checkout session with enhanced error handling
+    // Create new checkout session
     console.log('Creating checkout session...');
-    try {
-      const session = await stripe.checkout.sessions.create({
-        customer: customerId,
-        customer_email: customerId ? undefined : userEmail,
-        line_items: [
-          {
-            price: priceId,
-            quantity: 1,
-          },
-        ],
-        mode: 'subscription',
-        success_url: `${req.headers.get('origin')}/checkout?payment=success`,
-        cancel_url: `${req.headers.get('origin')}/checkout?payment=cancelled`,
-      });
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      customer_email: customerId ? undefined : userEmail,
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: `${req.headers.get('origin')}/checkout?payment=success`,
+      cancel_url: `${req.headers.get('origin')}/checkout?payment=cancelled`,
+    });
 
-      console.log('Checkout session created successfully:', session.id);
-      return new Response(
-        JSON.stringify({ url: session.url }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      );
-    } catch (error) {
-      console.error('Error creating checkout session:', error);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Failed to create checkout session',
-          details: error.message 
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500,
-        }
-      );
-    }
+    console.log('Checkout session created successfully:', session.id);
+    return new Response(
+      JSON.stringify({ url: session.url }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    );
   } catch (error) {
-    console.error('Unexpected error in checkout process:', error);
+    console.error('Error in checkout process:', error);
     return new Response(
       JSON.stringify({ 
-        error: 'An unexpected error occurred. Please try again later.',
+        error: 'Failed to create checkout session',
         details: error.message 
       }),
       { 
