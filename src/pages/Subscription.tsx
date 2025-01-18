@@ -6,20 +6,7 @@ import BasicSignupDialog from "@/components/subscription/BasicSignupDialog";
 import PremiumSignupDialog from "@/components/subscription/PremiumSignupDialog";
 import AdvancedSignupDialog from "@/components/subscription/AdvancedSignupDialog";
 import { supabase } from "@/integrations/supabase/client";
-
-declare global {
-  interface Window {
-    gtag: (
-      command: string,
-      action: string,
-      params: {
-        event_category: string;
-        event_label: string;
-        value?: number;
-      }
-    ) => void;
-  }
-}
+import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 
 const SubscriptionPage = () => {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
@@ -27,6 +14,7 @@ const SubscriptionPage = () => {
   const [showPremiumSignupDialog, setShowPremiumSignupDialog] = useState(false);
   const [showAdvancedSignupDialog, setShowAdvancedSignupDialog] = useState(false);
   const [selectedPriceId, setSelectedPriceId] = useState<string | null>(null);
+  const { subscriptionTier } = useSubscriptionTier(supabase.auth.getUser());
 
   const tiers = [
     {
@@ -39,7 +27,7 @@ const SubscriptionPage = () => {
         "Basic calculator tools",
         "Public news feed"
       ],
-      buttonText: "Get Started",
+      buttonText: subscriptionTier === 'basic' ? "Current Plan" : "Get Started",
       highlighted: false
     },
     {
@@ -53,7 +41,7 @@ const SubscriptionPage = () => {
         "Detailed project comparisons",
         "Premium news access"
       ],
-      buttonText: "Subscribe Now",
+      buttonText: subscriptionTier === 'premium' ? "Current Plan" : "Subscribe Now",
       highlighted: true
     },
     {
@@ -68,7 +56,7 @@ const SubscriptionPage = () => {
         "Early access to new features",
         "Advanced market analytics"
       ],
-      buttonText: "Subscribe Now",
+      buttonText: subscriptionTier === 'advanced' ? "Current Plan" : "Subscribe Now",
       highlighted: false
     }
   ];
@@ -83,17 +71,23 @@ const SubscriptionPage = () => {
       });
     }
 
+    // If user is already on this tier, show toast and return
+    if (subscriptionTier?.toLowerCase() === tierName.toLowerCase()) {
+      toast.info("You are already subscribed to this plan");
+      return;
+    }
+
     setSelectedTier(tierName);
     setSelectedPriceId(priceId);
     
-    switch(tierName) {
-      case "Basic":
+    switch(tierName.toLowerCase()) {
+      case "basic":
         setShowBasicSignupDialog(true);
         break;
-      case "Premium":
+      case "premium":
         setShowPremiumSignupDialog(true);
         break;
-      case "Advanced":
+      case "advanced":
         setShowAdvancedSignupDialog(true);
         break;
     }
@@ -102,11 +96,6 @@ const SubscriptionPage = () => {
   const handleStripeCheckout = async (userId: string) => {
     if (!selectedPriceId) {
       toast.error('No subscription plan selected');
-      return;
-    }
-
-    if (!userId) {
-      toast.error('User not authenticated');
       return;
     }
 
