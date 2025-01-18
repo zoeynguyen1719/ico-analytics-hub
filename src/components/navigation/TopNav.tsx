@@ -73,7 +73,7 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
       <div className="container mx-auto px-4">
         <div className="flex items-center h-20">
           {/* Logo Section */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 cursor-pointer" onClick={() => navigate('/')}>
             <img 
               src="/lovable-uploads/fc6224c9-4be9-4d1a-b5ad-3da64a81c6e0.png" 
               alt="Mericulum Logo" 
