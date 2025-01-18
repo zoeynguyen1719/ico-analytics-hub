@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
-import { toast } from "sonner";
-import SubscriptionTier from "@/components/subscription/SubscriptionTier";
-import BasicSignupDialog from "@/components/subscription/BasicSignupDialog";
-import PremiumSignupDialog from "@/components/subscription/PremiumSignupDialog";
-import AdvancedSignupDialog from "@/components/subscription/AdvancedSignupDialog";
-import { supabase } from "@/integrations/supabase/client";
-import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import DashboardLayout from "@/components/DashboardLayout";
+import SubscriptionTierCard from "@/components/subscription/SubscriptionTierCard";
+import SubscriptionDialogs from "@/components/subscription/SubscriptionDialogs";
+import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 
 const SubscriptionPage = () => {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
@@ -42,7 +40,7 @@ const SubscriptionPage = () => {
         "Basic calculator tools",
         "Public news feed"
       ],
-      buttonText: subscriptionTier === 'basic' ? "Current Plan" : "Get Started",
+      buttonText: "Get Started",
       highlighted: false
     },
     {
@@ -56,7 +54,7 @@ const SubscriptionPage = () => {
         "Detailed project comparisons",
         "Premium news access"
       ],
-      buttonText: subscriptionTier === 'premium' ? "Current Plan" : "Subscribe Now",
+      buttonText: "Subscribe Now",
       highlighted: true
     },
     {
@@ -71,13 +69,12 @@ const SubscriptionPage = () => {
         "Early access to new features",
         "Advanced market analytics"
       ],
-      buttonText: subscriptionTier === 'advanced' ? "Current Plan" : "Subscribe Now",
+      buttonText: "Subscribe Now",
       highlighted: false
     }
   ];
 
   const handleSubscribe = async (priceId: string | null, tierName: string) => {
-    // Track tier selection event
     if (window.gtag) {
       window.gtag('event', 'select_tier', {
         event_category: 'subscription',
@@ -86,7 +83,6 @@ const SubscriptionPage = () => {
       });
     }
 
-    // If user is already on this tier, show toast and return
     if (subscriptionTier?.toLowerCase() === tierName.toLowerCase()) {
       toast.info("You are already subscribed to this plan");
       return;
@@ -121,24 +117,10 @@ const SubscriptionPage = () => {
         return;
       }
 
-      // Check for existing subscription
-      const { data: existingSubscription, error: subError } = await supabase
-        .from('subscriptions')
-        .select('stripe_subscription_id, status')
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      if (subError) {
-        console.error('Error checking existing subscription:', subError);
-        toast.error('Error checking subscription status');
-        return;
-      }
-
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
           priceId: selectedPriceId,
-          userId,
-          existingSubscriptionId: existingSubscription?.stripe_subscription_id
+          userId
         },
         headers: {
           Authorization: `Bearer ${session.access_token}`
@@ -175,30 +157,24 @@ const SubscriptionPage = () => {
 
         <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto px-4">
           {tiers.map((tier) => (
-            <SubscriptionTier
+            <SubscriptionTierCard
               key={tier.name}
               {...tier}
               isSelected={selectedTier === tier.name}
+              isCurrentPlan={subscriptionTier?.toLowerCase() === tier.name.toLowerCase()}
               onSelect={() => handleSubscribe(tier.priceId, tier.name)}
             />
           ))}
         </div>
         
-        <BasicSignupDialog
-          open={showBasicSignupDialog}
-          onOpenChange={setShowBasicSignupDialog}
-        />
-        
-        <PremiumSignupDialog
-          open={showPremiumSignupDialog}
-          onOpenChange={setShowPremiumSignupDialog}
-          onSuccess={handleStripeCheckout}
-        />
-        
-        <AdvancedSignupDialog
-          open={showAdvancedSignupDialog}
-          onOpenChange={setShowAdvancedSignupDialog}
-          onSuccess={handleStripeCheckout}
+        <SubscriptionDialogs
+          showBasicSignupDialog={showBasicSignupDialog}
+          showPremiumSignupDialog={showPremiumSignupDialog}
+          showAdvancedSignupDialog={showAdvancedSignupDialog}
+          setShowBasicSignupDialog={setShowBasicSignupDialog}
+          setShowPremiumSignupDialog={setShowPremiumSignupDialog}
+          setShowAdvancedSignupDialog={setShowAdvancedSignupDialog}
+          handleStripeCheckout={handleStripeCheckout}
         />
       </div>
     </DashboardLayout>
