@@ -56,6 +56,12 @@ export default {
           green: "#4BA3CC",
           dark: "#1A3B47",
           gray: "#2A4B57",
+          neon: {
+            blue: "#00f2ff",
+            purple: "#9f00ff",
+            green: "#00ff9f",
+            pink: "#ff00f2"
+          }
         },
       },
       borderRadius: {
