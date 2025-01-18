@@ -1,5 +1,6 @@
 import { SidebarProvider, Sidebar, SidebarContent, SidebarTrigger } from "@/components/ui/sidebar";
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import Footer from "./Footer";
 import AIChatBox from "./chat/AIChatBox";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +8,7 @@ import TopNav from "./navigation/TopNav";
 import { mainMenuItems, toolMenuItems } from "./navigation/MainMenu";
 import ToolsMenu from "./navigation/ToolsMenu";
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+const DashboardLayout = () => {
   const [user, setUser] = useState(() => supabase.auth.getUser());
 
   return (
@@ -41,7 +42,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
         {/* Main Content */}
         <main className="flex-1 pt-32 p-8">
-          {children}
+          <Outlet />
         </main>
 
         {/* Footer */}
