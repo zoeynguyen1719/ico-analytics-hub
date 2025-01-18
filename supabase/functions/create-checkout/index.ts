@@ -33,7 +33,7 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    // Create Supabase admin client with more detailed error logging
+    // Create Supabase admin client
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -46,15 +46,14 @@ serve(async (req) => {
       }
     );
 
-    // Get user email using admin API with enhanced error handling
+    // Get user details using admin API
     console.log('Fetching user details...');
-    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
     
-    if (userError || !userData?.user) {
-      const errorMessage = userError?.message || 'User not found';
-      console.error('Error fetching user:', errorMessage);
+    if (userError) {
+      console.error('Error fetching user:', userError.message);
       return new Response(
-        JSON.stringify({ error: `Error fetching user: ${errorMessage}` }),
+        JSON.stringify({ error: `Error fetching user: ${userError.message}` }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 500,
@@ -62,21 +61,32 @@ serve(async (req) => {
       );
     }
 
-    const userEmail = userData.user.email;
+    if (!user) {
+      console.error('User not found for ID:', userId);
+      return new Response(
+        JSON.stringify({ error: 'User not found' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 404,
+        }
+      );
+    }
+
+    const userEmail = user.email;
     if (!userEmail) {
-      console.error('No user email found for ID:', userId);
+      console.error('No email found for user:', userId);
       return new Response(
         JSON.stringify({ error: 'User email not found' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500,
+          status: 400,
         }
       );
     }
 
     console.log('User found:', userEmail);
 
-    // Check if customer already exists with detailed logging
+    // Check if customer already exists
     console.log('Checking for existing Stripe customer...');
     const { data: customers } = await stripe.customers.list({
       email: userEmail,
@@ -91,7 +101,7 @@ serve(async (req) => {
       console.log('No existing customer found, will create new');
     }
 
-    console.log('Creating checkout session with priceId:', priceId);
+    console.log('Creating checkout session...');
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : userEmail,
