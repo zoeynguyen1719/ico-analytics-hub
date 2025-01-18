@@ -7,6 +7,7 @@ import PremiumSignupDialog from "@/components/subscription/PremiumSignupDialog";
 import AdvancedSignupDialog from "@/components/subscription/AdvancedSignupDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { useNavigate } from "react-router-dom";
 
 const SubscriptionPage = () => {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
@@ -14,7 +15,19 @@ const SubscriptionPage = () => {
   const [showPremiumSignupDialog, setShowPremiumSignupDialog] = useState(false);
   const [showAdvancedSignupDialog, setShowAdvancedSignupDialog] = useState(false);
   const [selectedPriceId, setSelectedPriceId] = useState<string | null>(null);
-  const { subscriptionTier } = useSubscriptionTier(supabase.auth.getUser());
+  const { data: { user } } = await supabase.auth.getUser();
+  const { subscriptionTier } = useSubscriptionTier(user);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/signin');
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
   const tiers = [
     {
@@ -100,11 +113,19 @@ const SubscriptionPage = () => {
     }
 
     try {
-      console.log('Creating checkout session for user:', userId);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error('Authentication required');
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
           priceId: selectedPriceId,
           userId 
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
         }
       });
       
