@@ -68,6 +68,10 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
 
   const showUpgradeButton = user && subscriptionTier && subscriptionTier !== 'advanced';
 
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
   return (
     <header className="w-full bg-black border-b border-crypto-gray">
       <div className="container mx-auto px-4">
@@ -77,8 +81,11 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
             <img 
               src="/lovable-uploads/fc6224c9-4be9-4d1a-b5ad-3da64a81c6e0.png" 
               alt="Mericulum Logo" 
-              className="h-12 w-auto cursor-pointer"
-              onClick={() => navigate('/')}
+              className="h-12 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={handleLogoClick}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && handleLogoClick()}
             />
           </div>
 
