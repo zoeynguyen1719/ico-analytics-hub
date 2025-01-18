@@ -1,10 +1,10 @@
-import { User, TrendingUp, Robot, Briefcase } from 'lucide-react';
+import { User, TrendingUp, Bot, Briefcase } from 'lucide-react';
 
 const UnitsPanel = () => {
   const units = [
     { icon: User, label: 'Analysts', count: 5, color: 'text-blue-400' },
     { icon: TrendingUp, label: 'Traders', count: 3, color: 'text-green-400' },
-    { icon: Robot, label: 'AI Bots', count: 8, color: 'text-purple-400' },
+    { icon: Bot, label: 'AI Bots', count: 8, color: 'text-purple-400' },
     { icon: Briefcase, label: 'Consultants', count: 2, color: 'text-yellow-400' },
   ];
 
