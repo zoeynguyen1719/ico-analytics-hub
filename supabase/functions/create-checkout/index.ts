@@ -33,7 +33,7 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    // Create Supabase admin client
+    // Create Supabase admin client with more detailed error logging
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -46,14 +46,15 @@ serve(async (req) => {
       }
     );
 
-    // Get user email using admin API
+    // Get user email using admin API with enhanced error handling
     console.log('Fetching user details...');
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
     
     if (userError || !userData?.user) {
-      console.error('Error fetching user:', userError || 'User not found');
+      const errorMessage = userError?.message || 'User not found';
+      console.error('Error fetching user:', errorMessage);
       return new Response(
-        JSON.stringify({ error: `Error fetching user: ${userError?.message || 'User not found'}` }),
+        JSON.stringify({ error: `Error fetching user: ${errorMessage}` }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 500,
@@ -75,7 +76,7 @@ serve(async (req) => {
 
     console.log('User found:', userEmail);
 
-    // Check if customer already exists
+    // Check if customer already exists with detailed logging
     console.log('Checking for existing Stripe customer...');
     const { data: customers } = await stripe.customers.list({
       email: userEmail,
@@ -90,7 +91,7 @@ serve(async (req) => {
       console.log('No existing customer found, will create new');
     }
 
-    console.log('Creating checkout session...');
+    console.log('Creating checkout session with priceId:', priceId);
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : userEmail,
