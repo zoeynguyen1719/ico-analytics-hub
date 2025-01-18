@@ -14,12 +14,14 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Starting checkout process...');
     const { priceId, userId } = await req.json();
     
-    if (!userId) {
-      console.error('No userId provided');
+    // Validate required parameters
+    if (!userId || !priceId) {
+      console.error('Missing required parameters:', { userId, priceId });
       return new Response(
-        JSON.stringify({ error: 'User ID is required' }),
+        JSON.stringify({ error: 'User ID and price ID are required' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400,
@@ -27,13 +29,12 @@ serve(async (req) => {
       );
     }
 
-    console.log('Processing checkout for user:', userId);
-    
+    console.log('Initializing Stripe...');
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     });
 
-    // Create Supabase admin client
+    console.log('Creating Supabase admin client...');
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -46,25 +47,28 @@ serve(async (req) => {
       }
     );
 
-    // Get user details using admin API
-    console.log('Fetching user details...');
+    // Get user details using admin API with enhanced error handling
+    console.log('Fetching user details for ID:', userId);
     const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
     
     if (userError) {
       console.error('Error fetching user:', userError.message);
       return new Response(
-        JSON.stringify({ error: `Error fetching user: ${userError.message}` }),
+        JSON.stringify({ 
+          error: 'User not found or could not be retrieved',
+          details: userError.message 
+        }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500,
+          status: 404,
         }
       );
     }
 
     if (!user) {
-      console.error('User not found for ID:', userId);
+      console.error('No user found for ID:', userId);
       return new Response(
-        JSON.stringify({ error: 'User not found' }),
+        JSON.stringify({ error: 'User not found or could not be retrieved' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 404,
@@ -76,7 +80,7 @@ serve(async (req) => {
     if (!userEmail) {
       console.error('No email found for user:', userId);
       return new Response(
-        JSON.stringify({ error: 'User email not found' }),
+        JSON.stringify({ error: 'Invalid user data: email is required' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400,
@@ -84,9 +88,33 @@ serve(async (req) => {
       );
     }
 
-    console.log('User found:', userEmail);
+    console.log('User validated successfully:', userEmail);
 
-    // Check if customer already exists
+    // Validate price ID with Stripe
+    try {
+      console.log('Validating price ID:', priceId);
+      const price = await stripe.prices.retrieve(priceId);
+      if (!price.active) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid or inactive price ID' }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 400,
+          }
+        );
+      }
+    } catch (error) {
+      console.error('Error validating price:', error);
+      return new Response(
+        JSON.stringify({ error: 'Invalid price ID provided' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      );
+    }
+
+    // Check for existing Stripe customer
     console.log('Checking for existing Stripe customer...');
     const { data: customers } = await stripe.customers.list({
       email: userEmail,
@@ -101,33 +129,51 @@ serve(async (req) => {
       console.log('No existing customer found, will create new');
     }
 
+    // Create checkout session with enhanced error handling
     console.log('Creating checkout session...');
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      customer_email: customerId ? undefined : userEmail,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: `${req.headers.get('origin')}/checkout?payment=success`,
-      cancel_url: `${req.headers.get('origin')}/checkout?payment=cancelled`,
-    });
+    try {
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        customer_email: customerId ? undefined : userEmail,
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        mode: 'subscription',
+        success_url: `${req.headers.get('origin')}/checkout?payment=success`,
+        cancel_url: `${req.headers.get('origin')}/checkout?payment=cancelled`,
+      });
 
-    console.log('Checkout session created:', session.id);
-    return new Response(
-      JSON.stringify({ url: session.url }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+      console.log('Checkout session created successfully:', session.id);
+      return new Response(
+        JSON.stringify({ url: session.url }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      );
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to create checkout session',
+          details: error.message 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500,
+        }
+      );
+    }
   } catch (error) {
-    console.error('Error creating checkout session:', error);
+    console.error('Unexpected error in checkout process:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: 'An unexpected error occurred. Please try again later.',
+        details: error.message 
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
