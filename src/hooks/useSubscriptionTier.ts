@@ -7,36 +7,40 @@ export const useSubscriptionTier = (user: any) => {
   const checkSubscriptionTier = async (user: any) => {
     if (!user?.id) return;
     
-    // Check for subscription using user_id
-    const { data: subData, error: subError } = await supabase
-      .from('subscriptions')
-      .select('tier')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    if (subError) {
-      console.error('Error checking subscription:', subError);
-      return;
-    }
-
-    if (subData) {
-      setSubscriptionTier(subData.tier);
-    } else {
-      // Check basic_signups if no subscription found
-      const { data: basicData, error: basicError } = await supabase
-        .from('basic_signups')
-        .select('email')
-        .eq('email', user.email)
+    try {
+      // First check subscriptions table using user_id
+      const { data: subData, error: subError } = await supabase
+        .from('subscriptions')
+        .select('tier')
+        .eq('user_id', user.id)
         .maybeSingle();
 
-      if (basicError) {
-        console.error('Error checking basic signup:', basicError);
+      if (subError) {
+        console.error('Error checking subscription:', subError);
         return;
       }
 
-      if (basicData) {
-        setSubscriptionTier('basic');
+      if (subData) {
+        setSubscriptionTier(subData.tier);
+      } else {
+        // If no subscription found, check basic_signups using email
+        const { data: basicData, error: basicError } = await supabase
+          .from('basic_signups')
+          .select('email')
+          .eq('email', user.email)
+          .maybeSingle();
+
+        if (basicError) {
+          console.error('Error checking basic signup:', basicError);
+          return;
+        }
+
+        if (basicData) {
+          setSubscriptionTier('basic');
+        }
       }
+    } catch (error) {
+      console.error('Error in checkSubscriptionTier:', error);
     }
   };
 
