@@ -1,6 +1,9 @@
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface SubscriptionTierProps {
   name: string;
@@ -23,6 +26,32 @@ const SubscriptionTier = ({
   isSelected,
   onSelect,
 }: SubscriptionTierProps) => {
+  const navigate = useNavigate();
+
+  const handleSubscribe = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast.error("Please sign in to subscribe");
+        navigate("/signin");
+        return;
+      }
+
+      // For the specific premium tier with Stripe checkout
+      if (name.toLowerCase() === "premium") {
+        window.location.href = "https://buy.stripe.com/5kA8wH0ZO5c7dnG8ww";
+        return;
+      }
+
+      // For other tiers, use the existing selection logic
+      onSelect();
+    } catch (error) {
+      console.error("Error handling subscription:", error);
+      toast.error("Error processing subscription. Please try again.");
+    }
+  };
+
   return (
     <Card
       className={`relative p-8 rounded-xl border ${
@@ -58,7 +87,7 @@ const SubscriptionTier = ({
       </ul>
 
       <Button
-        onClick={onSelect}
+        onClick={handleSubscribe}
         className={`w-full ${
           isSelected
             ? "bg-crypto-blue hover:bg-crypto-blue/90"
