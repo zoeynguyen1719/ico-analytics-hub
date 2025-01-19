@@ -1,7 +1,17 @@
 import { useState } from "react";
-import { toolMenuItems } from "./MainMenu";
+import { LucideIcon } from "lucide-react";
 
-const ToolsMenu = () => {
+interface ToolMenuItem {
+  icon: LucideIcon;
+  label: string;
+  path: string;
+}
+
+interface ToolsMenuProps {
+  items?: ToolMenuItem[];
+}
+
+const ToolsMenu = ({ items = [] }: ToolsMenuProps) => {
   const [showTools, setShowTools] = useState(false);
 
   return (
@@ -15,7 +25,7 @@ const ToolsMenu = () => {
           Tools
         </span>
         <div className="flex items-center gap-6 pl-10">
-          {toolMenuItems.map((item) => (
+          {items.map((item) => (
             <a
               key={item.label}
               href={item.path}
