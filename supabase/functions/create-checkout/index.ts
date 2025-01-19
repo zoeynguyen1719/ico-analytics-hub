@@ -14,14 +14,12 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Starting checkout process...');
-    const { priceId, userId, existingSubscriptionId } = await req.json();
+    const { priceId, userId } = await req.json();
     
-    // Validate required parameters
-    if (!userId || !priceId) {
-      console.error('Missing required parameters:', { userId, priceId });
+    if (!userId) {
+      console.error('No userId provided');
       return new Response(
-        JSON.stringify({ error: 'User ID and price ID are required' }),
+        JSON.stringify({ error: 'User ID is required' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400,
@@ -29,7 +27,13 @@ serve(async (req) => {
       );
     }
 
-    console.log('Creating Supabase admin client...');
+    console.log('Processing checkout for user:', userId);
+    
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2023-10-16',
+    });
+
+    // Create Supabase admin client
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -42,53 +46,36 @@ serve(async (req) => {
       }
     );
 
-    // Get user details using admin API with enhanced error handling
-    console.log('Fetching user details for ID:', userId);
-    const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
+    // Get user email using admin API
+    console.log('Fetching user details...');
+    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
     
-    if (userError) {
-      console.error('Error fetching user:', userError.message);
+    if (userError || !userData?.user) {
+      console.error('Error fetching user:', userError || 'User not found');
       return new Response(
-        JSON.stringify({ 
-          error: 'User not found or could not be retrieved',
-          details: userError.message 
-        }),
+        JSON.stringify({ error: `Error fetching user: ${userError?.message || 'User not found'}` }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 404,
+          status: 500,
         }
       );
     }
 
-    if (!user) {
-      console.error('No user found for ID:', userId);
-      return new Response(
-        JSON.stringify({ error: 'User not found or could not be retrieved' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 404,
-        }
-      );
-    }
-
-    const userEmail = user.email;
+    const userEmail = userData.user.email;
     if (!userEmail) {
-      console.error('No email found for user:', userId);
+      console.error('No user email found for ID:', userId);
       return new Response(
-        JSON.stringify({ error: 'Invalid user data: email is required' }),
+        JSON.stringify({ error: 'User email not found' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400,
+          status: 500,
         }
       );
     }
 
-    console.log('Initializing Stripe...');
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2023-10-16',
-    });
+    console.log('User found:', userEmail);
 
-    // Check for existing Stripe customer
+    // Check if customer already exists
     console.log('Checking for existing Stripe customer...');
     const { data: customers } = await stripe.customers.list({
       email: userEmail,
@@ -99,46 +86,10 @@ serve(async (req) => {
     if (customers.length > 0) {
       customerId = customers[0].id;
       console.log('Existing customer found:', customerId);
-
-      // Check existing subscription if ID provided
-      if (existingSubscriptionId) {
-        try {
-          const subscription = await stripe.subscriptions.retrieve(existingSubscriptionId);
-          
-          if (subscription.status === 'canceled' || subscription.status === 'incomplete_expired') {
-            // Reactivate subscription if it's canceled but still within the current period
-            if (subscription.current_period_end * 1000 > Date.now()) {
-              await stripe.subscriptions.update(existingSubscriptionId, {
-                cancel_at_period_end: false,
-                items: [{ price: priceId }],
-              });
-              
-              // Update subscription in database
-              await supabaseAdmin
-                .from('subscriptions')
-                .update({
-                  status: 'active',
-                  updated_at: new Date().toISOString(),
-                  cancel_at: null
-                })
-                .eq('stripe_subscription_id', existingSubscriptionId);
-
-              return new Response(
-                JSON.stringify({ message: 'Subscription reactivated successfully' }),
-                { 
-                  headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-                  status: 200,
-                }
-              );
-            }
-          }
-        } catch (error) {
-          console.log('Error retrieving subscription, will create new one:', error);
-        }
-      }
+    } else {
+      console.log('No existing customer found, will create new');
     }
 
-    // Create new checkout session
     console.log('Creating checkout session...');
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -154,7 +105,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/checkout?payment=cancelled`,
     });
 
-    console.log('Checkout session created successfully:', session.id);
+    console.log('Checkout session created:', session.id);
     return new Response(
       JSON.stringify({ url: session.url }),
       { 
@@ -163,12 +114,9 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error in checkout process:', error);
+    console.error('Error creating checkout session:', error);
     return new Response(
-      JSON.stringify({ 
-        error: 'Failed to create checkout session',
-        details: error.message 
-      }),
+      JSON.stringify({ error: error.message }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,

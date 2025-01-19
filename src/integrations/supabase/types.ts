@@ -153,72 +153,27 @@ export type Database = {
         }
         Relationships: []
       }
-      subscription_history: {
-        Row: {
-          changed_at: string | null
-          id: string
-          metadata: Json | null
-          new_status: Database["public"]["Enums"]["subscription_status"] | null
-          new_tier: Database["public"]["Enums"]["subscription_tier"] | null
-          old_status: Database["public"]["Enums"]["subscription_status"] | null
-          old_tier: Database["public"]["Enums"]["subscription_tier"] | null
-          reason: string | null
-          user_id: string | null
-        }
-        Insert: {
-          changed_at?: string | null
-          id?: string
-          metadata?: Json | null
-          new_status?: Database["public"]["Enums"]["subscription_status"] | null
-          new_tier?: Database["public"]["Enums"]["subscription_tier"] | null
-          old_status?: Database["public"]["Enums"]["subscription_status"] | null
-          old_tier?: Database["public"]["Enums"]["subscription_tier"] | null
-          reason?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          changed_at?: string | null
-          id?: string
-          metadata?: Json | null
-          new_status?: Database["public"]["Enums"]["subscription_status"] | null
-          new_tier?: Database["public"]["Enums"]["subscription_tier"] | null
-          old_status?: Database["public"]["Enums"]["subscription_status"] | null
-          old_tier?: Database["public"]["Enums"]["subscription_tier"] | null
-          reason?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       subscriptions: {
         Row: {
-          cancel_at: string | null
           created_at: string
-          current_period_end: string | null
           id: string
-          status: Database["public"]["Enums"]["subscription_status"] | null
-          stripe_subscription_id: string | null
+          status: string | null
           tier: Database["public"]["Enums"]["subscription_tier"]
           updated_at: string
           user_id: string
         }
         Insert: {
-          cancel_at?: string | null
           created_at?: string
-          current_period_end?: string | null
           id?: string
-          status?: Database["public"]["Enums"]["subscription_status"] | null
-          stripe_subscription_id?: string | null
+          status?: string | null
           tier: Database["public"]["Enums"]["subscription_tier"]
           updated_at?: string
           user_id: string
         }
         Update: {
-          cancel_at?: string | null
           created_at?: string
-          current_period_end?: string | null
           id?: string
-          status?: Database["public"]["Enums"]["subscription_status"] | null
-          stripe_subscription_id?: string | null
+          status?: string | null
           tier?: Database["public"]["Enums"]["subscription_tier"]
           updated_at?: string
           user_id?: string
@@ -260,7 +215,6 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      subscription_status: "active" | "cancelled" | "past_due"
       subscription_tier: "basic" | "premium" | "advanced"
     }
     CompositeTypes: {

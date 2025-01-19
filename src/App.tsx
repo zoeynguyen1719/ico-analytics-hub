@@ -24,14 +24,12 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
-          <Route element={<DashboardLayout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/subscription" element={<SubscriptionPage />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/research" element={<Research />} />
-            <Route path="/games" element={<Games />} />
-          </Route>
+          <Route path="/" element={<Index />} />
+          <Route path="/subscription" element={<SubscriptionPage />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/research" element={<Research />} />
+          <Route path="/games" element={<Games />} />
         </Routes>
         <Toaster />
       </Router>

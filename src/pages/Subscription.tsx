@@ -1,11 +1,25 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import DashboardLayout from "@/components/DashboardLayout";
-import SubscriptionTierCard from "@/components/subscription/SubscriptionTierCard";
-import SubscriptionDialogs from "@/components/subscription/SubscriptionDialogs";
-import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { toast } from "sonner";
+import SubscriptionTier from "@/components/subscription/SubscriptionTier";
+import BasicSignupDialog from "@/components/subscription/BasicSignupDialog";
+import PremiumSignupDialog from "@/components/subscription/PremiumSignupDialog";
+import AdvancedSignupDialog from "@/components/subscription/AdvancedSignupDialog";
+import { supabase } from "@/integrations/supabase/client";
+
+declare global {
+  interface Window {
+    gtag: (
+      command: string,
+      action: string,
+      params: {
+        event_category: string;
+        event_label: string;
+        value?: number;
+      }
+    ) => void;
+  }
+}
 
 const SubscriptionPage = () => {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
@@ -13,21 +27,6 @@ const SubscriptionPage = () => {
   const [showPremiumSignupDialog, setShowPremiumSignupDialog] = useState(false);
   const [showAdvancedSignupDialog, setShowAdvancedSignupDialog] = useState(false);
   const [selectedPriceId, setSelectedPriceId] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
-  const { subscriptionTier } = useSubscriptionTier(user);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/signin');
-      } else {
-        setUser(user);
-      }
-    };
-    checkAuth();
-  }, [navigate]);
 
   const tiers = [
     {
@@ -75,6 +74,7 @@ const SubscriptionPage = () => {
   ];
 
   const handleSubscribe = async (priceId: string | null, tierName: string) => {
+    // Track tier selection event
     if (window.gtag) {
       window.gtag('event', 'select_tier', {
         event_category: 'subscription',
@@ -83,22 +83,17 @@ const SubscriptionPage = () => {
       });
     }
 
-    if (subscriptionTier?.toLowerCase() === tierName.toLowerCase()) {
-      toast.info("You are already subscribed to this plan");
-      return;
-    }
-
     setSelectedTier(tierName);
     setSelectedPriceId(priceId);
     
-    switch(tierName.toLowerCase()) {
-      case "basic":
+    switch(tierName) {
+      case "Basic":
         setShowBasicSignupDialog(true);
         break;
-      case "premium":
+      case "Premium":
         setShowPremiumSignupDialog(true);
         break;
-      case "advanced":
+      case "Advanced":
         setShowAdvancedSignupDialog(true);
         break;
     }
@@ -110,20 +105,17 @@ const SubscriptionPage = () => {
       return;
     }
 
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        toast.error('Authentication required');
-        return;
-      }
+    if (!userId) {
+      toast.error('User not authenticated');
+      return;
+    }
 
+    try {
+      console.log('Creating checkout session for user:', userId);
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { 
           priceId: selectedPriceId,
-          userId
-        },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
+          userId 
         }
       });
       
@@ -157,24 +149,30 @@ const SubscriptionPage = () => {
 
         <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto px-4">
           {tiers.map((tier) => (
-            <SubscriptionTierCard
+            <SubscriptionTier
               key={tier.name}
               {...tier}
               isSelected={selectedTier === tier.name}
-              isCurrentPlan={subscriptionTier?.toLowerCase() === tier.name.toLowerCase()}
               onSelect={() => handleSubscribe(tier.priceId, tier.name)}
             />
           ))}
         </div>
         
-        <SubscriptionDialogs
-          showBasicSignupDialog={showBasicSignupDialog}
-          showPremiumSignupDialog={showPremiumSignupDialog}
-          showAdvancedSignupDialog={showAdvancedSignupDialog}
-          setShowBasicSignupDialog={setShowBasicSignupDialog}
-          setShowPremiumSignupDialog={setShowPremiumSignupDialog}
-          setShowAdvancedSignupDialog={setShowAdvancedSignupDialog}
-          handleStripeCheckout={handleStripeCheckout}
+        <BasicSignupDialog
+          open={showBasicSignupDialog}
+          onOpenChange={setShowBasicSignupDialog}
+        />
+        
+        <PremiumSignupDialog
+          open={showPremiumSignupDialog}
+          onOpenChange={setShowPremiumSignupDialog}
+          onSuccess={handleStripeCheckout}
+        />
+        
+        <AdvancedSignupDialog
+          open={showAdvancedSignupDialog}
+          onOpenChange={setShowAdvancedSignupDialog}
+          onSuccess={handleStripeCheckout}
         />
       </div>
     </DashboardLayout>
