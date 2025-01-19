@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "sonner";
 import Index from "@/pages/Index";
 import SignIn from "@/pages/SignIn";
 import Analytics from "@/pages/Analytics";
@@ -12,7 +13,14 @@ import Checkout from "@/pages/Checkout";
 import ProjectDetails from "@/pages/ProjectDetails";
 import "./App.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 3,
+    },
+  },
+});
 
 function App() {
   return (
@@ -30,6 +38,7 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/project/:slug" element={<ProjectDetails />} />
         </Routes>
+        <Toaster />
       </BrowserRouter>
     </QueryClientProvider>
   );
