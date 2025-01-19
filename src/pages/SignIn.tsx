@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,8 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { redirectTo, tier } = location.state || {};
 
   const handleReturnHome = () => {
     navigate("/");
@@ -62,7 +64,15 @@ const SignIn = () => {
         console.error("Sign in error:", signInError);
       } else {
         toast.success("Successfully signed in!");
-        navigate("/");
+        
+        // If this was a premium subscription signup flow, redirect to Stripe
+        if (redirectTo === "/subscription" && tier === "premium") {
+          window.location.href = "https://buy.stripe.com/5kA8wH0ZO5c7dnG8ww";
+          return;
+        }
+        
+        // Otherwise redirect to the specified page or home
+        navigate(redirectTo || "/");
       }
     } catch (error) {
       console.error("Sign in error:", error);

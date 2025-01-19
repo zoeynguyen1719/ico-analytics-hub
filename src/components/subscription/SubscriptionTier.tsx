@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import SignupDialog from "./SignupDialog";
 
 interface SubscriptionTierProps {
   name: string;
@@ -27,29 +29,52 @@ const SubscriptionTier = ({
   onSelect,
 }: SubscriptionTierProps) => {
   const navigate = useNavigate();
+  const [showSignupDialog, setShowSignupDialog] = useState(false);
 
   const handleSubscribe = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      if (!session) {
-        toast.error("Please sign in to subscribe");
-        navigate("/signin");
-        return;
-      }
-
-      // For the specific premium tier with Stripe checkout
+      // For premium tier with Stripe checkout
       if (name.toLowerCase() === "premium") {
+        if (!session) {
+          // If user is not logged in, show signup dialog
+          setShowSignupDialog(true);
+          return;
+        }
+        // If user is logged in, redirect to Stripe checkout
         window.location.href = "https://buy.stripe.com/5kA8wH0ZO5c7dnG8ww";
         return;
       }
 
       // For other tiers, use the existing selection logic
+      if (!session) {
+        toast.error("Please sign in to subscribe");
+        navigate("/signin", { 
+          state: { 
+            redirectTo: "/subscription",
+            tier: name.toLowerCase()
+          } 
+        });
+        return;
+      }
+
       onSelect();
     } catch (error) {
       console.error("Error handling subscription:", error);
       toast.error("Error processing subscription. Please try again.");
     }
+  };
+
+  const handleSignupSuccess = () => {
+    // After successful signup, redirect to signin page
+    toast.success("Account created! Please sign in to continue with your subscription.");
+    navigate("/signin", { 
+      state: { 
+        redirectTo: "/subscription",
+        tier: name.toLowerCase()
+      } 
+    });
   };
 
   return (
@@ -98,6 +123,17 @@ const SubscriptionTier = ({
       >
         {buttonText}
       </Button>
+
+      {name.toLowerCase() === "premium" && (
+        <SignupDialog
+          open={showSignupDialog}
+          onOpenChange={setShowSignupDialog}
+          onSuccess={handleSignupSuccess}
+          tier="premium"
+          title="Sign Up for Premium Plan"
+          description="Create your account to access premium features"
+        />
+      )}
     </Card>
   );
 };
