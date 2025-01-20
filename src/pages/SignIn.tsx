@@ -25,32 +25,8 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      // First, check if the user exists in auth.users
-      const { data: { user: existingUser }, error: userError } = await supabase.auth.getUser();
-      
-      if (!existingUser) {
-        // If no authenticated user, check subscriptions and basic_signups
-        const { data: subscription } = await supabase
-          .from('subscriptions')
-          .select('tier')
-          .eq('email', email.trim())
-          .maybeSingle();
-
-        const { data: basicSignup } = await supabase
-          .from('basic_signups')
-          .select('email')
-          .eq('email', email.trim())
-          .maybeSingle();
-
-        if (!subscription && !basicSignup) {
-          toast.error("No account found with this email. Please sign up first.");
-          setLoading(false);
-          return;
-        }
-      }
-
-      // Attempt to sign in
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      // First, sign in the user
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
@@ -62,18 +38,46 @@ const SignIn = () => {
           toast.error(signInError.message);
         }
         console.error("Sign in error:", signInError);
-      } else {
-        toast.success("Successfully signed in!");
-        
-        // If this was a premium subscription signup flow, redirect to Stripe
-        if (redirectTo === "/subscription" && tier === "premium") {
-          window.location.href = "https://buy.stripe.com/5kA8wH0ZO5c7dnG8ww";
+        return;
+      }
+
+      if (!signInData.user) {
+        toast.error("No user found with these credentials");
+        return;
+      }
+
+      // Check subscriptions using user_id
+      const { data: subscription } = await supabase
+        .from('subscriptions')
+        .select('tier')
+        .eq('user_id', signInData.user.id)
+        .maybeSingle();
+
+      if (!subscription) {
+        // If no subscription found, check basic_signups
+        const { data: basicSignup } = await supabase
+          .from('basic_signups')
+          .select('email')
+          .eq('email', email.trim())
+          .maybeSingle();
+
+        if (!basicSignup) {
+          toast.error("No account found with this email. Please sign up first.");
           return;
         }
-        
-        // Otherwise redirect to the specified page or home
-        navigate(redirectTo || "/");
       }
+
+      toast.success("Successfully signed in!");
+      
+      // If this was a premium subscription signup flow, redirect to Stripe
+      if (redirectTo === "/subscription" && tier === "premium") {
+        window.location.href = "https://buy.stripe.com/5kA8wH0ZO5c7dnG8ww";
+        return;
+      }
+      
+      // Otherwise redirect to the specified page or home
+      navigate(redirectTo || "/");
+
     } catch (error) {
       console.error("Sign in error:", error);
       toast.error("An unexpected error occurred. Please try again.");
