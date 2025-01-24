@@ -25,46 +25,47 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      // First, sign in the user
+      // First, check if the user exists in basic_signups
+      const { data: basicSignup, error: basicSignupError } = await supabase
+        .from('basic_signups')
+        .select('email')
+        .eq('email', email.trim())
+        .maybeSingle();
+
+      if (basicSignupError) {
+        console.error("Error checking basic signup:", basicSignupError);
+        toast.error("An error occurred while checking your account. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      if (!basicSignup) {
+        toast.error("No account found with this email. Please sign up first.");
+        setLoading(false);
+        return;
+      }
+
+      // If user exists, attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
 
       if (signInError) {
+        console.error("Sign in error:", signInError);
+        
         if (signInError.message.includes('Invalid login credentials')) {
           toast.error("Invalid email or password. Please try again.");
         } else {
-          toast.error(signInError.message);
+          toast.error("An error occurred while signing in. Please try again.");
         }
-        console.error("Sign in error:", signInError);
+        
         return;
       }
 
       if (!signInData.user) {
         toast.error("No user found with these credentials");
         return;
-      }
-
-      // Check subscriptions using user_id
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('tier')
-        .eq('user_id', signInData.user.id)
-        .maybeSingle();
-
-      if (!subscription) {
-        // If no subscription found, check basic_signups
-        const { data: basicSignup } = await supabase
-          .from('basic_signups')
-          .select('email')
-          .eq('email', email.trim())
-          .maybeSingle();
-
-        if (!basicSignup) {
-          toast.error("No account found with this email. Please sign up first.");
-          return;
-        }
       }
 
       toast.success("Successfully signed in!");
