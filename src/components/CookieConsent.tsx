@@ -3,14 +3,20 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 
-// Extend the existing gtag types
+// Define gtag as a function type that can handle both event tracking and consent management
 declare global {
   interface Window {
     dataLayer: any[];
-    gtag: {
-      (command: 'event', action: string, params: { event_category: string; event_label: string; value?: number }): void;
-      (command: 'consent', action: 'update', params: { analytics_storage: 'granted' | 'denied' }): void;
-    }
+    gtag: (
+      command: 'event' | 'consent',
+      action: string,
+      params: { 
+        event_category?: string; 
+        event_label?: string; 
+        value?: number;
+        analytics_storage?: 'granted' | 'denied';
+      }
+    ) => void;
   }
 }
 
