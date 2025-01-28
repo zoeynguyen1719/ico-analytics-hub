@@ -7,7 +7,10 @@ import { toast } from 'sonner';
 declare global {
   interface Window {
     dataLayer: any[];
-    gtag: (...args: any[]) => void;
+    gtag: {
+      (command: 'event', action: string, params: { event_category: string; event_label: string; value?: number }): void;
+      (command: 'consent', action: 'update', params: { analytics_storage: 'granted' | 'denied' }): void;
+    }
   }
 }
 
@@ -30,8 +33,8 @@ const CookieConsent = () => {
     // Enable Google Analytics after consent
     if (window.gtag) {
       window.gtag('consent', 'update', {
-        'analytics_storage': 'granted'
-      } as any);
+        analytics_storage: 'granted'
+      });
     }
   };
 
@@ -43,8 +46,8 @@ const CookieConsent = () => {
     // Disable Google Analytics if cookies are declined
     if (window.gtag) {
       window.gtag('consent', 'update', {
-        'analytics_storage': 'denied'
-      } as any);
+        analytics_storage: 'denied'
+      });
     }
   };
 
