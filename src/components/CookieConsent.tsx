@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
+import PrivacyPolicyDialog from './PrivacyPolicyDialog';
 
-// Define gtag as a function type that can handle both event tracking and consent management
 declare global {
   interface Window {
     dataLayer: any[];
     gtag: (
-      command: 'event' | 'consent',
+      command: string,
       action: string,
       params: { 
         event_category?: string; 
@@ -40,7 +40,7 @@ const CookieConsent = () => {
     if (window.gtag) {
       window.gtag('consent', 'update', {
         analytics_storage: 'granted'
-      });
+      } as any);
     }
   };
 
@@ -53,7 +53,7 @@ const CookieConsent = () => {
     if (window.gtag) {
       window.gtag('consent', 'update', {
         analytics_storage: 'denied'
-      });
+      } as any);
     }
   };
 
@@ -67,7 +67,7 @@ const CookieConsent = () => {
             <p>
               We use cookies to enhance your browsing experience and analyze our traffic. 
               By clicking "Accept", you consent to our use of cookies. 
-              See our <a href="/privacy-policy" className="underline hover:text-primary">Privacy Policy</a> for more information.
+              See our <PrivacyPolicyDialog /> for more information.
             </p>
           </div>
           <div className="flex gap-4">
