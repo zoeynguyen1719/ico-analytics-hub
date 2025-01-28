@@ -3,6 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 
+// Declare the gtag types
+declare global {
+  interface Window {
+    gtag: (
+      command: 'consent',
+      action: 'update',
+      config: { analytics_storage: 'granted' | 'denied' }
+    ) => void;
+  }
+}
+
 const CookieConsent = () => {
   const [showBanner, setShowBanner] = useState(false);
 
@@ -22,7 +33,7 @@ const CookieConsent = () => {
     // Enable Google Analytics after consent
     if (window.gtag) {
       window.gtag('consent', 'update', {
-        'analytics_storage': 'granted'
+        analytics_storage: 'granted'
       });
     }
   };
@@ -35,7 +46,7 @@ const CookieConsent = () => {
     // Disable Google Analytics if cookies are declined
     if (window.gtag) {
       window.gtag('consent', 'update', {
-        'analytics_storage': 'denied'
+        analytics_storage: 'denied'
       });
     }
   };
