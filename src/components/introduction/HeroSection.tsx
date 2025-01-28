@@ -45,7 +45,7 @@ const HeroSection = () => {
             className="bg-crypto-blue hover:bg-crypto-blue/90 text-crypto-dark min-w-[200px] h-14 text-lg cursor-rocket backdrop-blur-sm"
             onClick={() => navigate('/subscription')}
           >
-            Access App <ArrowRight className="ml-2 h-5 w-5" />
+            Register <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           
           <Button 
