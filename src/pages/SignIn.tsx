@@ -28,8 +28,25 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      console.log("Attempting to sign in with email:", email);
-      
+      console.log("Attempting sign in for email:", email);
+
+      // First check if the user's email is verified
+      const { data: { users }, error: getUserError } = await supabase.auth.admin
+        .listUsers({
+          filters: {
+            email: email.trim()
+          }
+        });
+
+      if (getUserError) {
+        console.error("Error checking user status:", getUserError);
+      } else if (users && users[0] && !users[0].email_confirmed_at) {
+        toast.error("Please verify your email before signing in. Check your inbox for the verification link.");
+        setLoading(false);
+        return;
+      }
+
+      // Attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
@@ -39,13 +56,14 @@ const SignIn = () => {
         console.error("Sign in error details:", {
           message: signInError.message,
           status: signInError.status,
-          name: signInError.name
+          name: signInError.name,
+          code: signInError.code
         });
         
         if (signInError.message.includes('Invalid login credentials')) {
-          toast.error("The email and password combination is incorrect. Please check your credentials and try again.");
+          toast.error("Invalid email or password. Please check your credentials and try again.");
         } else if (signInError.message.includes('Email not confirmed')) {
-          toast.error("Please confirm your email address before signing in.");
+          toast.error("Please verify your email before signing in. Check your inbox for the verification link.");
         } else {
           toast.error("An error occurred while signing in. Please try again.");
         }
@@ -69,7 +87,6 @@ const SignIn = () => {
 
       if (basicSignupError) {
         console.error("Error checking basic signup:", basicSignupError);
-        // Don't block the sign-in process for this error
       }
 
       // Update the basic_signups table with the user_id if it's not set
@@ -81,7 +98,6 @@ const SignIn = () => {
 
         if (updateError) {
           console.error("Error updating basic signup:", updateError);
-          // Don't block the sign-in process for this error
         }
       }
 
