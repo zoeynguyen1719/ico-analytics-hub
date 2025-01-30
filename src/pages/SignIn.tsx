@@ -28,7 +28,28 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      // First, check if the user exists in basic_signups
+      // First check if the user exists in auth
+      const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers({
+        filters: {
+          email: email.trim()
+        }
+      });
+
+      if (getUserError) {
+        console.error("Error checking user:", getUserError);
+        toast.error("An error occurred while checking your account. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // If user doesn't exist in auth, they need to sign up first
+      if (!users || users.length === 0) {
+        toast.error("No account found with this email. Please sign up first.");
+        setLoading(false);
+        return;
+      }
+
+      // Now check basic_signups
       const { data: basicSignup, error: basicSignupError } = await supabase
         .from('basic_signups')
         .select('email, user_id')
@@ -38,13 +59,6 @@ const SignIn = () => {
       if (basicSignupError) {
         console.error("Error checking basic signup:", basicSignupError);
         toast.error("An error occurred while checking your account. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      // If user exists in basic_signups but hasn't confirmed their email
-      if (basicSignup && !basicSignup.user_id) {
-        toast.error("Please check your email and confirm your account before signing in.");
         setLoading(false);
         return;
       }
@@ -59,7 +73,7 @@ const SignIn = () => {
         console.error("Sign in error:", signInError);
         
         if (signInError.message.includes('Invalid login credentials')) {
-          toast.error("Invalid email or password. Please check your credentials and try again.");
+          toast.error("The password you entered is incorrect. Please try again.");
         } else if (signInError.message.includes('Email not confirmed')) {
           toast.error("Please confirm your email address before signing in.");
         } else {
