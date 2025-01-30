@@ -7,6 +7,9 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { Database } from "@/integrations/supabase/types";
+
+type BasicSignup = Database['public']['Tables']['basic_signups']['Row'];
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -28,7 +31,7 @@ const SignIn = () => {
       // First, check if the user exists in basic_signups
       const { data: basicSignup, error: basicSignupError } = await supabase
         .from('basic_signups')
-        .select('email')
+        .select('email, user_id')
         .eq('email', email.trim())
         .maybeSingle();
 
