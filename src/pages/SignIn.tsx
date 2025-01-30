@@ -42,7 +42,14 @@ const SignIn = () => {
         return;
       }
 
-      // If user exists, attempt to sign in
+      // If user exists in basic_signups but hasn't confirmed their email
+      if (basicSignup && !basicSignup.user_id) {
+        toast.error("Please check your email and confirm your account before signing in.");
+        setLoading(false);
+        return;
+      }
+
+      // Attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
@@ -52,7 +59,9 @@ const SignIn = () => {
         console.error("Sign in error:", signInError);
         
         if (signInError.message.includes('Invalid login credentials')) {
-          toast.error("Invalid email or password. Please try again.");
+          toast.error("Invalid email or password. Please check your credentials and try again.");
+        } else if (signInError.message.includes('Email not confirmed')) {
+          toast.error("Please confirm your email address before signing in.");
         } else {
           toast.error("An error occurred while signing in. Please try again.");
         }
