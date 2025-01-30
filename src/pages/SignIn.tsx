@@ -39,12 +39,6 @@ const SignIn = () => {
         return;
       }
 
-      if (!basicSignup) {
-        toast.error("No account found with this email. Please sign up first.");
-        setLoading(false);
-        return;
-      }
-
       // If user exists, attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -59,13 +53,27 @@ const SignIn = () => {
         } else {
           toast.error("An error occurred while signing in. Please try again.");
         }
-        
+        setLoading(false);
         return;
       }
 
       if (!signInData.user) {
         toast.error("No user found with these credentials");
+        setLoading(false);
         return;
+      }
+
+      // Update the basic_signups table with the user_id if it's not set
+      if (basicSignup && !basicSignup.user_id) {
+        const { error: updateError } = await supabase
+          .from('basic_signups')
+          .update({ user_id: signInData.user.id })
+          .eq('email', email.trim());
+
+        if (updateError) {
+          console.error("Error updating basic signup:", updateError);
+          // Don't block the sign-in process for this error
+        }
       }
 
       toast.success("Successfully signed in!");
