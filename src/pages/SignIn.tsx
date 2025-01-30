@@ -28,21 +28,7 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      // Check basic_signups first
-      const { data: basicSignup, error: basicSignupError } = await supabase
-        .from('basic_signups')
-        .select('email, user_id')
-        .eq('email', email.trim())
-        .maybeSingle();
-
-      if (basicSignupError) {
-        console.error("Error checking basic signup:", basicSignupError);
-        toast.error("An error occurred while checking your account. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      // Attempt to sign in
+      // Attempt to sign in directly since we know the user exists
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
@@ -52,7 +38,7 @@ const SignIn = () => {
         console.error("Sign in error:", signInError);
         
         if (signInError.message.includes('Invalid login credentials')) {
-          toast.error("Invalid email or password. Please try again.");
+          toast.error("The password you entered is incorrect. Please try again.");
         } else if (signInError.message.includes('Email not confirmed')) {
           toast.error("Please confirm your email address before signing in.");
         } else {
@@ -67,6 +53,13 @@ const SignIn = () => {
         setLoading(false);
         return;
       }
+
+      // Check and update basic_signups if needed
+      const { data: basicSignup } = await supabase
+        .from('basic_signups')
+        .select('email, user_id')
+        .eq('email', email.trim())
+        .maybeSingle();
 
       // Update the basic_signups table with the user_id if it's not set
       if (basicSignup && !basicSignup.user_id) {
