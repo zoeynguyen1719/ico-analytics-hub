@@ -28,17 +28,22 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      // Attempt to sign in directly since we know the user exists
+      console.log("Attempting to sign in with email:", email);
+      
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
 
       if (signInError) {
-        console.error("Sign in error:", signInError);
+        console.error("Sign in error details:", {
+          message: signInError.message,
+          status: signInError.status,
+          name: signInError.name
+        });
         
         if (signInError.message.includes('Invalid login credentials')) {
-          toast.error("The password you entered is incorrect. Please try again.");
+          toast.error("The email and password combination is incorrect. Please check your credentials and try again.");
         } else if (signInError.message.includes('Email not confirmed')) {
           toast.error("Please confirm your email address before signing in.");
         } else {
@@ -49,17 +54,23 @@ const SignIn = () => {
       }
 
       if (!signInData.user) {
-        toast.error("No user found with these credentials");
+        console.error("No user data returned after successful sign in");
+        toast.error("Unable to complete sign in. Please try again.");
         setLoading(false);
         return;
       }
 
       // Check and update basic_signups if needed
-      const { data: basicSignup } = await supabase
+      const { data: basicSignup, error: basicSignupError } = await supabase
         .from('basic_signups')
         .select('email, user_id')
         .eq('email', email.trim())
         .maybeSingle();
+
+      if (basicSignupError) {
+        console.error("Error checking basic signup:", basicSignupError);
+        // Don't block the sign-in process for this error
+      }
 
       // Update the basic_signups table with the user_id if it's not set
       if (basicSignup && !basicSignup.user_id) {
@@ -86,7 +97,7 @@ const SignIn = () => {
       navigate(redirectTo || "/");
 
     } catch (error) {
-      console.error("Sign in error:", error);
+      console.error("Unexpected sign in error:", error);
       toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
