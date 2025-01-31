@@ -17,7 +17,7 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { redirectTo, tier } = location.state || {};
+  const { redirectTo = "/", tier } = location.state || {};
 
   const handleReturnHome = () => {
     navigate("/");
@@ -29,22 +29,6 @@ const SignIn = () => {
 
     try {
       console.log("Attempting sign in for email:", email);
-
-      // First check if the user's email is verified
-      const { data: { users }, error: getUserError } = await supabase.auth.admin
-        .listUsers({
-          filters: {
-            email: email.trim()
-          }
-        });
-
-      if (getUserError) {
-        console.error("Error checking user status:", getUserError);
-      } else if (users && users[0] && !users[0].email_confirmed_at) {
-        toast.error("Please verify your email before signing in. Check your inbox for the verification link.");
-        setLoading(false);
-        return;
-      }
 
       // Attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -60,21 +44,19 @@ const SignIn = () => {
           code: signInError.code
         });
         
-        if (signInError.message.includes('Invalid login credentials')) {
-          toast.error("Invalid email or password. Please check your credentials and try again.");
-        } else if (signInError.message.includes('Email not confirmed')) {
+        if (signInError.message.includes('Email not confirmed')) {
           toast.error("Please verify your email before signing in. Check your inbox for the verification link.");
+        } else if (signInError.message.includes('Invalid login credentials')) {
+          toast.error("Invalid email or password. Please check your credentials and try again.");
         } else {
           toast.error("An error occurred while signing in. Please try again.");
         }
-        setLoading(false);
         return;
       }
 
       if (!signInData.user) {
         console.error("No user data returned after successful sign in");
         toast.error("Unable to complete sign in. Please try again.");
-        setLoading(false);
         return;
       }
 
@@ -110,7 +92,7 @@ const SignIn = () => {
       }
       
       // Otherwise redirect to the specified page or home
-      navigate(redirectTo || "/");
+      navigate(redirectTo);
 
     } catch (error) {
       console.error("Unexpected sign in error:", error);
