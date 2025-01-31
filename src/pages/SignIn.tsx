@@ -15,12 +15,40 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { redirectTo = "/", tier } = location.state || {};
 
   const handleReturnHome = () => {
     navigate("/");
+  };
+
+  const handleForgotPassword = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      toast.error("Please enter your email address");
+      return;
+    }
+
+    setIsResettingPassword(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) {
+        console.error("Password reset error:", error);
+        toast.error("Failed to send reset password email. Please try again.");
+      } else {
+        toast.success("Password reset email sent! Please check your inbox.");
+      }
+    } catch (error) {
+      console.error("Unexpected password reset error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsResettingPassword(false);
+    }
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -128,14 +156,23 @@ const SignIn = () => {
               className="bg-crypto-gray text-white border-crypto-blue focus:border-crypto-green"
               placeholder="Enter your email"
               required
-              disabled={loading}
+              disabled={loading || isResettingPassword}
             />
           </div>
 
           <div>
-            <Label htmlFor="password" className="text-white">
-              Password
-            </Label>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="password" className="text-white">
+                Password
+              </Label>
+              <button
+                onClick={handleForgotPassword}
+                className="text-sm text-crypto-blue hover:text-crypto-green transition-colors"
+                disabled={isResettingPassword}
+              >
+                {isResettingPassword ? 'Sending...' : 'Forgot Password?'}
+              </button>
+            </div>
             <Input
               id="password"
               type="password"
@@ -144,13 +181,13 @@ const SignIn = () => {
               className="bg-crypto-gray text-white border-crypto-blue focus:border-crypto-green"
               placeholder="Enter your password"
               required
-              disabled={loading}
+              disabled={loading || isResettingPassword}
             />
           </div>
 
           <Button
             type="submit"
-            disabled={loading}
+            disabled={loading || isResettingPassword}
             className="w-full bg-crypto-blue hover:bg-crypto-blue/90"
           >
             {loading ? (
@@ -168,7 +205,7 @@ const SignIn = () => {
             onClick={handleReturnHome}
             variant="outline"
             className="w-full mt-4 border-crypto-blue text-crypto-blue hover:bg-crypto-blue/10"
-            disabled={loading}
+            disabled={loading || isResettingPassword}
           >
             Return to Homepage
           </Button>
