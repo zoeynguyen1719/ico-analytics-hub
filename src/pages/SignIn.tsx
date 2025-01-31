@@ -16,6 +16,7 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [lastResetAttempt, setLastResetAttempt] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   const { redirectTo = "/", tier } = location.state || {};
@@ -31,6 +32,15 @@ const SignIn = () => {
       return;
     }
 
+    // Check if enough time has passed since the last attempt (30 seconds)
+    const now = Date.now();
+    const timeSinceLastAttempt = now - lastResetAttempt;
+    if (timeSinceLastAttempt < 30000) {
+      const remainingSeconds = Math.ceil((30000 - timeSinceLastAttempt) / 1000);
+      toast.error(`Please wait ${remainingSeconds} seconds before requesting another reset email`);
+      return;
+    }
+
     setIsResettingPassword(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
@@ -39,8 +49,13 @@ const SignIn = () => {
 
       if (error) {
         console.error("Password reset error:", error);
-        toast.error("Failed to send reset password email. Please try again.");
+        if (error.status === 429) {
+          toast.error("Too many reset attempts. Please wait 30 seconds before trying again.");
+        } else {
+          toast.error("Failed to send reset password email. Please try again.");
+        }
       } else {
+        setLastResetAttempt(now);
         toast.success("Password reset email sent! Please check your inbox.");
       }
     } catch (error) {
