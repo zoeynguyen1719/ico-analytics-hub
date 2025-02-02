@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 export const useSubscriptionHandler = (name: string, onSelect: () => void) => {
   const [showSignupDialog, setShowSignupDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const getCheckoutUrl = (tierName: string) => {
@@ -27,20 +28,25 @@ export const useSubscriptionHandler = (name: string, onSelect: () => void) => {
 
   const handleSubscribe = async () => {
     try {
+      setLoading(true);
+      console.log('Checking session...');
       const { data: { session } } = await supabase.auth.getSession();
       
       const isStripeTier = ["premium", "advanced"].includes(name.toLowerCase());
       
       if (isStripeTier) {
         if (!session) {
+          console.log('No session found, showing signup dialog');
           setShowSignupDialog(true);
           return;
         }
+        console.log('Session found, redirecting to Stripe checkout');
         window.location.href = getCheckoutUrl(name);
         return;
       }
 
       if (!session) {
+        console.log('No session found for basic tier');
         toast.error("Please sign in to subscribe");
         navigate("/signin", { 
           state: { 
@@ -55,6 +61,8 @@ export const useSubscriptionHandler = (name: string, onSelect: () => void) => {
     } catch (error) {
       console.error("Error handling subscription:", error);
       toast.error("Error processing subscription. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,6 +70,7 @@ export const useSubscriptionHandler = (name: string, onSelect: () => void) => {
     showSignupDialog,
     setShowSignupDialog,
     handleSubscribe,
-    handleSignupSuccess
+    handleSignupSuccess,
+    loading
   };
 };

@@ -4,6 +4,7 @@ import SignupDialog from "./SignupDialog";
 import TierHeader from "./TierHeader";
 import TierFeatures from "./TierFeatures";
 import { useSubscriptionHandler } from "./useSubscriptionHandler";
+import { Loader2 } from "lucide-react";
 
 interface SubscriptionTierProps {
   name: string;
@@ -29,7 +30,8 @@ const SubscriptionTier = ({
     showSignupDialog,
     setShowSignupDialog,
     handleSubscribe,
-    handleSignupSuccess
+    handleSignupSuccess,
+    loading
   } = useSubscriptionHandler(name, onSelect);
 
   return (
@@ -52,6 +54,7 @@ const SubscriptionTier = ({
 
       <Button
         onClick={handleSubscribe}
+        disabled={loading}
         className={`w-full ${
           isSelected
             ? "bg-crypto-blue hover:bg-crypto-blue/90"
@@ -60,7 +63,14 @@ const SubscriptionTier = ({
             : "bg-gray-800 hover:bg-gray-700"
         }`}
       >
-        {buttonText}
+        {loading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Loading...
+          </>
+        ) : (
+          buttonText
+        )}
       </Button>
 
       {(name.toLowerCase() === "premium" || name.toLowerCase() === "advanced") && (
