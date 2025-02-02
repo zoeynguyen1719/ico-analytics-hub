@@ -1,12 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
 import { mainMenuItems } from "./MainMenu";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { useAuthState } from "@/hooks/useAuthState";
 import ProfileMenu from "./ProfileMenu";
-import { Button } from "@/components/ui/button";
-import { ArrowUpCircle } from "lucide-react";
+import UpgradeButton from "./UpgradeButton";
 
 interface TopNavProps {
   user: any;
@@ -14,39 +13,8 @@ interface TopNavProps {
 
 const TopNav = ({ user: initialUser }: TopNavProps) => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(initialUser);
-  const { subscriptionTier, setSubscriptionTier, checkSubscriptionTier, isLoading } = useSubscriptionTier(initialUser);
-
-  useEffect(() => {
-    const handleAuthChange = async (_event: string, session: any) => {
-      try {
-        if (session?.user) {
-          setUser(session.user);
-          await checkSubscriptionTier(session.user);
-        } else {
-          setUser(null);
-          setSubscriptionTier(null);
-          // If token is invalid, redirect to signin
-          if (_event === 'TOKEN_REFRESHED' || _event === 'SIGNED_OUT') {
-            navigate('/signin');
-            toast.error("Session expired. Please sign in again.");
-          }
-        }
-      } catch (error: any) {
-        console.error("Auth error:", error);
-        if (error.message?.includes('refresh_token_not_found')) {
-          navigate('/signin');
-          toast.error("Session expired. Please sign in again.");
-        }
-      }
-    };
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthChange);
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [navigate, checkSubscriptionTier, setSubscriptionTier]);
+  const { user, setUser } = useAuthState(initialUser);
+  const { subscriptionTier, setSubscriptionTier, checkSubscriptionTier, isLoading } = useSubscriptionTier(user);
 
   const handleSignOut = async () => {
     try {
@@ -62,15 +30,7 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
     }
   };
 
-  const handleUpgrade = () => {
-    navigate("/subscription");
-  };
-
   const showUpgradeButton = user && subscriptionTier && subscriptionTier !== 'advanced' && !isLoading;
-
-  const handleLogoClick = () => {
-    navigate('/');
-  };
 
   return (
     <header className="w-full bg-black border-b border-crypto-gray">
@@ -82,10 +42,10 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
               src="/lovable-uploads/fc6224c9-4be9-4d1a-b5ad-3da64a81c6e0.png" 
               alt="Mericulum Logo" 
               className="h-12 w-auto cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={handleLogoClick}
+              onClick={() => navigate('/')}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && handleLogoClick()}
+              onKeyDown={(e) => e.key === 'Enter' && navigate('/')}
             />
           </div>
 
@@ -107,15 +67,7 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
 
           {/* Profile Section */}
           <div className="flex items-center gap-4">
-            {showUpgradeButton && (
-              <Button
-                onClick={handleUpgrade}
-                className="bg-crypto-blue hover:bg-crypto-blue/90 text-white flex items-center gap-2"
-              >
-                <ArrowUpCircle className="h-4 w-4" />
-                Upgrade Tier
-              </Button>
-            )}
+            <UpgradeButton show={showUpgradeButton} />
             <ProfileMenu 
               user={user} 
               subscriptionTier={subscriptionTier}

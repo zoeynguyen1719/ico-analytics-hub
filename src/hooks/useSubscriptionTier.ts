@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -11,11 +11,10 @@ export const useSubscriptionTier = (user: any) => {
     
     setIsLoading(true);
     try {
-      // First check subscriptions table using user_id
       const { data: subData, error: subError } = await supabase
-        .from('subscriptions')
-        .select('tier')
-        .eq('user_id', user.id)
+        .from("subscriptions")
+        .select("tier")
+        .eq("user_id", user.id)
         .maybeSingle();
 
       if (subError) {
@@ -24,26 +23,25 @@ export const useSubscriptionTier = (user: any) => {
         return;
       }
 
-      if (subData) {
+      if (subData?.tier) {
         setSubscriptionTier(subData.tier);
-      } else {
-        // If no subscription found, check basic_signups using email
-        const { data: basicData, error: basicError } = await supabase
-          .from('basic_signups')
-          .select('email')
-          .eq('email', user.email)
-          .maybeSingle();
-
-        if (basicError) {
-          console.error('Error checking basic signup:', basicError);
-          toast.error('Error checking subscription status. Please try again.');
-          return;
-        }
-
-        if (basicData) {
-          setSubscriptionTier('basic');
-        }
+        return;
       }
+
+      // If no subscription found, check basic_signups
+      const { data: basicData, error: basicError } = await supabase
+        .from("basic_signups")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (basicError) {
+        console.error('Error checking basic signup:', basicError);
+        toast.error('Error checking subscription status. Please try again.');
+        return;
+      }
+
+      setSubscriptionTier(basicData ? 'basic' : null);
     } catch (error) {
       console.error('Error in checkSubscriptionTier:', error);
       toast.error('Error checking subscription status. Please try again.');
@@ -51,12 +49,6 @@ export const useSubscriptionTier = (user: any) => {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (user) {
-      checkSubscriptionTier(user);
-    }
-  }, [user]);
 
   return { subscriptionTier, setSubscriptionTier, checkSubscriptionTier, isLoading };
 };
