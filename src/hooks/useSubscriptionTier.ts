@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const useSubscriptionTier = (user: any) => {
   const [subscriptionTier, setSubscriptionTier] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const checkSubscriptionTier = async (user: any) => {
     if (!user?.id) return;
     
+    setIsLoading(true);
     try {
       // First check subscriptions table using user_id
       const { data: subData, error: subError } = await supabase
@@ -17,6 +20,7 @@ export const useSubscriptionTier = (user: any) => {
 
       if (subError) {
         console.error('Error checking subscription:', subError);
+        toast.error('Error checking subscription status. Please try again.');
         return;
       }
 
@@ -32,6 +36,7 @@ export const useSubscriptionTier = (user: any) => {
 
         if (basicError) {
           console.error('Error checking basic signup:', basicError);
+          toast.error('Error checking subscription status. Please try again.');
           return;
         }
 
@@ -41,6 +46,9 @@ export const useSubscriptionTier = (user: any) => {
       }
     } catch (error) {
       console.error('Error in checkSubscriptionTier:', error);
+      toast.error('Error checking subscription status. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -50,5 +58,5 @@ export const useSubscriptionTier = (user: any) => {
     }
   }, [user]);
 
-  return { subscriptionTier, setSubscriptionTier, checkSubscriptionTier };
+  return { subscriptionTier, setSubscriptionTier, checkSubscriptionTier, isLoading };
 };

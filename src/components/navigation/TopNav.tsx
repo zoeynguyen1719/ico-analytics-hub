@@ -15,7 +15,7 @@ interface TopNavProps {
 const TopNav = ({ user: initialUser }: TopNavProps) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(initialUser);
-  const { subscriptionTier, setSubscriptionTier, checkSubscriptionTier } = useSubscriptionTier(initialUser);
+  const { subscriptionTier, setSubscriptionTier, checkSubscriptionTier, isLoading } = useSubscriptionTier(initialUser);
 
   useEffect(() => {
     const handleAuthChange = async (_event: string, session: any) => {
@@ -66,7 +66,7 @@ const TopNav = ({ user: initialUser }: TopNavProps) => {
     navigate("/subscription");
   };
 
-  const showUpgradeButton = user && subscriptionTier && subscriptionTier !== 'advanced';
+  const showUpgradeButton = user && subscriptionTier && subscriptionTier !== 'advanced' && !isLoading;
 
   const handleLogoClick = () => {
     navigate('/');
