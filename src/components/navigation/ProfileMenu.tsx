@@ -15,6 +15,19 @@ const ProfileMenu = ({ user, subscriptionTier, onSignOut }: ProfileMenuProps) =>
   
   if (!user) return null;
 
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      toast.success("Signed out successfully");
+      navigate("/signin");
+    } catch (error: any) {
+      console.error("Error signing out:", error);
+      toast.error("Error signing out");
+    }
+  };
+
   const handleUpgrade = () => {
     navigate("/subscription");
   };
@@ -45,7 +58,7 @@ const ProfileMenu = ({ user, subscriptionTier, onSignOut }: ProfileMenuProps) =>
             </span>
           </div>
           <button
-            onClick={onSignOut}
+            onClick={handleSignOut}
             className="block w-full px-4 py-2 text-sm text-gray-300 hover:bg-crypto-gray hover:text-white transition-colors text-left"
           >
             Sign Out
