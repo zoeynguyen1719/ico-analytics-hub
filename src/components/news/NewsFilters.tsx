@@ -1,10 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 
 interface NewsFiltersProps {
   cryptoMentions: string[];
@@ -43,40 +38,15 @@ const NewsFilters = ({
         </SelectContent>
       </Select>
 
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className={cn(
-              "w-[200px] justify-start text-left font-normal bg-crypto-dark text-white border-crypto-gray",
-              !selectedDate && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 bg-crypto-dark border-crypto-gray" align="start">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            initialFocus
-            className="bg-crypto-dark text-white"
-          />
-        </PopoverContent>
-      </Popover>
-
-      {(selectedCrypto !== "all" || selectedDate) && (
+      {selectedCrypto !== "all" && (
         <Button 
           variant="outline" 
           className="bg-crypto-dark text-white border-crypto-gray hover:bg-crypto-gray"
           onClick={() => {
             setSelectedCrypto("all");
-            setSelectedDate(undefined);
           }}
         >
-          Clear Filters
+          Clear Filter
         </Button>
       )}
     </div>
