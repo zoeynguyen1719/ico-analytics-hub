@@ -35,15 +35,18 @@ const SubscriptionTier = ({
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      // For premium tier with Stripe checkout
-      if (name.toLowerCase() === "premium") {
+      // For premium and advanced tiers with Stripe checkout
+      if (name.toLowerCase() === "premium" || name.toLowerCase() === "advanced") {
         if (!session) {
           // If user is not logged in, show signup dialog
           setShowSignupDialog(true);
           return;
         }
         // If user is logged in, redirect to Stripe checkout
-        window.location.href = "https://buy.stripe.com/5kA8wH0ZO5c7dnG8ww";
+        const checkoutUrl = name.toLowerCase() === "premium" 
+          ? "https://buy.stripe.com/5kA8wH0ZO5c7dnG8ww"
+          : "https://buy.stripe.com/00g4gr8sg0VRdnG5kl";
+        window.location.href = checkoutUrl;
         return;
       }
 
@@ -124,14 +127,14 @@ const SubscriptionTier = ({
         {buttonText}
       </Button>
 
-      {name.toLowerCase() === "premium" && (
+      {(name.toLowerCase() === "premium" || name.toLowerCase() === "advanced") && (
         <SignupDialog
           open={showSignupDialog}
           onOpenChange={setShowSignupDialog}
           onSuccess={handleSignupSuccess}
-          tier="premium"
-          title="Sign Up for Premium Plan"
-          description="Create your account to access premium features"
+          tier={name.toLowerCase() as 'premium' | 'advanced'}
+          title={`Sign Up for ${name} Plan`}
+          description={`Create your account to access ${name.toLowerCase()} features`}
         />
       )}
     </Card>
