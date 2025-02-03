@@ -92,7 +92,7 @@ const ICOAnalytics = () => {
               <SelectValue placeholder="Filter by Platform" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Platforms</SelectItem>
+              <SelectItem value="all">All Platforms</SelectItem>
               {Object.keys(platformData || {}).map(platform => (
                 <SelectItem key={platform} value={platform}>{platform}</SelectItem>
               ))}
@@ -167,7 +167,7 @@ const ICOAnalytics = () => {
 
       {/* Projects Table */}
       <Card className="p-6 bg-crypto-dark border-crypto-blue">
-        <h3 className="text-lg font-semibold text-white mb-4">ICO Projects</h3>
+        <h3 className="text-lg font-semibold text-white mb-4">ICO Projects Overview</h3>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
