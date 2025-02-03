@@ -50,8 +50,7 @@ function App() {
             <Route path="/news" element={<News />} />
             <Route path="/subscription" element={<Subscription />} />
             <Route path="/checkout" element={<Checkout />} />
-            <Route path="/project/:slug" element={<ProjectDetails />} />
-            <Route path="/ico-dashboard" element={<ICODashboard />} />
+      
           </Routes>
         </Suspense>
         <Toaster />
