@@ -1,8 +1,8 @@
+
 import { Card } from "@/components/ui/card";
 import { ProjectSection } from "@/components/projects/ProjectSection";
 import IntroductionSection from "@/components/introduction/IntroductionSection";
 import OverviewStats from "@/components/overview/OverviewStats";
-import ICOAnalytics from "@/components/ico/ICOAnalytics";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -40,7 +40,6 @@ const DashboardContent = ({ activeSection, isAuthenticated, sections }: Dashboar
       <div className="space-y-12">
         <IntroductionSection />
         <OverviewStats />
-        <ICOAnalytics />
       </div>
     );
   }
