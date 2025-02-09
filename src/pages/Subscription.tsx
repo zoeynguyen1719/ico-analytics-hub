@@ -27,25 +27,29 @@ const SubscriptionPage = () => {
   const [showPremiumSignupDialog, setShowPremiumSignupDialog] = useState(false);
   const [showAdvancedSignupDialog, setShowAdvancedSignupDialog] = useState(false);
   const [selectedPriceId, setSelectedPriceId] = useState<string | null>(null);
-
   const [currentSubscription, setCurrentSubscription] = useState<string | null>(null);
 
-useEffect(() => {
-  const fetchSubscription = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    const { data } = await supabase
-      .from('user_subscriptions')
-      .select('tier')
-      .eq('user_id', user.id)
-      .single();
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('tier')
+        .eq('user_id', user.id)
+        .single();
 
-    if (data) setCurrentSubscription(data.tier);
-  };
+      if (error) {
+        console.error('Error fetching subscription:', error);
+        return;
+      }
 
-  fetchSubscription();
-}, []);
+      if (data) setCurrentSubscription(data.tier);
+    };
+
+    fetchSubscription();
+  }, []);
 
   const tiers = [
     {
@@ -171,14 +175,15 @@ useEffect(() => {
     }
 
   };
-// Add useEffect to handle Stripe redirect
-useEffect(() => {
-  const query = new URLSearchParams(window.location.search);
-  if (query.get('success') === 'true') {
-    fetchSubscription(); // Re-fetch subscription data
-    toast.success('Subscription updated successfully!');
-  }
-}, []);
+
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    if (query.get('success') === 'true') {
+      fetchSubscription(); // Re-fetch subscription data
+      toast.success('Subscription updated successfully!');
+    }
+  }, []);
+
   return (
     <DashboardLayout>
       <div className="py-8">
@@ -194,38 +199,37 @@ useEffect(() => {
             <SubscriptionTier
               key={tier.name}
               {...tier}
-              // In the SubscriptionTier component props
-              isSelected={currentSubscription === tier.name || selectedTier === tier.name}
+              isSelected={currentSubscription === tier.tierKey || selectedTier === tier.name}
               onSelect={() => handleSubscribe(tier.priceId, tier.name)}
             />
           ))}
         </div>
         
         <BasicSignupDialog
-  open={showBasicSignupDialog}
-  onOpenChange={(open) => {
-    setShowBasicSignupDialog(open);
-    if (!open) setSelectedTier(null);
-  }}
-/>
+          open={showBasicSignupDialog}
+          onOpenChange={(open) => {
+            setShowBasicSignupDialog(open);
+            if (!open) setSelectedTier(null);
+          }}
+        />
 
-<PremiumSignupDialog
-  open={showPremiumSignupDialog}
-  onOpenChange={(open) => {
-    setShowPremiumSignupDialog(open);
-    if (!open) setSelectedTier(null);
-  }}
-  onSuccess={handleStripeCheckout}
-/>
+        <PremiumSignupDialog
+          open={showPremiumSignupDialog}
+          onOpenChange={(open) => {
+            setShowPremiumSignupDialog(open);
+            if (!open) setSelectedTier(null);
+          }}
+          onSuccess={handleStripeCheckout}
+        />
 
-<AdvancedSignupDialog
-  open={showAdvancedSignupDialog}
-  onOpenChange={(open) => {
-    setShowAdvancedSignupDialog(open);
-    if (!open) setSelectedTier(null);
-  }}
-  onSuccess={handleStripeCheckout}
-/>
+        <AdvancedSignupDialog
+          open={showAdvancedSignupDialog}
+          onOpenChange={(open) => {
+            setShowAdvancedSignupDialog(open);
+            if (!open) setSelectedTier(null);
+          }}
+          onSuccess={handleStripeCheckout}
+        />
       </div>
     </DashboardLayout>
   );
