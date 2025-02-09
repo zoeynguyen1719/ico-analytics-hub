@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,7 +33,6 @@ const SignIn = () => {
       return;
     }
 
-    // Check if enough time has passed since the last attempt (30 seconds)
     const now = Date.now();
     const timeSinceLastAttempt = now - lastResetAttempt;
     if (timeSinceLastAttempt < 30000) {
@@ -73,6 +73,21 @@ const SignIn = () => {
     try {
       console.log("Attempting sign in for email:", email);
 
+      // Check if the email exists first
+      const { data: { users }, error: checkError } = await supabase.auth.admin.listUsers({
+        filters: {
+          email: email.trim()
+        }
+      });
+
+      if (checkError) {
+        console.error("Error checking user existence:", checkError);
+      } else if (!users || users.length === 0) {
+        toast.error("No account found with this email. Please sign up first.");
+        setLoading(false);
+        return;
+      }
+
       // Attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -90,7 +105,7 @@ const SignIn = () => {
         if (signInError.message.includes('Email not confirmed')) {
           toast.error("Please verify your email before signing in. Check your inbox for the verification link.");
         } else if (signInError.message.includes('Invalid login credentials')) {
-          toast.error("Invalid email or password. Please check your credentials and try again.");
+          toast.error("Incorrect password. Please try again or use 'Forgot Password' to reset it.");
         } else {
           toast.error("An error occurred while signing in. Please try again.");
         }
