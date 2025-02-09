@@ -28,11 +28,31 @@ const SubscriptionPage = () => {
   const [showAdvancedSignupDialog, setShowAdvancedSignupDialog] = useState(false);
   const [selectedPriceId, setSelectedPriceId] = useState<string | null>(null);
 
+  const [currentSubscription, setCurrentSubscription] = useState<string | null>(null);
+
+useEffect(() => {
+  const fetchSubscription = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('user_subscriptions')
+      .select('tier')
+      .eq('user_id', user.id)
+      .single();
+
+    if (data) setCurrentSubscription(data.tier);
+  };
+
+  fetchSubscription();
+}, []);
+
   const tiers = [
     {
       name: "Basic",
       price: "Free",
       priceId: null,
+      tierKey: "basic",
       features: [
         "Access to basic ICO listings",
         "Limited portfolio tracking",
@@ -46,6 +66,7 @@ const SubscriptionPage = () => {
       name: "Premium",
       price: "$19/month",
       priceId: "price_1QbOJzQjoDZWLsXdFOX1Ubk1",
+      tierKey: "premium",
       features: [
         "All Basic features",
         "Advanced portfolio analytics",
@@ -60,6 +81,7 @@ const SubscriptionPage = () => {
       name: "Advanced",
       price: "$49/month",
       priceId: "price_1QbOKNQjoDZWLsXdnELR9mD5",
+      tierKey: "advanced",
       features: [
         "All Premium features",
         "API access",
@@ -74,7 +96,12 @@ const SubscriptionPage = () => {
   ];
 
   const handleSubscribe = async (priceId: string | null, tierName: string) => {
-    // Track tier selection event
+    // Reset all dialogs first
+    setShowBasicSignupDialog(false);
+    setShowPremiumSignupDialog(false);
+    setShowAdvancedSignupDialog(false);
+  
+    // Track tier selection
     if (window.gtag) {
       window.gtag('event', 'select_tier', {
         event_category: 'subscription',
@@ -82,10 +109,11 @@ const SubscriptionPage = () => {
         value: tierName === 'Basic' ? 0 : tierName === 'Premium' ? 19 : 49
       });
     }
-
+  
     setSelectedTier(tierName);
     setSelectedPriceId(priceId);
-    
+  
+    // Open correct dialog
     switch(tierName) {
       case "Basic":
         setShowBasicSignupDialog(true);
@@ -135,8 +163,22 @@ const SubscriptionPage = () => {
       console.error('Subscription error:', error);
       toast.error('Error processing subscription');
     }
-  };
+    if (data?.url) {
+      // Add success callback to URL
+      const successUrl = new URL(data.url);
+      successUrl.searchParams.set('success', 'true');
+      window.location.href = successUrl.toString();
+    }
 
+  };
+// Add useEffect to handle Stripe redirect
+useEffect(() => {
+  const query = new URLSearchParams(window.location.search);
+  if (query.get('success') === 'true') {
+    fetchSubscription(); // Re-fetch subscription data
+    toast.success('Subscription updated successfully!');
+  }
+}, []);
   return (
     <DashboardLayout>
       <div className="py-8">
@@ -152,28 +194,38 @@ const SubscriptionPage = () => {
             <SubscriptionTier
               key={tier.name}
               {...tier}
-              isSelected={selectedTier === tier.name}
+              // In the SubscriptionTier component props
+              isSelected={currentSubscription === tier.name || selectedTier === tier.name}
               onSelect={() => handleSubscribe(tier.priceId, tier.name)}
             />
           ))}
         </div>
         
         <BasicSignupDialog
-          open={showBasicSignupDialog}
-          onOpenChange={setShowBasicSignupDialog}
-        />
-        
-        <PremiumSignupDialog
-          open={showPremiumSignupDialog}
-          onOpenChange={setShowPremiumSignupDialog}
-          onSuccess={handleStripeCheckout}
-        />
-        
-        <AdvancedSignupDialog
-          open={showAdvancedSignupDialog}
-          onOpenChange={setShowAdvancedSignupDialog}
-          onSuccess={handleStripeCheckout}
-        />
+  open={showBasicSignupDialog}
+  onOpenChange={(open) => {
+    setShowBasicSignupDialog(open);
+    if (!open) setSelectedTier(null);
+  }}
+/>
+
+<PremiumSignupDialog
+  open={showPremiumSignupDialog}
+  onOpenChange={(open) => {
+    setShowPremiumSignupDialog(open);
+    if (!open) setSelectedTier(null);
+  }}
+  onSuccess={handleStripeCheckout}
+/>
+
+<AdvancedSignupDialog
+  open={showAdvancedSignupDialog}
+  onOpenChange={(open) => {
+    setShowAdvancedSignupDialog(open);
+    if (!open) setSelectedTier(null);
+  }}
+  onSuccess={handleStripeCheckout}
+/>
       </div>
     </DashboardLayout>
   );
