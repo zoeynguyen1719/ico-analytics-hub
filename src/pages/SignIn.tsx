@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -73,21 +72,6 @@ const SignIn = () => {
     try {
       console.log("Attempting sign in for email:", email);
 
-      // Check if the email exists first
-      const { data: { users }, error: checkError } = await supabase.auth.admin.listUsers({
-        filters: {
-          email: email.trim()
-        }
-      });
-
-      if (checkError) {
-        console.error("Error checking user existence:", checkError);
-      } else if (!users || users.length === 0) {
-        toast.error("No account found with this email. Please sign up first.");
-        setLoading(false);
-        return;
-      }
-
       // Attempt to sign in
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
@@ -161,8 +145,8 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8 bg-crypto-dark border-crypto-gray">
+    <div className="min-h-screen bg-gradient-dark from-crypto-gradient-from to-crypto-gradient-to flex items-center justify-center p-4">
+      <Card className="w-full max-w-md p-8 bg-crypto-glass border-crypto-gray backdrop-blur-xl">
         <div className="text-center mb-8">
           <img
             src="/lovable-uploads/fc6224c9-4be9-4d1a-b5ad-3da64a81c6e0.png"
@@ -183,7 +167,7 @@ const SignIn = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-crypto-gray text-white border-crypto-blue focus:border-crypto-green"
+              className="bg-crypto-dark/50 text-white border-crypto-blue focus:border-crypto-green"
               placeholder="Enter your email"
               required
               disabled={loading || isResettingPassword}
@@ -208,7 +192,7 @@ const SignIn = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-crypto-gray text-white border-crypto-blue focus:border-crypto-green"
+              className="bg-crypto-dark/50 text-white border-crypto-blue focus:border-crypto-green"
               placeholder="Enter your password"
               required
               disabled={loading || isResettingPassword}
