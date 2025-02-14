@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { toast } from "sonner";
@@ -7,19 +8,49 @@ import PremiumSignupDialog from "@/components/subscription/PremiumSignupDialog";
 import AdvancedSignupDialog from "@/components/subscription/AdvancedSignupDialog";
 import { supabase } from "@/integrations/supabase/client";
 
-declare global {
-  interface Window {
-    gtag: (
-      command: string,
-      action: string,
-      params: {
-        event_category: string;
-        event_label: string;
-        value?: number;
-      }
-    ) => void;
+const tiers = [
+  {
+    name: "Basic",
+    tierKey: "basic",
+    description: "Perfect for getting started",
+    price: "Free",
+    priceId: null,
+    features: [
+      "Basic market analysis",
+      "Limited API access",
+      "Community support",
+      "Basic portfolio tracking"
+    ]
+  },
+  {
+    name: "Premium",
+    tierKey: "premium",
+    description: "For serious traders",
+    price: "$49/month",
+    priceId: "price_premium",
+    features: [
+      "Advanced market analysis",
+      "Full API access",
+      "Priority support",
+      "Advanced portfolio tracking",
+      "Real-time alerts"
+    ]
+  },
+  {
+    name: "Advanced",
+    tierKey: "advanced",
+    description: "For professional traders",
+    price: "$99/month",
+    priceId: "price_advanced",
+    features: [
+      "Everything in Premium",
+      "Custom API solutions",
+      "Dedicated support",
+      "White-label options",
+      "Custom integrations"
+    ]
   }
-}
+];
 
 const SubscriptionPage = () => {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
@@ -29,8 +60,61 @@ const SubscriptionPage = () => {
   const [selectedPriceId, setSelectedPriceId] = useState<string | null>(null);
   const [currentSubscription, setCurrentSubscription] = useState<string | null>(null);
 
+  const handleSubscribe = async (priceId: string | null, tierName: string) => {
+    setSelectedTier(tierName);
+    setSelectedPriceId(priceId);
+
+    if (tierName.toLowerCase() === 'basic') {
+      setShowBasicSignupDialog(true);
+    } else if (tierName.toLowerCase() === 'premium') {
+      setShowPremiumSignupDialog(true);
+    } else if (tierName.toLowerCase() === 'advanced') {
+      setShowAdvancedSignupDialog(true);
+    }
+  };
+
+  const handleStripeCheckout = async (userId: string) => {
+    if (!selectedPriceId) {
+      toast.error('No subscription plan selected');
+      return;
+    }
+
+    if (!userId) {
+      toast.error('User not authenticated');
+      return;
+    }
+
+    try {
+      console.log('Creating checkout session for user:', userId);
+      const response = await supabase.functions.invoke('create-checkout', {
+        body: { 
+          priceId: selectedPriceId,
+          userId 
+        }
+      });
+      
+      if (response.error) {
+        console.error('Checkout error:', response.error);
+        toast.error('Error creating checkout session');
+        return;
+      }
+
+      if (response.data?.url) {
+        const successUrl = new URL(response.data.url);
+        successUrl.searchParams.set('success', 'true');
+        window.location.href = successUrl.toString();
+      } else {
+        console.error('Invalid checkout response:', response.data);
+        toast.error('Invalid checkout response');
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+      toast.error('Error processing subscription');
+    }
+  };
+
   useEffect(() => {
-    const fetchSubscription = async () => {
+    const fetchCurrentSubscription = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -48,146 +132,19 @@ const SubscriptionPage = () => {
       if (data) setCurrentSubscription(data.tier);
     };
 
-    fetchSubscription();
-  }, []);
+    fetchCurrentSubscription();
 
-  const tiers = [
-    {
-      name: "Basic",
-      price: "Free",
-      priceId: null,
-      tierKey: "basic",
-      features: [
-        "Access to basic ICO listings",
-        "Limited portfolio tracking",
-        "Basic calculator tools",
-        "Public news feed"
-      ],
-      buttonText: "Get Started",
-      highlighted: false
-    },
-    {
-      name: "Premium",
-      price: "$19/month",
-      priceId: "price_1QbOJzQjoDZWLsXdFOX1Ubk1",
-      tierKey: "premium",
-      features: [
-        "All Basic features",
-        "Advanced portfolio analytics",
-        "Priority ICO alerts",
-        "Detailed project comparisons",
-        "Premium news access"
-      ],
-      buttonText: "Subscribe Now",
-      highlighted: true
-    },
-    {
-      name: "Advanced",
-      price: "$49/month",
-      priceId: "price_1QbOKNQjoDZWLsXdnELR9mD5",
-      tierKey: "advanced",
-      features: [
-        "All Premium features",
-        "API access",
-        "Custom alerts",
-        "Priority support",
-        "Early access to new features",
-        "Advanced market analytics"
-      ],
-      buttonText: "Subscribe Now",
-      highlighted: false
-    }
-  ];
-
-  const handleSubscribe = async (priceId: string | null, tierName: string) => {
-    // Reset all dialogs first
-    setShowBasicSignupDialog(false);
-    setShowPremiumSignupDialog(false);
-    setShowAdvancedSignupDialog(false);
-  
-    // Track tier selection
-    if (window.gtag) {
-      window.gtag('event', 'select_tier', {
-        event_category: 'subscription',
-        event_label: tierName,
-        value: tierName === 'Basic' ? 0 : tierName === 'Premium' ? 19 : 49
-      });
-    }
-  
-    setSelectedTier(tierName);
-    setSelectedPriceId(priceId);
-  
-    // Open correct dialog
-    switch(tierName) {
-      case "Basic":
-        setShowBasicSignupDialog(true);
-        break;
-      case "Premium":
-        setShowPremiumSignupDialog(true);
-        break;
-      case "Advanced":
-        setShowAdvancedSignupDialog(true);
-        break;
-    }
-  };
-
-  const handleStripeCheckout = async (userId: string) => {
-    if (!selectedPriceId) {
-      toast.error('No subscription plan selected');
-      return;
-    }
-
-    if (!userId) {
-      toast.error('User not authenticated');
-      return;
-    }
-
-    try {
-      console.log('Creating checkout session for user:', userId);
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { 
-          priceId: selectedPriceId,
-          userId 
-        }
-      });
-      
-      if (error) {
-        console.error('Checkout error:', error);
-        toast.error('Error creating checkout session');
-        return;
-      }
-
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        console.error('Invalid checkout response:', data);
-        toast.error('Invalid checkout response');
-      }
-    } catch (error) {
-      console.error('Subscription error:', error);
-      toast.error('Error processing subscription');
-    }
-    if (data?.url) {
-      // Add success callback to URL
-      const successUrl = new URL(data.url);
-      successUrl.searchParams.set('success', 'true');
-      window.location.href = successUrl.toString();
-    }
-
-  };
-
-  useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     if (query.get('success') === 'true') {
-      fetchSubscription(); // Re-fetch subscription data
+      fetchCurrentSubscription();
       toast.success('Subscription updated successfully!');
     }
   }, []);
 
   return (
     <DashboardLayout>
-      <div className="py-8">
-        <div className="text-center mb-12">
+      <div className="py-8 min-h-screen bg-gradient-dark from-crypto-gradient-from to-crypto-gradient-to">
+        <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl font-bold text-crypto-blue mb-4">Choose Your Plan</h1>
           <p className="text-gray-400 max-w-2xl mx-auto">
             Select the perfect plan for your needs. Upgrade or downgrade at any time.
