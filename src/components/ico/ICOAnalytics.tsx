@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useICOProjects } from "@/services/icoService";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
@@ -7,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
 const ICOAnalytics = () => {
   const {
     data: projects,
@@ -143,25 +145,31 @@ const ICOAnalytics = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="bg-gray-400 hover:bg-gray-300 rounded-md">Project Name</TableHead>
-                <TableHead className="bg-gray-400 hover:bg-gray-300 rounded-md">Platform</TableHead>
-                <TableHead className="bg-gray-400 hover:bg-gray-300 rounded-md">Value</TableHead>
-                <TableHead className="bg-gray-400 hover:bg-gray-300 rounded-md">Status</TableHead>
+                <TableHead className="bg-gray-400 hover:bg-gray-300 rounded-md text-white">Project Name</TableHead>
+                <TableHead className="bg-gray-400 hover:bg-gray-300 rounded-md text-white">Platform</TableHead>
+                <TableHead className="bg-gray-400 hover:bg-gray-300 rounded-md text-white">Value</TableHead>
+                <TableHead className="bg-gray-400 hover:bg-gray-300 rounded-md text-white">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedProjects.map((project, index) => <TableRow key={index} className="cursor-pointer hover:bg-crypto-gray/10" onClick={() => setSelectedProject(project)}>
+              {sortedProjects.map((project, index) => (
+                <TableRow key={index} className="cursor-pointer hover:bg-crypto-gray/10" onClick={() => setSelectedProject(project)}>
                   <TableCell className="font-medium text-white">{project["Project Name"]}</TableCell>
-                  <TableCell>{project.Platform}</TableCell>
-                  <TableCell>{project.value}</TableCell>
+                  <TableCell className="text-white">{project.Platform}</TableCell>
+                  <TableCell className="text-white">{project.value}</TableCell>
                   <TableCell>
-                    {project.isHighlighted ? <span className="text-green-500 flex items-center gap-1">
+                    {project.isHighlighted ? (
+                      <span className="text-green-500 flex items-center gap-1">
                         <TrendingUp className="h-4 w-4" /> Active
-                      </span> : <span className="text-red-500 flex items-center gap-1">
+                      </span>
+                    ) : (
+                      <span className="text-red-500 flex items-center gap-1">
                         <TrendingDown className="h-4 w-4" /> Inactive
-                      </span>}
+                      </span>
+                    )}
                   </TableCell>
-                </TableRow>)}
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>
@@ -209,4 +217,5 @@ const ICOAnalytics = () => {
       </Dialog>
     </div>;
 };
+
 export default ICOAnalytics;
