@@ -145,7 +145,7 @@ const ICOAnalytics = () => {
               <TableRow>
                 <TableHead className="bg-gray-400 hover:bg-gray-300 rounded-md">Project Name</TableHead>
                 <TableHead className="bg-gray-400 hover:bg-gray-300 rounded-md">Platform</TableHead>
-                <TableHead>Value</TableHead>
+                <TableHead className="bg-gray-400 hover:bg-gray-300 rounded-md">Value</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
