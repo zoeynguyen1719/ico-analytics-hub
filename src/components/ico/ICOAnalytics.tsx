@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
 const ICOAnalytics = () => {
   const {
     data: projects,
@@ -17,13 +18,13 @@ const ICOAnalytics = () => {
   const [sortField, setSortField] = useState("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [selectedProject, setSelectedProject] = useState<any>(null);
+
   if (isLoading) {
     return <div className="flex items-center justify-center h-64">
         <Loader2 className="h-8 w-8 animate-spin text-crypto-blue" />
       </div>;
   }
 
-  // Filter and sort projects
   const filteredProjects = projects?.filter(project => {
     const matchesSearch = project["Project Name"]?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSector = !selectedSector || project.Platform === selectedSector;
@@ -36,12 +37,10 @@ const ICOAnalytics = () => {
     return sortDirection === "asc" ? aValue > bValue ? 1 : -1 : aValue < bValue ? 1 : -1;
   });
 
-  // Calculate statistics
   const totalProjects = projects?.length || 0;
   const activeProjects = projects?.filter(p => p.isHighlighted)?.length || 0;
   const avgValue = projects?.reduce((acc, curr) => acc + parseFloat(curr.value?.replace('$', '').replace(',', '') || '0'), 0) / totalProjects || 0;
 
-  // Prepare data for charts
   const platformData = projects?.reduce((acc: any, curr) => {
     if (curr.Platform) {
       acc[curr.Platform] = (acc[curr.Platform] || 0) + 1;
@@ -53,6 +52,7 @@ const ICOAnalytics = () => {
     value
   }));
   const COLORS = ['#6FD5FF', '#4BA3CC', '#34D399', '#8B5CF6', '#F59E0B'];
+
   const CustomTooltip = ({
     active,
     payload,
@@ -66,27 +66,40 @@ const ICOAnalytics = () => {
     }
     return null;
   };
+
   return <div className="space-y-6">
-      {/* Filters Section */}
-      <Card className="p-6 bg-crypto-dark border-crypto-blue">
+      <Card className="p-6 bg-zinc-800/50 backdrop-blur-sm border-crypto-blue">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-grow">
-            <Input type="text" placeholder="Search projects..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 border-crypto-gray bg-zinc-300 hover:bg-zinc-200" />
-            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+            <Input 
+              type="text" 
+              placeholder="Search projects..." 
+              value={searchQuery} 
+              onChange={e => setSearchQuery(e.target.value)} 
+              className="pl-10 bg-zinc-700 border-crypto-gray text-white placeholder:text-zinc-400 hover:bg-zinc-600 focus:bg-zinc-600 transition-colors" 
+            />
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-zinc-400" />
           </div>
           <Select value={selectedSector} onValueChange={setSelectedSector}>
-            <SelectTrigger className="w-[180px] bg-crypto-dark border-crypto-gray">
+            <SelectTrigger className="w-[180px] bg-zinc-700 border-crypto-gray text-white">
               <SelectValue placeholder="Filter by Platform" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Platforms</SelectItem>
-              {Object.keys(platformData || {}).map(platform => <SelectItem key={platform} value={platform}>{platform}</SelectItem>)}
+            <SelectContent className="bg-zinc-800 border-crypto-gray">
+              <SelectItem value="all" className="text-white hover:bg-zinc-700">All Platforms</SelectItem>
+              {Object.keys(platformData || {}).map(platform => (
+                <SelectItem 
+                  key={platform} 
+                  value={platform}
+                  className="text-white hover:bg-zinc-700"
+                >
+                  {platform}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
       </Card>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="p-6 bg-crypto-dark border-crypto-blue hover:bg-crypto-gray/10 transition-colors">
           <h3 className="text-lg font-semibold text-white mb-2">Total Projects</h3>
@@ -102,7 +115,6 @@ const ICOAnalytics = () => {
         </Card>
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-6 bg-crypto-dark border-crypto-blue">
           <h3 className="text-lg font-semibold text-white mb-4">Projects by Platform</h3>
@@ -144,7 +156,6 @@ const ICOAnalytics = () => {
         </Card>
       </div>
 
-      {/* Projects Table */}
       <Card className="p-6 bg-crypto-dark border-crypto-blue">
         <h3 className="text-lg font-semibold text-white mb-4">ICO Projects Overview</h3>
         <div className="overflow-x-auto">
@@ -175,7 +186,6 @@ const ICOAnalytics = () => {
         </div>
       </Card>
 
-      {/* Project Details Dialog */}
       <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
         <DialogContent className="bg-crypto-dark border-crypto-blue text-white max-w-4xl">
           <DialogHeader>
@@ -218,4 +228,5 @@ const ICOAnalytics = () => {
       </Dialog>
     </div>;
 };
+
 export default ICOAnalytics;
