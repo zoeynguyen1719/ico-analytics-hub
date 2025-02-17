@@ -7,7 +7,17 @@ interface MarketChartsProps {
   barChartData: any[];
 }
 
-const COLORS = ['#6FD5FF', '#4BA3CC', '#34D399', '#8B5CF6', '#F59E0B'];
+const COLORS = ['#6FD5FF', '#4BA3CC', '#34D399', '#8B5CF6', '#F59E0B', '#EC4899'];
+
+// Sample sector data - in a real app, this would come from your API or data processing
+const sectorData = [
+  { name: 'DeFi', value: 35 },
+  { name: 'Gaming', value: 25 },
+  { name: 'Infrastructure', value: 20 },
+  { name: 'NFT/Metaverse', value: 15 },
+  { name: 'AI/ML', value: 10 },
+  { name: 'Others', value: 5 }
+];
 
 const MarketCharts = ({ pieChartData, barChartData }: MarketChartsProps) => {
   return (
@@ -18,7 +28,7 @@ const MarketCharts = ({ pieChartData, barChartData }: MarketChartsProps) => {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={pieChartData}
+                data={sectorData}
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
@@ -28,11 +38,17 @@ const MarketCharts = ({ pieChartData, barChartData }: MarketChartsProps) => {
                 dataKey="value"
                 label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
               >
-                {pieChartData.map((entry, index) => (
+                {sectorData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1A1A1A',
+                  border: '1px solid #4BA3CC',
+                  borderRadius: '4px'
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -46,7 +62,13 @@ const MarketCharts = ({ pieChartData, barChartData }: MarketChartsProps) => {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
               <XAxis dataKey="Project Name" stroke="#6FD5FF" />
               <YAxis stroke="#6FD5FF" />
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1A1A1A',
+                  border: '1px solid #4BA3CC',
+                  borderRadius: '4px'
+                }}
+              />
               <Bar dataKey="value" fill="#4BA3CC">
                 {barChartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
