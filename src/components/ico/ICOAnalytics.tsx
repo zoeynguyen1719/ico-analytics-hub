@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 const ICOAnalytics = () => {
   const { data: projects, isLoading } = useICOProjects();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSector, setSelectedSector] = useState("");
+  const [selectedSector, setSelectedSector] = useState("all");
   const [sortField, setSortField] = useState("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [selectedProject, setSelectedProject] = useState<any>(null);
@@ -26,7 +26,7 @@ const ICOAnalytics = () => {
 
   const filteredProjects = projects?.filter(project => {
     const matchesSearch = project["Project Name"]?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSector = !selectedSector || project.Platform === selectedSector;
+    const matchesSector = selectedSector === "all" || project.Platform === selectedSector;
     return matchesSearch && matchesSector;
   }) || [];
 
@@ -80,7 +80,7 @@ const ICOAnalytics = () => {
             <SelectValue placeholder="Filter by Sector" />
           </SelectTrigger>
           <SelectContent className="bg-zinc-800 border-crypto-gray">
-            <SelectItem value="" className="text-white hover:bg-zinc-700">All Sectors</SelectItem>
+            <SelectItem value="all" className="text-white hover:bg-zinc-700">All Sectors</SelectItem>
             {Object.keys(platformData || {}).map(platform => (
               <SelectItem key={platform} value={platform} className="text-white hover:bg-zinc-700">
                 {platform}
