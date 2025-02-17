@@ -12,12 +12,21 @@ interface SearchAndFilterProps {
   platforms: string[];
 }
 
+// Define sectors to match the distribution chart
+const sectors = [
+  'DeFi',
+  'Gaming',
+  'Infrastructure',
+  'NFT/Metaverse',
+  'AI/ML',
+  'Others'
+];
+
 const SearchAndFilter = ({
   searchQuery,
   setSearchQuery,
   selectedSector,
   setSelectedSector,
-  platforms
 }: SearchAndFilterProps) => {
   return (
     <Card className="p-6 bg-zinc-800/50 backdrop-blur-sm border-crypto-blue">
@@ -38,9 +47,9 @@ const SearchAndFilter = ({
           </SelectTrigger>
           <SelectContent className="bg-zinc-800 border-crypto-gray">
             <SelectItem value="all" className="text-white hover:bg-zinc-700">All Sectors</SelectItem>
-            {platforms.map(platform => (
-              <SelectItem key={platform} value={platform} className="text-white hover:bg-zinc-700">
-                {platform}
+            {sectors.map(sector => (
+              <SelectItem key={sector} value={sector.toLowerCase()} className="text-white hover:bg-zinc-700">
+                {sector}
               </SelectItem>
             ))}
           </SelectContent>
