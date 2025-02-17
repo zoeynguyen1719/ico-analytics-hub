@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useICOProjects } from "@/services/icoService";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
@@ -198,78 +197,164 @@ const ICOAnalytics = () => {
 
     {/* Token Detail Modal */}
     <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
-      <DialogContent className="bg-crypto-dark border-crypto-blue text-white max-w-4xl">
+      <DialogContent className="bg-crypto-dark border-crypto-blue text-white max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-white">
+          <DialogTitle className="text-2xl font-bold text-white flex items-center gap-2">
             {selectedProject?.["Project Name"]}
+            {selectedProject?.isHighlighted && (
+              <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Active</span>
+            )}
           </DialogTitle>
         </DialogHeader>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Token Info */}
-          <div className="space-y-4">
-            <div>
-              <h4 className="text-sm text-gray-400">Platform</h4>
-              <p className="text-lg">{selectedProject?.Platform}</p>
-            </div>
-            <div>
-              <h4 className="text-sm text-gray-400">Price</h4>
-              <p className="text-lg">{selectedProject?.value}</p>
-            </div>
-            <div>
-              <h4 className="text-sm text-gray-400">Status</h4>
-              <p className="text-lg">
-                {selectedProject?.isHighlighted ? 
-                  <span className="text-green-500">Active</span> : 
-                  <span className="text-red-500">Inactive</span>
-                }
-              </p>
-            </div>
+        <div className="space-y-6">
+          {/* Key Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
+              <h4 className="text-sm text-gray-400">Current Price</h4>
+              <p className="text-xl font-bold">{selectedProject?.value}</p>
+              <span className={`text-sm flex items-center gap-1 ${
+                selectedProject?.isHighlighted ? 'text-green-400' : 'text-red-400'
+              }`}>
+                {selectedProject?.isHighlighted ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+                {selectedProject?.ROI ? `${selectedProject.ROI}%` : 'N/A'}
+              </span>
+            </Card>
             
-            {/* Social Links */}
-            <div className="flex gap-2 pt-4">
-              {selectedProject?.website_url && (
-                <Button size="icon" variant="outline" asChild>
-                  <a href={selectedProject.website_url} target="_blank" rel="noopener noreferrer">
-                    <Globe className="h-4 w-4" />
-                  </a>
-                </Button>
-              )}
-              {selectedProject?.whitepaper_url && (
-                <Button size="icon" variant="outline" asChild>
-                  <a href={selectedProject.whitepaper_url} target="_blank" rel="noopener noreferrer">
-                    <FileText className="h-4 w-4" />
-                  </a>
-                </Button>
-              )}
-              {selectedProject?.social_links?.twitter && (
-                <Button size="icon" variant="outline" asChild>
-                  <a href={selectedProject.social_links.twitter} target="_blank" rel="noopener noreferrer">
-                    <Twitter className="h-4 w-4" />
-                  </a>
-                </Button>
-              )}
-              {selectedProject?.social_links?.telegram && (
-                <Button size="icon" variant="outline" asChild>
-                  <a href={selectedProject.social_links.telegram} target="_blank" rel="noopener noreferrer">
-                    <MessageCircle className="h-4 w-4" />
-                  </a>
-                </Button>
-              )}
-            </div>
+            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
+              <h4 className="text-sm text-gray-400">Market Cap</h4>
+              <p className="text-xl font-bold">
+                ${parseFloat(selectedProject?.value?.replace('$', '').replace(',', '') || '0').toLocaleString()}
+              </p>
+              <span className="text-sm text-gray-400">
+                Rank #{selectedProject?.id || 'N/A'}
+              </span>
+            </Card>
+            
+            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
+              <h4 className="text-sm text-gray-400">24h Volume</h4>
+              <p className="text-xl font-bold">
+                ${((selectedProject?.token_metrics as any)?.volume || 0).toLocaleString()}
+              </p>
+              <span className="text-sm text-gray-400">
+                {selectedProject?.Platform || 'Unknown'} Network
+              </span>
+            </Card>
           </div>
 
-          {/* Price Chart */}
-          <div className="h-[200px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={[{ value: selectedProject?.value }]}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="name" stroke="#6FD5FF" />
-                <YAxis stroke="#6FD5FF" />
-                <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#4BA3CC" fill="#4BA3CC" />
-              </LineChart>
-            </ResponsiveContainer>
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
+              <h4 className="text-sm text-gray-400 mb-2">Price History</h4>
+              <div className="h-[200px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={[
+                    { value: selectedProject?.value, date: 'Now' },
+                    { value: selectedProject?.["Sale Price"], date: 'ICO' }
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                    <XAxis dataKey="date" stroke="#6FD5FF" />
+                    <YAxis stroke="#6FD5FF" />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="value" stroke="#4BA3CC" strokeWidth={2} dot={{ fill: '#4BA3CC' }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+
+            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
+              <h4 className="text-sm text-gray-400 mb-2">Token Distribution</h4>
+              <div className="h-[200px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Distributed', value: selectedProject?.distributed_percentage || 0 },
+                        { name: 'Remaining', value: 100 - (selectedProject?.distributed_percentage || 0) }
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      <Cell fill="#4BA3CC" />
+                      <Cell fill="#1a2e44" />
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+          </div>
+
+          {/* Token Info */}
+          <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-sm text-gray-400">Token Type</h4>
+                  <p className="text-lg">{selectedProject?.token_type || 'N/A'}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm text-gray-400">Hard Cap</h4>
+                  <p className="text-lg">{selectedProject?.hard_cap || 'N/A'}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm text-gray-400">Token Supply</h4>
+                  <p className="text-lg">{selectedProject?.token_supply?.toLocaleString() || 'N/A'}</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-sm text-gray-400">Platform</h4>
+                  <p className="text-lg">{selectedProject?.Platform || 'N/A'}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm text-gray-400">ICO Date</h4>
+                  <p className="text-lg">{selectedProject?.["ICO date"] || 'N/A'}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm text-gray-400">KYC Required</h4>
+                  <p className="text-lg">{selectedProject?.kyc_required ? 'Yes' : 'No'}</p>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* External Links */}
+          <div className="flex flex-wrap gap-2">
+            {selectedProject?.website_url && (
+              <Button variant="outline" size="sm" className="text-white hover:text-crypto-blue" asChild>
+                <a href={selectedProject.website_url} target="_blank" rel="noopener noreferrer">
+                  <Globe className="h-4 w-4 mr-2" /> Website
+                </a>
+              </Button>
+            )}
+            {selectedProject?.whitepaper_url && (
+              <Button variant="outline" size="sm" className="text-white hover:text-crypto-blue" asChild>
+                <a href={selectedProject.whitepaper_url} target="_blank" rel="noopener noreferrer">
+                  <FileText className="h-4 w-4 mr-2" /> Whitepaper
+                </a>
+              </Button>
+            )}
+            {selectedProject?.social_links?.twitter && (
+              <Button variant="outline" size="sm" className="text-white hover:text-crypto-blue" asChild>
+                <a href={selectedProject.social_links.twitter} target="_blank" rel="noopener noreferrer">
+                  <Twitter className="h-4 w-4 mr-2" /> Twitter
+                </a>
+              </Button>
+            )}
+            {selectedProject?.social_links?.telegram && (
+              <Button variant="outline" size="sm" className="text-white hover:text-crypto-blue" asChild>
+                <a href={selectedProject.social_links.telegram} target="_blank" rel="noopener noreferrer">
+                  <MessageCircle className="h-4 w-4 mr-2" /> Telegram
+                </a>
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>
