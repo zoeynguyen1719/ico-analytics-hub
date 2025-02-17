@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -29,9 +28,9 @@ const TokenDetailsModal = ({ selectedProject, onClose }: TokenDetailsModalProps)
         <div className="space-y-6">
           {/* Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
-              <h4 className="text-sm text-gray-400">Current Price</h4>
-              <p className="text-xl font-bold">{selectedProject.value}</p>
+            <Card className="bg-zinc-900/90 p-4 border-crypto-blue">
+              <h4 className="text-sm text-gray-300">Current Price</h4>
+              <p className="text-xl font-bold text-white">{selectedProject.value}</p>
               <span className={`text-sm flex items-center gap-1 ${
                 selectedProject.isHighlighted ? 'text-green-400' : 'text-red-400'
               }`}>
@@ -40,22 +39,22 @@ const TokenDetailsModal = ({ selectedProject, onClose }: TokenDetailsModalProps)
               </span>
             </Card>
             
-            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
-              <h4 className="text-sm text-gray-400">Market Cap</h4>
-              <p className="text-xl font-bold">
+            <Card className="bg-zinc-900/90 p-4 border-crypto-blue">
+              <h4 className="text-sm text-gray-300">Market Cap</h4>
+              <p className="text-xl font-bold text-white">
                 ${parseFloat(selectedProject.value?.replace('$', '').replace(',', '') || '0').toLocaleString()}
               </p>
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-gray-300">
                 Rank #{selectedProject.id || 'N/A'}
               </span>
             </Card>
             
-            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
-              <h4 className="text-sm text-gray-400">24h Volume</h4>
-              <p className="text-xl font-bold">
+            <Card className="bg-zinc-900/90 p-4 border-crypto-blue">
+              <h4 className="text-sm text-gray-300">24h Volume</h4>
+              <p className="text-xl font-bold text-white">
                 ${((selectedProject.token_metrics as any)?.volume || 0).toLocaleString()}
               </p>
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-gray-300">
                 {selectedProject.Platform || 'Unknown'} Network
               </span>
             </Card>
@@ -63,8 +62,8 @@ const TokenDetailsModal = ({ selectedProject, onClose }: TokenDetailsModalProps)
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
-              <h4 className="text-sm text-gray-400 mb-2">Price History</h4>
+            <Card className="bg-zinc-900/90 p-4 border-crypto-blue">
+              <h4 className="text-sm text-gray-300 mb-2">Price History</h4>
               <div className="h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={[
@@ -81,8 +80,8 @@ const TokenDetailsModal = ({ selectedProject, onClose }: TokenDetailsModalProps)
               </div>
             </Card>
 
-            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
-              <h4 className="text-sm text-gray-400 mb-2">Token Distribution</h4>
+            <Card className="bg-zinc-900/90 p-4 border-crypto-blue">
+              <h4 className="text-sm text-gray-300 mb-2">Token Distribution</h4>
               <div className="h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -110,35 +109,35 @@ const TokenDetailsModal = ({ selectedProject, onClose }: TokenDetailsModalProps)
           </div>
 
           {/* Token Info */}
-          <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
+          <Card className="bg-zinc-900/90 p-4 border-crypto-blue">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-sm text-gray-400">Token Type</h4>
-                  <p className="text-lg">{selectedProject.token_type || 'N/A'}</p>
+                  <h4 className="text-sm text-gray-300">Token Type</h4>
+                  <p className="text-lg text-white">{selectedProject.token_type || 'N/A'}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm text-gray-400">Hard Cap</h4>
-                  <p className="text-lg">{selectedProject.hard_cap || 'N/A'}</p>
+                  <h4 className="text-sm text-gray-300">Hard Cap</h4>
+                  <p className="text-lg text-white">{selectedProject.hard_cap || 'N/A'}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm text-gray-400">Token Supply</h4>
-                  <p className="text-lg">{selectedProject.token_supply?.toLocaleString() || 'N/A'}</p>
+                  <h4 className="text-sm text-gray-300">Token Supply</h4>
+                  <p className="text-lg text-white">{selectedProject.token_supply?.toLocaleString() || 'N/A'}</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-sm text-gray-400">Platform</h4>
-                  <p className="text-lg">{selectedProject.Platform || 'N/A'}</p>
+                  <h4 className="text-sm text-gray-300">Platform</h4>
+                  <p className="text-lg text-white">{selectedProject.Platform || 'N/A'}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm text-gray-400">ICO Date</h4>
-                  <p className="text-lg">{selectedProject["ICO date"] || 'N/A'}</p>
+                  <h4 className="text-sm text-gray-300">ICO Date</h4>
+                  <p className="text-lg text-white">{selectedProject["ICO date"] || 'N/A'}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm text-gray-400">KYC Required</h4>
-                  <p className="text-lg">{selectedProject.kyc_required ? 'Yes' : 'No'}</p>
+                  <h4 className="text-sm text-gray-300">KYC Required</h4>
+                  <p className="text-lg text-white">{selectedProject.kyc_required ? 'Yes' : 'No'}</p>
                 </div>
               </div>
             </div>
@@ -147,29 +146,29 @@ const TokenDetailsModal = ({ selectedProject, onClose }: TokenDetailsModalProps)
           {/* External Links */}
           <div className="flex flex-wrap gap-2">
             {selectedProject.website_url && (
-              <Button variant="outline" size="sm" className="text-white hover:text-crypto-blue" asChild>
+              <Button variant="outline" size="sm" className="text-gray-200 hover:text-crypto-blue bg-zinc-900/90" asChild>
                 <a href={selectedProject.website_url} target="_blank" rel="noopener noreferrer">
                   <Globe className="h-4 w-4 mr-2" /> Website
                 </a>
               </Button>
             )}
             {selectedProject.whitepaper_url && (
-              <Button variant="outline" size="sm" className="text-white hover:text-crypto-blue" asChild>
+              <Button variant="outline" size="sm" className="text-gray-200 hover:text-crypto-blue bg-zinc-900/90" asChild>
                 <a href={selectedProject.whitepaper_url} target="_blank" rel="noopener noreferrer">
                   <FileText className="h-4 w-4 mr-2" /> Whitepaper
                 </a>
               </Button>
             )}
-            {selectedProject.social_links?.twitter && (
-              <Button variant="outline" size="sm" className="text-white hover:text-crypto-blue" asChild>
-                <a href={selectedProject.social_links.twitter} target="_blank" rel="noopener noreferrer">
+            {(selectedProject.social_links as any)?.twitter && (
+              <Button variant="outline" size="sm" className="text-gray-200 hover:text-crypto-blue bg-zinc-900/90" asChild>
+                <a href={(selectedProject.social_links as any).twitter} target="_blank" rel="noopener noreferrer">
                   <Twitter className="h-4 w-4 mr-2" /> Twitter
                 </a>
               </Button>
             )}
-            {selectedProject.social_links?.telegram && (
-              <Button variant="outline" size="sm" className="text-white hover:text-crypto-blue" asChild>
-                <a href={selectedProject.social_links.telegram} target="_blank" rel="noopener noreferrer">
+            {(selectedProject.social_links as any)?.telegram && (
+              <Button variant="outline" size="sm" className="text-gray-200 hover:text-crypto-blue bg-zinc-900/90" asChild>
+                <a href={(selectedProject.social_links as any).telegram} target="_blank" rel="noopener noreferrer">
                   <MessageCircle className="h-4 w-4 mr-2" /> Telegram
                 </a>
               </Button>
