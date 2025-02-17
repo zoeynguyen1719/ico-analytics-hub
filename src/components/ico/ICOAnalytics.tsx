@@ -1,13 +1,13 @@
-import { Card } from "@/components/ui/card";
-import { useICOProjects } from "@/services/icoService";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { Loader2, TrendingUp, TrendingDown, Filter, Search, Globe, FileText, Twitter, MessageCircle } from "lucide-react";
+
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { useICOProjects } from "@/services/icoService";
+import { Loader2 } from "lucide-react";
+import SearchAndFilter from "./components/SearchAndFilter";
+import MarketStats from "./components/MarketStats";
+import MarketCharts from "./components/MarketCharts";
+import TokensTable from "./components/TokensTable";
+import TokenDetailsModal from "./components/TokenDetailsModal";
+import { ICOProject } from "@/types/ico";
 
 const ICOAnalytics = () => {
   const { data: projects, isLoading } = useICOProjects();
@@ -15,7 +15,7 @@ const ICOAnalytics = () => {
   const [selectedSector, setSelectedSector] = useState("all");
   const [sortField, setSortField] = useState("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [selectedProject, setSelectedProject] = useState<ICOProject | null>(null);
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-64">
@@ -36,9 +36,8 @@ const ICOAnalytics = () => {
     return sortDirection === "asc" ? aValue > bValue ? 1 : -1 : aValue < bValue ? 1 : -1;
   });
 
-  // Market statistics
+  // Market statistics calculations
   const totalMarketCap = projects?.reduce((acc, curr) => acc + parseFloat(curr.value?.replace('$', '').replace(',', '') || '0'), 0) || 0;
-  // Using token_metrics for volume calculation if available, otherwise use a default value
   const totalVolume = projects?.reduce((acc, curr) => {
     const metrics = curr.token_metrics as { volume?: number } || {};
     return acc + (metrics.volume || 0);
@@ -58,308 +57,38 @@ const ICOAnalytics = () => {
     value
   }));
 
-  const COLORS = ['#6FD5FF', '#4BA3CC', '#34D399', '#8B5CF6', '#F59E0B'];
+  return (
+    <div className="space-y-6">
+      <SearchAndFilter
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        selectedSector={selectedSector}
+        setSelectedSector={setSelectedSector}
+        platforms={Object.keys(platformData || {})}
+      />
 
-  return <div className="space-y-6">
-    {/* Search and Filter Section */}
-    <Card className="p-6 bg-zinc-800/50 backdrop-blur-sm border-crypto-blue">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-grow">
-          <Input 
-            type="text" 
-            placeholder="Search tokens..." 
-            value={searchQuery} 
-            onChange={e => setSearchQuery(e.target.value)} 
-            className="pl-10 bg-zinc-700 border-crypto-gray text-white placeholder:text-zinc-400 hover:bg-zinc-600 focus:bg-zinc-600 transition-colors" 
-          />
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-zinc-400" />
-        </div>
-        <Select value={selectedSector} onValueChange={setSelectedSector}>
-          <SelectTrigger className="w-[180px] bg-zinc-700 border-crypto-gray text-white">
-            <SelectValue placeholder="Filter by Sector" />
-          </SelectTrigger>
-          <SelectContent className="bg-zinc-800 border-crypto-gray">
-            <SelectItem value="all" className="text-white hover:bg-zinc-700">All Sectors</SelectItem>
-            {Object.keys(platformData || {}).map(platform => (
-              <SelectItem key={platform} value={platform} className="text-white hover:bg-zinc-700">
-                {platform}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-    </Card>
+      <MarketStats
+        totalMarketCap={totalMarketCap}
+        totalVolume={totalVolume}
+        averagePrice={averagePrice}
+      />
 
-    {/* Market Overview Cards */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Card className="p-6 bg-crypto-dark border-crypto-blue hover:bg-crypto-gray/10 transition-colors">
-        <h3 className="text-lg font-semibold text-white mb-2">Total Market Cap</h3>
-        <p className="text-3xl font-bold text-crypto-blue">${totalMarketCap.toLocaleString()}</p>
-      </Card>
-      <Card className="p-6 bg-crypto-dark border-crypto-blue hover:bg-crypto-gray/10 transition-colors">
-        <h3 className="text-lg font-semibold text-white mb-2">24h Volume</h3>
-        <p className="text-3xl font-bold text-crypto-blue">${totalVolume.toLocaleString()}</p>
-      </Card>
-      <Card className="p-6 bg-crypto-dark border-crypto-blue hover:bg-crypto-gray/10 transition-colors">
-        <h3 className="text-lg font-semibold text-white mb-2">Average Token Price</h3>
-        <p className="text-3xl font-bold text-crypto-blue">${averagePrice.toFixed(2)}</p>
-      </Card>
+      <MarketCharts
+        pieChartData={pieChartData}
+        barChartData={sortedProjects}
+      />
+
+      <TokensTable
+        projects={sortedProjects}
+        onSelectProject={setSelectedProject}
+      />
+
+      <TokenDetailsModal
+        selectedProject={selectedProject}
+        onClose={() => setSelectedProject(null)}
+      />
     </div>
-
-    {/* Charts Section */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card className="p-6 bg-crypto-dark border-crypto-blue">
-        <h3 className="text-lg font-semibold text-white mb-4">Sector Distribution</h3>
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={pieChartData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={100}
-                fill="#8884d8"
-                paddingAngle={5}
-                dataKey="value"
-                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-              >
-                {pieChartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
-
-      <Card className="p-6 bg-crypto-dark border-crypto-blue">
-        <h3 className="text-lg font-semibold text-white mb-4">Market Cap Distribution</h3>
-        <div className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={sortedProjects}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="Project Name" stroke="#6FD5FF" />
-              <YAxis stroke="#6FD5FF" />
-              <Tooltip />
-              <Bar dataKey="value" fill="#4BA3CC">
-                {sortedProjects.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
-    </div>
-
-    {/* Tokens Table */}
-    <Card className="p-6 bg-crypto-dark border-crypto-blue">
-      <h3 className="text-lg font-semibold text-white mb-4">Token Overview</h3>
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="bg-zinc-800 text-white">Token</TableHead>
-              <TableHead className="bg-zinc-800 text-white">Platform</TableHead>
-              <TableHead className="bg-zinc-800 text-white">Price</TableHead>
-              <TableHead className="bg-zinc-800 text-white">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedProjects.map((project, index) => (
-              <TableRow 
-                key={index} 
-                className="cursor-pointer hover:bg-crypto-gray/10" 
-                onClick={() => setSelectedProject(project)}
-              >
-                <TableCell className="font-medium text-white">{project["Project Name"]}</TableCell>
-                <TableCell className="text-white">{project.Platform}</TableCell>
-                <TableCell className="text-white">{project.value}</TableCell>
-                <TableCell>
-                  {project.isHighlighted ? (
-                    <span className="text-green-500 flex items-center gap-1">
-                      <TrendingUp className="h-4 w-4" /> Active
-                    </span>
-                  ) : (
-                    <span className="text-red-500 flex items-center gap-1">
-                      <TrendingDown className="h-4 w-4" /> Inactive
-                    </span>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </Card>
-
-    {/* Token Detail Modal */}
-    <Dialog open={!!selectedProject} onOpenChange={() => setSelectedProject(null)}>
-      <DialogContent className="bg-crypto-dark border-crypto-blue text-white max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-white flex items-center gap-2">
-            {selectedProject?.["Project Name"]}
-            {selectedProject?.isHighlighted && (
-              <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Active</span>
-            )}
-          </DialogTitle>
-        </DialogHeader>
-        
-        <div className="space-y-6">
-          {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
-              <h4 className="text-sm text-gray-400">Current Price</h4>
-              <p className="text-xl font-bold">{selectedProject?.value}</p>
-              <span className={`text-sm flex items-center gap-1 ${
-                selectedProject?.isHighlighted ? 'text-green-400' : 'text-red-400'
-              }`}>
-                {selectedProject?.isHighlighted ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-                {selectedProject?.ROI ? `${selectedProject.ROI}%` : 'N/A'}
-              </span>
-            </Card>
-            
-            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
-              <h4 className="text-sm text-gray-400">Market Cap</h4>
-              <p className="text-xl font-bold">
-                ${parseFloat(selectedProject?.value?.replace('$', '').replace(',', '') || '0').toLocaleString()}
-              </p>
-              <span className="text-sm text-gray-400">
-                Rank #{selectedProject?.id || 'N/A'}
-              </span>
-            </Card>
-            
-            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
-              <h4 className="text-sm text-gray-400">24h Volume</h4>
-              <p className="text-xl font-bold">
-                ${((selectedProject?.token_metrics as any)?.volume || 0).toLocaleString()}
-              </p>
-              <span className="text-sm text-gray-400">
-                {selectedProject?.Platform || 'Unknown'} Network
-              </span>
-            </Card>
-          </div>
-
-          {/* Charts Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
-              <h4 className="text-sm text-gray-400 mb-2">Price History</h4>
-              <div className="h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={[
-                    { value: selectedProject?.value, date: 'Now' },
-                    { value: selectedProject?.["Sale Price"], date: 'ICO' }
-                  ]}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                    <XAxis dataKey="date" stroke="#6FD5FF" />
-                    <YAxis stroke="#6FD5FF" />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="value" stroke="#4BA3CC" strokeWidth={2} dot={{ fill: '#4BA3CC' }} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </Card>
-
-            <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
-              <h4 className="text-sm text-gray-400 mb-2">Token Distribution</h4>
-              <div className="h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={[
-                        { name: 'Distributed', value: selectedProject?.distributed_percentage || 0 },
-                        { name: 'Remaining', value: 100 - (selectedProject?.distributed_percentage || 0) }
-                      ]}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      <Cell fill="#4BA3CC" />
-                      <Cell fill="#1a2e44" />
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </Card>
-          </div>
-
-          {/* Token Info */}
-          <Card className="bg-zinc-800/50 p-4 border-crypto-blue">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-sm text-gray-400">Token Type</h4>
-                  <p className="text-lg">{selectedProject?.token_type || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm text-gray-400">Hard Cap</h4>
-                  <p className="text-lg">{selectedProject?.hard_cap || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm text-gray-400">Token Supply</h4>
-                  <p className="text-lg">{selectedProject?.token_supply?.toLocaleString() || 'N/A'}</p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-sm text-gray-400">Platform</h4>
-                  <p className="text-lg">{selectedProject?.Platform || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm text-gray-400">ICO Date</h4>
-                  <p className="text-lg">{selectedProject?.["ICO date"] || 'N/A'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm text-gray-400">KYC Required</h4>
-                  <p className="text-lg">{selectedProject?.kyc_required ? 'Yes' : 'No'}</p>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* External Links */}
-          <div className="flex flex-wrap gap-2">
-            {selectedProject?.website_url && (
-              <Button variant="outline" size="sm" className="text-white hover:text-crypto-blue" asChild>
-                <a href={selectedProject.website_url} target="_blank" rel="noopener noreferrer">
-                  <Globe className="h-4 w-4 mr-2" /> Website
-                </a>
-              </Button>
-            )}
-            {selectedProject?.whitepaper_url && (
-              <Button variant="outline" size="sm" className="text-white hover:text-crypto-blue" asChild>
-                <a href={selectedProject.whitepaper_url} target="_blank" rel="noopener noreferrer">
-                  <FileText className="h-4 w-4 mr-2" /> Whitepaper
-                </a>
-              </Button>
-            )}
-            {selectedProject?.social_links?.twitter && (
-              <Button variant="outline" size="sm" className="text-white hover:text-crypto-blue" asChild>
-                <a href={selectedProject.social_links.twitter} target="_blank" rel="noopener noreferrer">
-                  <Twitter className="h-4 w-4 mr-2" /> Twitter
-                </a>
-              </Button>
-            )}
-            {selectedProject?.social_links?.telegram && (
-              <Button variant="outline" size="sm" className="text-white hover:text-crypto-blue" asChild>
-                <a href={selectedProject.social_links.telegram} target="_blank" rel="noopener noreferrer">
-                  <MessageCircle className="h-4 w-4 mr-2" /> Telegram
-                </a>
-              </Button>
-            )}
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  </div>;
+  );
 };
 
 export default ICOAnalytics;
