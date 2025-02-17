@@ -45,7 +45,7 @@ const ICOAnalytics = () => {
   const averagePrice = totalMarketCap / (projects?.length || 1);
 
   // Platform/Sector distribution data
-  const platformData = projects?.reduce((acc: any, curr) => {
+  const platformData = projects?.reduce((acc: Record<string, number>, curr) => {
     if (curr.Platform) {
       acc[curr.Platform] = (acc[curr.Platform] || 0) + parseFloat(curr.value?.replace('$', '').replace(',', '') || '0');
     }
@@ -54,7 +54,7 @@ const ICOAnalytics = () => {
 
   const pieChartData = Object.entries(platformData || {}).map(([name, value]) => ({
     name,
-    value
+    value: value as number
   }));
 
   return (
