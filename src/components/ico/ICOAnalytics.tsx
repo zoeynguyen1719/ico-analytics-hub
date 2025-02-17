@@ -39,7 +39,11 @@ const ICOAnalytics = () => {
 
   // Market statistics
   const totalMarketCap = projects?.reduce((acc, curr) => acc + parseFloat(curr.value?.replace('$', '').replace(',', '') || '0'), 0) || 0;
-  const totalVolume = projects?.reduce((acc, curr) => acc + (curr.volume || 0), 0) || 0;
+  // Using token_metrics for volume calculation if available, otherwise use a default value
+  const totalVolume = projects?.reduce((acc, curr) => {
+    const metrics = curr.token_metrics as { volume?: number } || {};
+    return acc + (metrics.volume || 0);
+  }, 0) || 0;
   const averagePrice = totalMarketCap / (projects?.length || 1);
 
   // Platform/Sector distribution data

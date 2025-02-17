@@ -15,6 +15,8 @@ const tiers = [
     description: "Perfect for getting started",
     price: "Free",
     priceId: null,
+    buttonText: "Get Started",
+    highlighted: false,
     features: [
       "Basic market analysis",
       "Limited API access",
@@ -28,6 +30,8 @@ const tiers = [
     description: "For serious traders",
     price: "$49/month",
     priceId: "price_premium",
+    buttonText: "Upgrade Now",
+    highlighted: true,
     features: [
       "Advanced market analysis",
       "Full API access",
@@ -42,6 +46,8 @@ const tiers = [
     description: "For professional traders",
     price: "$99/month",
     priceId: "price_advanced",
+    buttonText: "Go Pro",
+    highlighted: false,
     features: [
       "Everything in Premium",
       "Custom API solutions",
